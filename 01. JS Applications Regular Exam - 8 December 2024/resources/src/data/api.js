@@ -23,3 +23,6 @@ async function request(method, url, data) {
         return result;
     } catch (error) {throw error;}
 }
+
+export const get = request.bind(null, "get");
+export const post = request.bind(null, "post");
