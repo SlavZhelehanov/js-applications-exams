@@ -1,9 +1,10 @@
 import {setUserData, clearUserData} from "../utils/utils.js";
-import {post} from "../data/api.js";
+import {post, get} from "../data/api.js";
 
 const endpoints = {
     register: 'users/register',
     login: '/users/login',
+    logout: '/users/logout'
 }
 
 export async function registerUser(email, password) {
@@ -15,4 +16,9 @@ export async function registerUser(email, password) {
 export async function login(email, password) {
     const result = await post(endpoints.login, { email, password });
     setUserData(result);
+}
+
+export async function logout() {
+    get(endpoints.logout);
+    clearUserData();
 }
