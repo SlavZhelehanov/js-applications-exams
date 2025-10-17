@@ -1,4 +1,6 @@
 import {getUserData, clearUserData} from "../utils/utils.js";
+import {notify} from '../views/partials/notifications.js';
+
 const URL = 'http://localhost:3030';
 
 async function request(method, url, data) {
@@ -17,11 +19,14 @@ async function request(method, url, data) {
         const response = await fetch(URL + url, options);
         let result;
 
-        if(response.status !== 204) result = await response.json();
-        if(response.ok === false && response.status === 403) clearUserData();
-        if(response.ok === false && response.status !== 403) throw result;
+        if (response.status !== 204) result = await response.json();
+        if (response.ok === false && response.status === 403) clearUserData();
+        if (response.ok === false && response.status !== 403) throw result;
         return result;
-    } catch (error) {throw error;}
+    } catch (error) {
+        notify(error.message);
+        throw error;
+    }
 }
 
 export const get = request.bind(null, "get");
