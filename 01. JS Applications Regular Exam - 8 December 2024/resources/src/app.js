@@ -8,6 +8,7 @@ import {loginPage} from "./views/auth/login.js";
 import {logoutAction} from "./views/auth/logout.js";
 import {dashboardPage} from "./views/drones/dashboard.js";
 import {detailsPage} from "./views/drones/details.js";
+import {editPage} from "./views/drones/edit.js";
 
 const wrapper = document.getElementById('wrapper');
 
@@ -19,6 +20,7 @@ page("/login", loginPage);
 page("/logout", logoutAction);
 page("/catalog", dashboardPage);
 page('/catalog/:id', detailsPage);
+page('/catalog/:id/edit', editPage);
 
 page.start();
 
