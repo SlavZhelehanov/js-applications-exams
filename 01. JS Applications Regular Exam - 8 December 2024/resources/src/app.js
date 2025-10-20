@@ -7,6 +7,7 @@ import {registerPage} from "./views/auth/register.js";
 import {loginPage} from "./views/auth/login.js";
 import {logoutAction} from "./views/auth/logout.js";
 import {dashboardPage} from "./views/drones/dashboard.js";
+import {detailsPage} from "./views/drones/details.js";
 
 const wrapper = document.getElementById('wrapper');
 
@@ -17,6 +18,7 @@ page("/register", registerPage);
 page("/login", loginPage);
 page("/logout", logoutAction);
 page("/catalog", dashboardPage);
+page('/catalog/:id', detailsPage);
 
 page.start();
 
