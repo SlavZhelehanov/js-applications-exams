@@ -40,5 +40,14 @@ export async function detailsPage(ctx) {
 
     if (userData && userData._id === item._ownerId) item.canEdit = true;
 
+    ctx.render(detailsTemplate(item, onDelete));
+
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await deleteDrone(id);
+            ctx.page.redirect('/catalog');
+        }
     }
 }

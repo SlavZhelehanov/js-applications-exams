@@ -1,6 +1,16 @@
-import {get} from "../data/api.js";
+import {get, del} from "../data/api.js";
 
 export async function getAllDrones() {
     const path = '/data/drones?sortBy=_createdOn%20desc';
     return get(path);
+}
+
+export async function getById(id) {
+    const path = `/data/drones/${id}`;
+    return get(path);
+}
+
+export async function deleteDrone(id) {
+    const path = `/data/drones/${id}`;
+    return del(path);
 }
