@@ -1,4 +1,5 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
+import {getAllDrones} from '../../services/dronesService';
 
 function dashboardTemplate(drones) {
     return html`
@@ -34,5 +35,7 @@ function droneDroned(drone) {
 }
 
 export async function dashboardPage(ctx) {
-    ctx.render(dashboardTemplate());
+    const Drones = await getAllDrones();
+
+    ctx.render(dashboardTemplate(Drones));
 }
