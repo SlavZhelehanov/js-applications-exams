@@ -1,6 +1,8 @@
-import { html } from '../../../node_modules/lit-html/lit-html.js';
+import {html} from '../../../node_modules/lit-html/lit-html.js';
+import {getUserData} from '../../utils/utils.js';
+import {getById, deleteDrone} from '../../services/dronesService.js';
 
-function detailsTemplate (drone, onDelete) {
+function detailsTemplate(drone, onDelete) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -32,9 +34,11 @@ function detailsTemplate (drone, onDelete) {
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(detailsTemplate({}, onDelete));
+    const id = ctx.params.id;
+    const item = await getById(id);
+    const userData = getUserData();
 
-    function onDelete() {
-        ctx.page.redirect('/catalog');
+    if (userData && userData._id === item._ownerId) item.canEdit = true;
+
     }
 }
