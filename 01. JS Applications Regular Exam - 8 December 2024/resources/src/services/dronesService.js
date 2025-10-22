@@ -1,4 +1,4 @@
-import {get, del} from "../data/api.js";
+import {get, del, post} from "../data/api.js";
 
 export async function getAllDrones() {
     const path = '/data/drones?sortBy=_createdOn%20desc';
@@ -13,4 +13,9 @@ export async function getById(id) {
 export async function deleteDrone(id) {
     const path = `/data/drones/${id}`;
     return del(path);
+}
+
+export async function createDrone(data) {
+    const path = `'/data/drones'`;
+    return post(path, data);
 }

@@ -1,6 +1,7 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
 import {createSubmitHandler} from '../../utils/utils.js';
-import {notify} from '../../views/partials/notifications.js';
+import {notify} from '../partials/notifications';
+import {createDrone} from '../../services/dronesService.js';
 
 
 function createTemplate(onCreate) {
@@ -26,7 +27,13 @@ function createTemplate(onCreate) {
 export function createPage(ctx) {
     ctx.render(createTemplate(createSubmitHandler(onCreate)));
 
-    function onCreate({model, imageUrl, price, condition, weight, phone, description}) {
+    async function onCreate({model, imageUrl, price, condition, weight, phone, description}) {
+        if ([model, imageUrl, price, condition, weight, phone, description].some((el) => el === '')) {
+            return notify('All fields are required');
+        }
+
+        await createDrone({model, imageUrl, price, condition, weight, phone, description});
+
         ctx.page.redirect('/catalog');
     }
 }
