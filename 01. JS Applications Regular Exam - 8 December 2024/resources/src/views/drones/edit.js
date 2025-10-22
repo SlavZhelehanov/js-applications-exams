@@ -1,6 +1,7 @@
 import {html} from "../../../node_modules/lit-html/lit-html.js";
-import {notify} from '../../views/partials/notifications.js';
+import {notify} from '../partials/notifications';
 import {createSubmitHandler} from "../../utils/utils.js";
+import {getById, updateDrone} from "../../services/dronesService.js";
 
 function editTemplate(drone, onEdit) {
     return html`
@@ -27,10 +28,17 @@ function editTemplate(drone, onEdit) {
 
 export async function editPage(ctx) {
     const id = ctx.params.id;
+    const Drone = await getById(id);
 
-    ctx.render(editTemplate({}, createSubmitHandler(onEdit)));
+    ctx.render(editTemplate(Drone, createSubmitHandler(onEdit)));
 
-    function onEdit({model,imageUrl,price,condition,weight,phone,description}) {
+    async function onEdit({model, imageUrl, price, condition, weight, phone, description}) {
+        if ([model, imageUrl, price, condition, weight, phone, description].some((el) => el === "")) {
+            return notify("All fields are required");
+        }
+
+        await updateDrone(id, {model, imageUrl, price, condition, weight, phone, description});
+
         ctx.page.redirect("/catalog/" + id);
     }
 }

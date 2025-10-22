@@ -19,3 +19,7 @@ export async function createDrone(data) {
     const path = `'/data/drones'`;
     return post(path, data);
 }
+
+export async function updateDrone(id, data) {
+    return put(endpoints.byId + id, data);
+}
