@@ -39,7 +39,6 @@ export function registerPage(ctx) {
     ctx.render(registerTemplate(createSubmitHandler(onRegister)));
 
     async function onRegister({email, password,['re-password']: repass}, form) {
-
         if (email === '' || password === '') {
             return notify('All fields are required');
         }

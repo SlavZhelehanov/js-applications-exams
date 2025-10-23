@@ -2,7 +2,7 @@ import {setUserData, clearUserData} from "../utils/utils.js";
 import {post, get} from "../data/api.js";
 
 const endpoints = {
-    register: 'users/register',
+    register: '/users/register',
     login: '/users/login',
     logout: '/users/logout'
 }

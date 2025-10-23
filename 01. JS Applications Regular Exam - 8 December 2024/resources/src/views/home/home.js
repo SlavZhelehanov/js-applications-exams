@@ -1,4 +1,4 @@
-import {html} from "lit-html";
+import {html} from "../../../node_modules/lit-html/lit-html.js";
 
 function template() {
     return html`
@@ -10,5 +10,5 @@ function template() {
 }
 
 export function homePage(ctx) {
-    ctx.render(template());
+    ctx.render(template);
 }

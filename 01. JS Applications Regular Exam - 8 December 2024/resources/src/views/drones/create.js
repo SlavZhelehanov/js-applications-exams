@@ -1,6 +1,6 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
 import {createSubmitHandler} from '../../utils/utils.js';
-import {notify} from '../partials/notifications';
+import {notify} from '../partials/notifications.js';
 import {createDrone} from '../../services/dronesService.js';
 
 

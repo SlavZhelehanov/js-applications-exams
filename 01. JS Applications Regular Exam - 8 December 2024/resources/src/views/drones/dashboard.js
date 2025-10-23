@@ -1,5 +1,5 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
-import {getAllDrones} from '../../services/dronesService';
+import {getAllDrones} from '../../services/dronesService.js';
 
 function dashboardTemplate(drones) {
     return html`

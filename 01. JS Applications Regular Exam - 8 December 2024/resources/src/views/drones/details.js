@@ -18,7 +18,7 @@ function detailsTemplate(drone, onDelete) {
                         <p class="drone-description">${drone?.description}</p>
                         <p class="phone-number">Phone: ${drone?.phone}</p>
                     </div>
-                    ${drone?.canEdit
+                    ${drone.canEdit
                             ? html`
                                 <div class="buttons">
                                     <a href="/catalog/${drone?._id}/edit" id="edit-btn">Edit</a>
