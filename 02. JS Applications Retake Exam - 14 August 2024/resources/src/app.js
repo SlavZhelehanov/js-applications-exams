@@ -4,6 +4,7 @@ import {getUserData} from "./utils/utils.js";
 import {layoutPage} from "./views/layouts/main.js";
 import {homePage} from "./views/home/home.js";
 import {registerPage} from "./views/auth/register.js";
+import {loginPage} from "./views/auth/login.js";
 
 const wrapper = document.getElementById('wrapper');
 
@@ -22,5 +23,6 @@ page(decorateContext);
 page("/index.html", "/");
 page("/", homePage);
 page("/register", registerPage);
+page("/login", loginPage);
 
 page.start();
