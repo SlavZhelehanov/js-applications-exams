@@ -1,12 +1,13 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
 import {createSubmitHandler} from '../../utils/utils.js';
+import {registerUser} from '../../services/authService.js';
 
 function registerTemplate(onRegister) {
     return html`
         <section id="register">
             <div class="form">
                 <h2>Register</h2>
-                <form class="register-form">
+                <form class="register-form" @submit=${onRegister}>
                     <input
                             type="text"
                             name="email"
@@ -34,5 +35,19 @@ function registerTemplate(onRegister) {
 }
 
 export function registerPage(ctx) {
-    ctx.render(registerTemplate(createSubmitHandler()));
+    ctx.render(registerTemplate(createSubmitHandler(onRegister)));
+
+    async function onRegister({email, password,['re-password']: repass}, form) {
+        if (email === '' || password === '') {
+            return console.log('All fields are required');
+        }
+
+        if (password !== repass) {
+            return console.log("Passwords don't match");
+        }
+
+        await registerUser(email, password);
+        form.reset();
+        ctx.page.redirect('/');
+    }
 }
