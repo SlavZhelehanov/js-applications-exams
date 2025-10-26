@@ -32,6 +32,13 @@ function requireAuth(ctx, next) {
     next();
 }
 
+// Guest-only guard middleware (redirect logged users away from login/register)
+function guestOnly(ctx, next) {
+    const userData = getUserData();
+    if (userData) {
+        page.redirect('/shows');
+        return;
+    }
     next();
 }
 
@@ -41,6 +48,8 @@ page("/", homePage);
 page("/register", registerPage);
 page("/login", loginPage);
 page("/logout", logoutAction);
+page("/register", guestOnly, registerPage);
+page("/login", guestOnly, loginPage);
 page("/logout", requireAuth, logoutAction);
 page("/shows", dashboardPage);
 
