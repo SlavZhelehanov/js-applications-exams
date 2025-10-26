@@ -1,12 +1,13 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
 import {createSubmitHandler} from '../../utils/utils.js';
+import {createShow} from '../../services/showsService.js';
 
-function createTemplate() {
+function createTemplate(onCreate) {
     return html`
         <section id="create">
             <div class="form">
                 <h2>Add Show</h2>
-                <form class="create-form">
+                <form class="create-form" @submit=${onCreate}>
                     <input
                             type="text"
                             name="title"
@@ -15,8 +16,8 @@ function createTemplate() {
                     />
                     <input
                             type="text"
-                            name="image-url"
-                            id="image-url"
+                            name="imageUrl"
+                            id="imageUrl"
                             placeholder="Image URL"
                     />
                     <input
@@ -46,5 +47,15 @@ function createTemplate() {
 }
 
 export function createPage(ctx) {
-    ctx.render(createTemplate(createSubmitHandler()));
+    async function onCreate({title, imageUrl, genre, country, details}) {
+        if ([title, imageUrl, genre, country, details].some((el) => el === '')) {
+            return console.log('All fields are required');
+        }
+
+        await createShow({title, imageUrl, genre, country, details});
+
+        ctx.page.redirect('/shows');
+    }
+
+    ctx.render(createTemplate(createSubmitHandler(onCreate)));
 }
