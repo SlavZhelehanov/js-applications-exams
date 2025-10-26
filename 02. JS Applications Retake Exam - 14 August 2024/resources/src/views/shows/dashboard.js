@@ -1,18 +1,19 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
+import {getAllShows} from '../../services/showsService.js';
 
 function dashboardTemplate(shows) {
-    return html`        
-            ${shows.length > 0
-                    ? html`
-                        <h2>Users Recommendations</h2>
-                        <section id="shows">
+    return html`
+        ${shows.length > 0
+                ? html`
+                    <h2>Users Recommendations</h2>
+                    <section id="shows">
                         ${shows.map(showsTemplate)}
-                        </section>                            
-                    `
-                    : html`
-                        <h2 id="no-show">No shows Added.</h2>
-                    `
-            }
+                    </section>
+                `
+                : html`
+                    <h2 id="no-show">No shows Added.</h2>
+                `
+        }
     `;
 }
 
@@ -31,7 +32,7 @@ function showsTemplate(show) {
 }
 
 export async function dashboardPage(ctx) {
-    const shows = [];
+    const shows = await getAllShows();
 
     ctx.render(dashboardTemplate(shows));
 }
