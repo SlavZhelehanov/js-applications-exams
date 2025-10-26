@@ -17,7 +17,7 @@ function detailsTemplate(show, onDelete) {
                     ${show.isCreator
                             ? html`
                                 <div class="action-buttons">
-                                    <a href="/shows/${show._id}/edit" id="edit-btn">Edit</a>
+                                    <a href="/edit/${show._id}" id="edit-btn">Edit</a>
                                     <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
                                 </div>
                             `

@@ -9,6 +9,7 @@ import {logoutAction} from "./views/auth/logout.js";
 import {dashboardPage} from "./views/shows/dashboard.js";
 import {createPage} from "./views/shows/create.js";
 import {detailsPage} from "./views/shows/details.js";
+import {editPage} from "./views/shows/edit.js";
 
 const wrapper = document.getElementById('wrapper');
 
@@ -53,5 +54,6 @@ page("/logout", requireAuth, logoutAction);
 page("/shows", dashboardPage);
 page('/addShow', requireAuth, createPage);
 page('/details/:id', detailsPage);
+page('/edit/:id', editPage);
 
 page.start();
