@@ -2,18 +2,36 @@ import {setUserData, clearUserData} from "../utils/utils.js";
 import {post, get} from "../utils/api.js";
 
 export async function registerUser(email, password) {
-    const user = await post("/users/register", {email, password});
+    try {
+        const user = await post("/users/register", {email, password});
 
-    setUserData(user);
+        if(399 < user.code) throw user.message;
+
+        setUserData(user);
+    } catch (error) {
+        throw error; // Re-throw to let caller handle it
+    }
 }
 
 export async function login(email, password) {
-    const result = await post("/users/login", {email, password});
+    try {
+        const user = await post("/users/login", {email, password});
 
-    setUserData(result);
+        if(399 < user.code) throw user.message;
+
+        setUserData(user);
+    } catch (error) {
+        throw error;
+    }
 }
 
 export async function logout() {
-    get("/users/logout");
-    clearUserData();
+    try {
+        await get("/users/logout");
+        clearUserData();
+    } catch (error) {
+        console.error("Logout failed:", error);
+        // Still clear local data even if server request fails
+        clearUserData();
+    }
 }
