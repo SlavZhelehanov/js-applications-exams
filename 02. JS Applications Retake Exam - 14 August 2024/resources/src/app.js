@@ -7,6 +7,8 @@ import {registerPage} from "./views/auth/register.js";
 import {loginPage} from "./views/auth/login.js";
 import {logoutAction} from "./views/auth/logout.js";
 import {dashboardPage} from "./views/shows/dashboard.js";
+import {createPage} from "./views/shows/create.js";
+import {detailsPage} from "./views/shows/details.js";
 
 const wrapper = document.getElementById('wrapper');
 
@@ -18,7 +20,7 @@ function renderView(content) {
 
 function decorateContext(ctx, next) {
     ctx.render = renderView;
-    ctx.page = page;
+    // ctx.page = page;
     next();
 }
 
@@ -45,12 +47,11 @@ function guestOnly(ctx, next) {
 page(decorateContext);
 page("/index.html", "/");
 page("/", homePage);
-page("/register", registerPage);
-page("/login", loginPage);
-page("/logout", logoutAction);
 page("/register", guestOnly, registerPage);
 page("/login", guestOnly, loginPage);
 page("/logout", requireAuth, logoutAction);
 page("/shows", dashboardPage);
+page('/addShow', requireAuth, createPage);
+page('/details/:id', detailsPage);
 
 page.start();
