@@ -18,6 +18,20 @@ function renderView(content) {
 
 function decorateContext(ctx, next) {
     ctx.render = renderView;
+    ctx.page = page;
+    next();
+}
+
+// Authentication guard middleware
+function requireAuth(ctx, next) {
+    const userData = getUserData();
+    if (!userData) {
+        page.redirect('/login');
+        return;
+    }
+    next();
+}
+
     next();
 }
 
@@ -27,6 +41,7 @@ page("/", homePage);
 page("/register", registerPage);
 page("/login", loginPage);
 page("/logout", logoutAction);
+page("/logout", requireAuth, logoutAction);
 page("/shows", dashboardPage);
 
 page.start();
