@@ -14,5 +14,5 @@ function template() {
 }
 
 export function homePage(ctx) {
-    ctx.render(template);
+    ctx.render(template());
 }
