@@ -1,4 +1,4 @@
-import {get, post} from "../utils/api.js";
+import {get, post, put} from "../utils/api.js";
 
 export async function getAllShows() {
     const path = '/data/shows?sortBy=_createdOn%20desc';
@@ -13,4 +13,9 @@ export async function getById(id) {
 export async function createShow(data) {
     const path = `/data/shows`;
     return post(path, data);
+}
+
+export async function updateShow(id, data) {
+    const path = `/data/drones/${id}`;
+    return put(path, data);
 }
