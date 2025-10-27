@@ -1,5 +1,5 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
-import {createSubmitHandler} from '../../utils/utils.js';
+// import {createSubmitHandler} from '../../utils/utils.js';
 import {login} from '../../services/authService.js';
 
 function loginTemplate(onLogin) {
@@ -26,13 +26,27 @@ function loginTemplate(onLogin) {
 }
 
 export function loginPage(ctx) {
-    ctx.render(loginTemplate(createSubmitHandler(onLogin)));
+    // ctx.render(loginTemplate(createSubmitHandler(onLogin)));
+    ctx.render(loginTemplate(onLogin));
 
-    async function onLogin({email, password}, form) {
-        if (email === '' || password === '') return console.log('All fields are required');
+    // async function onLogin({email, password}, form) {
+    //     if (email === '' || password === '') return console.log('All fields are required');
+    //
+    //     await login(email, password);
+    //     form.reset();
+    //     ctx.page.redirect('/');
+    // }
+    async function onLogin(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+
+        if (email.trim() === '' || password.trim() === '') return alert('All fields are required!');
 
         await login(email, password);
-        form.reset();
+        e.target.reset();
+        ctx.setUserNav();
         ctx.page.redirect('/');
     }
 }

@@ -1,5 +1,5 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
-import {createSubmitHandler} from '../../utils/utils.js';
+// import {createSubmitHandler} from '../../utils/utils.js';
 import {registerUser} from '../../services/authService.js';
 
 function registerTemplate(onRegister) {
@@ -35,19 +35,35 @@ function registerTemplate(onRegister) {
 }
 
 export function registerPage(ctx) {
-    ctx.render(registerTemplate(createSubmitHandler(onRegister)));
+    // ctx.render(registerTemplate(createSubmitHandler(onRegister)));
+    ctx.render(registerTemplate(onRegister));
 
-    async function onRegister({email, password,['re-password']: repass}, form) {
-        if (email === '' || password === '') {
-            return console.log('All fields are required');
-        }
+    // async function onRegister({email, password,['re-password']: repass}, form) {
+    //     if (email === '' || password === '') {
+    //         return console.log('All fields are required');
+    //     }
+    //
+    //     if (password !== repass) {
+    //         return console.log("Passwords don't match");
+    //     }
+    //
+    //     await registerUser(email, password);
+    //     form.reset();
+    //     ctx.page.redirect('/');
+    // }
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const repass = formData.get('re-password');
 
-        if (password !== repass) {
-            return console.log("Passwords don't match");
-        }
+        if (email === '' || password === '') return alert('All fields are required');
+        if (password !== repass) return alert("Passwords don't match");
 
         await registerUser(email, password);
-        form.reset();
+        e.target.reset();
+        ctx.setUserNav();
         ctx.page.redirect('/');
     }
 }

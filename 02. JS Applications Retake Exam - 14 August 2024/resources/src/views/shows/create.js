@@ -1,5 +1,5 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
-import {createSubmitHandler} from '../../utils/utils.js';
+// import {createSubmitHandler} from '../../utils/utils.js';
 import {createShow} from '../../services/showsService.js';
 
 function createTemplate(onCreate) {
@@ -16,8 +16,8 @@ function createTemplate(onCreate) {
                     />
                     <input
                             type="text"
-                            name="imageUrl"
-                            id="imageUrl"
+                            name="image-url"
+                            id="image-url"
                             placeholder="Image URL"
                     />
                     <input
@@ -47,15 +47,23 @@ function createTemplate(onCreate) {
 }
 
 export function createPage(ctx) {
-    async function onCreate({title, imageUrl, genre, country, details}) {
-        if ([title, imageUrl, genre, country, details].some((el) => el === '')) {
-            return console.log('All fields are required');
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const show = {
+            title: formData.get('title').trim(),
+            imageUrl: formData.get('image-url').trim(),
+            genre: formData.get('genre').trim(),
+            country: formData.get('country').trim(),
+            details: formData.get('details').trim(),
         }
+        if (Object.values(newFact).some((x) => !x)) return alert("All fields are required!");
 
-        await createShow({title, imageUrl, genre, country, details});
-
+        await createShow(show);
+        e.target.reset();
         ctx.page.redirect('/shows');
     }
 
-    ctx.render(createTemplate(createSubmitHandler(onCreate)));
+    ctx.render(createTemplate(onCreate));
 }

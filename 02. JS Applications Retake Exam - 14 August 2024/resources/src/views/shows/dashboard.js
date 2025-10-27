@@ -2,18 +2,13 @@ import {html} from '../../../node_modules/lit-html/lit-html.js';
 import {getAllShows} from '../../services/showsService.js';
 
 function dashboardTemplate(shows) {
-    return html`
+    return html`<h2>Users Recommendations</h2>
+    <section id="shows">
         ${shows.length > 0
-                ? html`
-                    <h2>Users Recommendations</h2>
-                    <section id="shows">
-                        ${shows.map(showsTemplate)}
-                    </section>
-                `
-                : html`
-                    <h2 id="no-show">No shows Added.</h2>
-                `
+                ? html`${shows.map(showsTemplate)}`
+                : html`<h2 id="no-show">No shows Added.</h2>`
         }
+    </section>
     `;
 }
 

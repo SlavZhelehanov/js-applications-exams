@@ -1,5 +1,5 @@
 import {html} from "../../../node_modules/lit-html/lit-html.js";
-import {createSubmitHandler} from "../../utils/utils.js";
+// import {createSubmitHandler} from "../../utils/utils.js";
 import {getById, updateShow} from "../../services/showsService.js";
 
 function editTemplate(show, onEdit) {
@@ -17,8 +17,8 @@ function editTemplate(show, onEdit) {
                     />
                     <input
                             type="text"
-                            name="imageUrl"
-                            id="imageUrl"
+                            name="image-url"
+                            id="image-url"
                             placeholder="Image URL"
                             value=${show?.imageUrl}
                     />
@@ -54,15 +54,24 @@ export async function editPage(ctx) {
     const id = ctx.params.id;
     const show = await getById(id);
 
-    async function onEdit({title, imageUrl, genre, country, details}) {
-        if ([title, imageUrl, genre, country, details].some((el) => el === "")) {
-            return console.log("All fields are required");
+    async function onEdit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const show = {
+            title: formData.get("title").trim(),
+            imageUrl: formData.get("image-url").trim(),
+            genre: formData.get("genre").trim(),
+            country: formData.get("country").trim(),
+            details: formData.get("details").trim(),
         }
 
-        await updateShow(id, {title, imageUrl, genre, country, details});
+        if (Object.values(show).some((x) => !x)) return alert("All fields are required!");
 
+        await updateShow(id, show);
+        e.target.reset();
         ctx.page.redirect(`/details/${id}`);
     }
 
-    ctx.render(editTemplate(show, createSubmitHandler(onEdit)));
+    ctx.render(editTemplate(show, onEdit));
 }
