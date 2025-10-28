@@ -1,4 +1,4 @@
-import {getUserData, clearUserData} from "./utils.js";
+import {getUserData} from "./utils.js";
 
 const URL = 'http://localhost:3030';
 
@@ -7,7 +7,7 @@ async function request(method, url, data) {
     const userData = getUserData();
 
     if (userData) {
-        options.headers['X-Authorization'] = userData['accessToken'];
+        options.headers['x-authorization'] = userData['accessToken'];
     }
     if (data !== undefined) {
         options.headers['Content-Type'] = 'application/json';
@@ -16,13 +16,18 @@ async function request(method, url, data) {
 
     try {
         const response = await fetch(URL + url, options);
-        let result;
 
-        if (response.status !== 204) result = await response.json();
-        if (response.ok === false && response.status === 403) clearUserData();
-        if (response.ok === false && response.status !== 403) throw result;
-        return result;
+        if (response.ok === false) {
+            const error = await response.json();
+            throw new Error(error.message);
+        }
+        try {
+            return await response.json();
+        } catch (err) {
+            return response;
+        }
     } catch (error) {
+        alert(error.message);
         throw error;
     }
 }
@@ -30,3 +35,4 @@ async function request(method, url, data) {
 export const get = request.bind(null, "get");
 export const post = request.bind(null, "post");
 export const put = request.bind(null, 'put');
+export const del = request.bind(null, "delete");
