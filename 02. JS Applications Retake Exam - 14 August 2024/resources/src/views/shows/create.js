@@ -58,7 +58,7 @@ export function createPage(ctx) {
             country: formData.get('country').trim(),
             details: formData.get('details').trim(),
         }
-        if (Object.values(newFact).some((x) => !x)) return alert("All fields are required!");
+        if (Object.values(show).some((x) => !x)) return alert("All fields are required!");
 
         await createShow(show);
         e.target.reset();
