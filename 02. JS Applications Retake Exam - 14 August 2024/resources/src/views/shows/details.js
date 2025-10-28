@@ -1,6 +1,5 @@
 import {html} from '../../../node_modules/lit-html/lit-html.js';
-import {getUserData} from '../../utils/utils.js';
-import {getById} from '../../services/showsService.js';
+import {getById, deleteShow} from '../../services/showsService.js';
 
 function detailsTemplate(show, onDelete) {
     return html`
@@ -11,18 +10,18 @@ function detailsTemplate(show, onDelete) {
                     <p id="details-title">${show.title}</p>
                     <div id="info-wrapper">
                         <div id="description">
-                            <p id="details-description">${show.description}</p>
+                            <p id="details-description">${show.details}</p>
                         </div>
                     </div>
-                    ${show.isCreator
-                            ? html`
-                                <div class="action-buttons">
+                    <div id="action-buttons">
+                        ${show.isCreator
+                                ? html`
                                     <a href="/edit/${show._id}" id="edit-btn">Edit</a>
                                     <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
-                                </div>
-                            `
-                            : null
-                    }
+                                `
+                                : null
+                        }
+                    </div>
                 </div>
             </div>
         </section>
@@ -31,18 +30,21 @@ function detailsTemplate(show, onDelete) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id;
-    const item = await getById(id);
-    const userData = getUserData();
+    const show = await getById(id);
+    const userData = ctx.userData;
 
-    if (userData && userData._id === item._ownerId) item.isCreator = true;
+    console.log("userData: ", userData);
+
+    if (userData && userData._id === show._ownerId) show.isCreator = true;
 
     async function onDelete() {
         const choice = confirm('Are you sure?');
 
         if (choice) {
+            await deleteShow(id);
             ctx.page.redirect('/shows');
         }
     }
 
-    ctx.render(detailsTemplate(item, onDelete));
+    ctx.render(detailsTemplate(show, onDelete));
 }
