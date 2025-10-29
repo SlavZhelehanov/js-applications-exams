@@ -1,4 +1,4 @@
-import {get, post} from "../utils/api.js";
+import {get, post, put} from "../utils/api.js";
 
 export async function getAllSolutions() {
     const path = '/data/solutions?sortBy=_createdOn%20desc';
@@ -13,4 +13,9 @@ export async function getById(id) {
 export async function createSolution(data) {
     const path = `/data/solutions`;
     return await post(path, data);
+}
+
+export async function updateSolution(id, data) {
+    const path = `/data/solutions/${id}`;
+    return await put(path, data);
 }
