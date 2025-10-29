@@ -1,0 +1,17 @@
+import { render } from "../node_modules/lit-html/lit-html.js";
+import page from "./lib/page.mjs";
+
+import {homePage} from "./views/home/home.js";
+
+const main = document.getElementsByTagName('main')[0];
+
+function decorateCTX(ctx, next) {
+    ctx.render = function (content) {
+        return render(content, main);
+    }
+    next();
+}
+
+page(decorateCTX);
+page("/", homePage)
+page.start();
