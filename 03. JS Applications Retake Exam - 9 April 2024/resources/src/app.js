@@ -4,6 +4,7 @@ import page from "./lib/page.mjs";
 import {homePage} from "./views/home/home.js";
 import {dashboardPage} from "./views/solutions/dashboard.js";
 import {registerPage} from "./views/auth/register.js";
+import {loginPage} from "./views/auth/login.js";
 
 const main = document.getElementsByTagName('main')[0];
 
@@ -18,5 +19,6 @@ page(decorateCTX);
 page("/", homePage);
 page("/solutions", dashboardPage);
 page("/register", registerPage);
+page("/login", loginPage);
 
 page.start();
