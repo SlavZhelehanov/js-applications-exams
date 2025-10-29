@@ -13,7 +13,7 @@ export async function registerUser(email, password) {
 export async function login(email, password) {
     const user = await post("/users/login", {email, password});
 
-    if (399 < user.code) throw user.message;
+    if (399 < user.status) throw user.statusText;
 
     saveUserData(user);
 }

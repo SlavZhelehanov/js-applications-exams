@@ -1,12 +1,13 @@
 import { html } from '../../../node_modules/lit-html/lit-html.js';
+import {login} from '../../services/authService.js';
 
-function template() {
+function template(onLogin) {
     return html`
         <section id="login">
             <div class="form">
                 <img class="border" src="./images/border.png" alt=""/>
                 <h2>Login</h2>
-                <form class="login-form">
+                <form class="login-form" @submit=${onLogin}>
                     <input type="text" name="email" id="email" placeholder="email"/>
                     <input
                             type="password"
@@ -25,5 +26,23 @@ function template() {
 }
 
 export function loginPage(ctx) {
-    ctx.render(template());
+    async function onLogin(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+
+        if (email.trim() === '' || password.trim() === '') return alert('All fields are required!');
+
+        try {
+            await login(email, password);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err);
+        }
+    }
+
+    ctx.render(template(onLogin));
 }
