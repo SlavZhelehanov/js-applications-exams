@@ -30,7 +30,7 @@ page("/solutions", dashboardPage);
 page("/register", registerPage);
 page("/login", loginPage);
 page("/create", createPage);
-page("/edit", editPage);
-page("/details", detailsPage);
+page("/edit/:id", editPage);
+page("/details/:id", detailsPage);
 
 page.start();
