@@ -31,7 +31,7 @@ export function setPageNavigation() {
     const user = getUserData();
     const classUser = document.querySelector('.user');
     const classGuest = document.querySelector('.guest');
-    console.log("user: ", user)
+	
     user
         ? [
             (classUser.style.display = "inline-block"),
