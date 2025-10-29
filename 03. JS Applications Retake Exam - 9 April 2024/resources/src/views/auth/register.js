@@ -47,10 +47,11 @@ export function registerPage(ctx) {
         try {
             await registerUser(email, password);
             e.target.reset();
-            ctx.setUserNav();
+            ctx.setNavigation();
             ctx.page.redirect('/');
         } catch (err) {
-            alert(err.message);
+            if(err.message) alert(err.message);
+            else alert(err);
         }
     }
 
