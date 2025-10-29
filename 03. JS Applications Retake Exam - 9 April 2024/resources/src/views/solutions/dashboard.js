@@ -39,6 +39,9 @@ function template() {
                 </div>
             </div>
         </section>
+
+        <!-- Display an h2 if there are no posts -->
+<!--        <h2 id="no-solution">No Solutions Added.</h2>-->
     `;
 }
 

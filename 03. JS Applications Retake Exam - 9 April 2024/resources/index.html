@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=\, initial-scale=1.0"/>
+    <meta name="viewport" content="initial-scale=1.0"/>
     <link rel="stylesheet" href="./styles/styles.css"/>
     <title>RenewTech Cleanup</title>
     <script src="./src/app.js" type="module" defer></script>
@@ -27,7 +27,7 @@
             <!-- Guest users -->
             <div class="guest">
                 <a href="#">Login</a>
-                <a href="#">Register</a>
+                <a href="/register">Register</a>
             </div>
         </nav>
     </header>
@@ -37,38 +37,7 @@
 
         <!-- Dashboard page -->
 
-        <!-- Display an h2 if there are no posts -->
-        <h2 id="no-solution">No Solutions Added.</h2>
-
         <!-- Register Page (Only for Guest users) -->
-        <section id="register">
-            <div class="form">
-                <img class="border" src="./images/border.png" alt=""/>
-                <h2>Register</h2>
-                <form class="register-form">
-                    <input
-                            type="text"
-                            name="email"
-                            id="register-email"
-                            placeholder="email"
-                    />
-                    <input
-                            type="password"
-                            name="password"
-                            id="register-password"
-                            placeholder="password"
-                    />
-                    <input
-                            type="password"
-                            name="re-password"
-                            id="repeat-password"
-                            placeholder="repeat password"
-                    />
-                    <button type="submit">register</button>
-                    <p class="message">Already registered? <a href="#">Login</a></p>
-                </form>
-            </div>
-        </section>
 
         <!-- Login Page (Only for Guest users) -->
         <section id="login">
