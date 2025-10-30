@@ -31,13 +31,13 @@ nav {
   justify-content: center;
 }
 
-.logo {
+#logo {
   margin-top: 5px;
   width: 90px;
   transition: transform 0.5s ease-in-out;
 }
 
-.logo:hover {
+#logo:hover {
   animation: shake 2s;
   animation-iteration-count: infinite;
 }

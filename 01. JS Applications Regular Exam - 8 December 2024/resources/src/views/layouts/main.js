@@ -4,7 +4,7 @@ export function layoutPage(userData, content) {
     return html`
         <header>
             <!-- Navigation -->
-            <a id="logo" href="#"><img id="logo" src="./images/logo2.png" alt="img"/></a>
+            <a class="logo" href="/"><img class="logo" src="./images/logo2.png" alt="img"/></a>
             <nav>
                 <div>
                     <a href="/catalog">Marketplace</a>
