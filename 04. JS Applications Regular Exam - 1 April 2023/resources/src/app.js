@@ -9,6 +9,7 @@ import {loginPage} from "./views/auth/login.js";
 import {createPage} from "./views/fruits/create.js";
 import {editPage} from "./views/fruits/edit.js";
 import {detailsPage} from "./views/fruits/details.js";
+import {searchPage} from "./views/home/search.js";
 
 const main = document.getElementsByTagName('main')[0];
 
@@ -32,5 +33,6 @@ page("/login", loginPage);
 page("/addFruit", createPage)
 page("/edit/:id", editPage);
 page("/details/:id", detailsPage);
+page("/search", searchPage);
 
 page.start();
