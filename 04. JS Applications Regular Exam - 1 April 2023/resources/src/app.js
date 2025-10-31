@@ -2,6 +2,7 @@ import { render } from "./lib/lit-html.min.js";
 import page from "./lib/page.mjs";
 
 import {getUserData, setNavigation} from "./utils/utils.js";
+import {homePage} from "./views/home/home.js";
 
 const main = document.getElementsByTagName('main')[0];
 
@@ -12,10 +13,12 @@ function decorateCTX(ctx, next) {
         return render(content, main);
     }
     ctx.setNavigation = setNavigation;
-    ctx.userData = getUserData();
+    // ctx.userData = getUserData();
     next();
 }
 
 page(decorateCTX);
+page("/index.html", "/");
+page("/", homePage);
 
 page.start();
