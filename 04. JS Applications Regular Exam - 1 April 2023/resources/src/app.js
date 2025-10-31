@@ -8,6 +8,7 @@ import {registerPage} from "./views/auth/register.js";
 import {loginPage} from "./views/auth/login.js";
 import {createPage} from "./views/fruits/create.js";
 import {editPage} from "./views/fruits/edit.js";
+import {detailsPage} from "./views/fruits/details.js";
 
 const main = document.getElementsByTagName('main')[0];
 
@@ -30,5 +31,6 @@ page("/register", registerPage);
 page("/login", loginPage);
 page("/addFruit", createPage)
 page("/edit/:id", editPage);
+page("/details/:id", detailsPage);
 
 page.start();

@@ -1,5 +1,4 @@
-import {html} from '../../../node_modules/lit-html/lit-html.js';
-import {getById, updateSolution} from "../../services/solutionsService.js";
+import {html} from '../../lib/lit-html.min.js';
 
 function template() {
     return html`
