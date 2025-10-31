@@ -8,7 +8,6 @@ export function clearUserData() { sessionStorage.removeItem(item); }
 
 export function setNavigation() {
     const isLoggedIn = getUserData();
-    console.log("isLoggedIn: ", isLoggedIn)
     // const [_, divUser, divGuest] = document.getElementsByTagName('nav')[0].getElementsByTagName('div');
     const [_, authDiv] = document.getElementsByTagName('nav')[0].getElementsByTagName('div');
     const [a1, a2] = authDiv.getElementsByTagName('a');
