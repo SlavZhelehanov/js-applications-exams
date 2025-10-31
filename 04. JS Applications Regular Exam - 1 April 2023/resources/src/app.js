@@ -6,6 +6,7 @@ import {homePage} from "./views/home/home.js";
 import {dashboardPage} from "./views/fruits/dashboard.js";
 import {registerPage} from "./views/auth/register.js";
 import {loginPage} from "./views/auth/login.js";
+import {createPage} from "./views/fruits/create.js";
 
 const main = document.getElementsByTagName('main')[0];
 
@@ -26,5 +27,6 @@ page("/", homePage);
 page("/fruits", dashboardPage);
 page("/register", registerPage);
 page("/login", loginPage);
+page("/addFruit", createPage)
 
 page.start();

@@ -15,7 +15,7 @@ function template() {
                     />
                     <button type="submit">login</button>
                     <p class="message">
-                        Not registered? <a href="#">Create an account</a>
+                        Not registered? <a href="/register">Create an account</a>
                     </p>
                 </form>
             </div>
@@ -23,5 +23,5 @@ function template() {
 }
 
 export function loginPage(ctx) {
-    ctx.render(template(onLogin));
+    ctx.render(template());
 }
