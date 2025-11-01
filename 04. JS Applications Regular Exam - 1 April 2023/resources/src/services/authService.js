@@ -9,6 +9,15 @@ export async function registerUser(email, password) {
 
     saveUserData(user);
 }
+
+export async function login(email, password) {
+    const user = await post("/users/login", {email, password});
+
+    if (399 < user.status) throw user.statusText;
+
+    saveUserData(user);
+}
+
 export async function logout() {
     const result = await get("/users/logout");
 
