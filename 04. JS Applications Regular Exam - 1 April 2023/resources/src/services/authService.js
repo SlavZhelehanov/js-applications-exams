@@ -9,3 +9,10 @@ export async function registerUser(email, password) {
 
     saveUserData(user);
 }
+export async function logout() {
+    const result = await get("/users/logout");
+
+    clearUserData();
+
+    return result;
+}
