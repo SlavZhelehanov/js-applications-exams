@@ -1,11 +1,12 @@
 import {html} from "../../lib/lit-html.min.js";
+import {createFruit} from "../../services/fruitsService.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="create">
             <div class="form">
                 <h2>Add Fruit</h2>
-                <form class="create-form">
+                <form class="create-form" @submit=${onCreate}>
                     <input
                             type="text"
                             name="name"
@@ -39,5 +40,23 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const fruit = {
+            name: formData.get('name').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            description: formData.get('description').trim(),
+            nutrition: formData.get('nutrition').trim()
+        }
+
+        if (Object.values(fruit).some((x) => !x)) return alert("All fields are required!");
+
+        await createFruit(fruit);
+        e.target.reset();
+        ctx.page.redirect('/fruits');
+    }
+
+    ctx.render(template(onCreate));
 }
