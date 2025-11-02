@@ -1,6 +1,7 @@
-import { html } from '../../lib/lit-html.min.js';
+import {html} from '../../lib/lit-html.min.js';
+import {searchFruit} from "../../services/fruitsService.js";
 
-function template() {
+function template(fruits, onSearch) {
     return html`
         <section id="search">
             <div class="form">
@@ -11,29 +12,43 @@ function template() {
                             name="search"
                             id="search-input"
                     />
-                    <button class="button-list">Search</button>
+                    <button @click=${onSearch} class="button-list">Search</button>
                 </form>
             </div>
             <h4>Results:</h4>
-            <div class="search-result">
-                <p class="no-result">No result.</p>
-                <!--If there are matches display a div with information about every fruit-->
-                <div class="fruit">
-                    <img src="./images/fruit 1.png" alt="example1"/>
-                    <h3 class="title">Pineapple</h3>
-                    <p class="description">The pineapple is a tropical plant with an edible fruit.
-                        It is the most economically significant plant in the family Bromeliaceae.The
-                        pineapple is indigenous to South America.
-                        Pineapples grow as a small shrub, the individual flowers of the unpollinated plant
-                        fuse to form a multiple fruit. The plant is normally propagated from the offset produced
-                        at the top of the fruit,or from a side shoot, and typically matures within a year.</p>
-                    <a class="details-btn" href="">More Info</a>
-                </div>
-            </div>
+            ${fruits !== undefined
+                    ? html`
+                        <div class="search-result">
+                            ${fruits.length === 0 
+                                    ? html`<p class="no-result">No result.</p>` 
+                                    : fruits.map(p => html`
+                                        <div class="fruit">
+                                            <img src="${p.imageUrl}" alt="example1"/>
+                                            <h3 class="title">${p.name}</h3>
+                                            <p class="description">${p.description}</p>
+                                            <a class="details-btn" href="/details/${p._id}">More Info</a>
+                                        </div>`)
+                            }
+                        </div>
+                    ` : ''
+            }
         </section>
     `
 }
 
 export async function searchPage(ctx) {
-    ctx.render(template());
+    const fruit = ctx.querystring.split('=')[1];
+    let fruits = '';
+
+    if (fruit && 0 < fruit.length) fruits = await searchFruit(fruit.trim());
+    console.log(fruit)
+    async function onSearch() {
+        const query = document.querySelector('#search-input').value;
+
+        if (query.trim() === '') return alert('All fields are required!');
+
+        ctx.page.redirect(`/search?query=${query}`);
+    }
+
+    ctx.render(template(fruits, onSearch));
 }

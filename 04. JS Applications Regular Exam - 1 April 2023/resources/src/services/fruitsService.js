@@ -24,3 +24,8 @@ export async function deleteFruit(id) {
     const path = `/data/fruits/${id}`;
     return await del(path);
 }
+
+export async function searchFruit(query) {
+    const path = `/data/fruits?where=name%20LIKE%20%22${query}%22`;
+    return await get(path);
+}
