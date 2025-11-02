@@ -1,4 +1,4 @@
-import {get, post, put} from "../utils/api.js";
+import {get, post, put, del} from "../utils/api.js";
 
 export async function getAllFruits() {
     const path = '/data/fruits?sortBy=_createdOn%20desc';
@@ -18,4 +18,9 @@ export async function getById(id) {
 export async function updateFruit(id, data) {
     const path = `/data/fruits/${id}`;
     return await put(path, data);
+}
+
+export async function deleteFruit(id) {
+    const path = `/data/fruits/${id}`;
+    return await del(path);
 }

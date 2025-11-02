@@ -1,7 +1,7 @@
-import { html } from '../../lib/lit-html.min.js';
-import {getById} from "../../services/fruitsService.js";
+import {html} from '../../lib/lit-html.min.js';
+import {deleteFruit, getById} from "../../services/fruitsService.js";
 
-function template(fruit) {
+function template(fruit, isAuthor, onDelete) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -15,8 +15,12 @@ function template(fruit) {
                     </div>
                     <!--Edit and Delete are only for creator-->
                     <div id="action-buttons">
-                        <a href="/edit/${fruit._id}" id="edit-btn">Edit</a>
-                        <a href="" id="delete-btn">Delete</a>
+                        ${isAuthor
+                                ? html`
+                                    <a href="/edit/${fruit._id}" id="edit-btn">Edit</a>
+                                    <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
+                                ` : null
+                        }
                     </div>
                 </div>
             </div>
@@ -26,6 +30,16 @@ function template(fruit) {
 export async function detailsPage(ctx) {
     const id = ctx.params.id;
     const fruit = await getById(id);
+    const isAuthor = ctx.userData && ctx.userData._id === fruit._ownerId;
 
-    ctx.render(template(fruit));
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await deleteFruit(id);
+            ctx.page.redirect('/fruits');
+        }
+    }
+
+    ctx.render(template(fruit, isAuthor, onDelete));
 }
