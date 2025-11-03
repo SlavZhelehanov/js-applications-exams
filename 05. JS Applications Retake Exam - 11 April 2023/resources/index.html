@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=\, initial-scale=1.0"/>
+    <meta name="viewport" content="initial-scale=1.0"/>
     <link rel="stylesheet" href="./styles/styles.css"/>
     <title>Eventer</title>
     <script src="./src/app.js" type="module" defer></script>
@@ -12,25 +12,15 @@
 <div id="wrapper">
     <header>
         <!-- Navigation -->
-        <a id="logo" href="/"
-        ><img id="logo-img" src="./images/logo.png" alt=""
-        /></a>
+        <a id="logo" href="/"><img id="logo-img" src="./images/logo.png" alt=""/></a>
 
         <nav>
-            <div>
-                <a href="#">Events</a>
-            </div>
-
-            <!-- Logged-in users -->
-            <div class="user">
-                <a href="#">Add Event</a>
-                <a href="#">Logout</a>
-            </div>
+            <div><a href="/events">Events</a></div>
 
             <!-- Guest users -->
             <div class="guest">
-                <a href="#">Login</a>
-                <a href="#">Register</a>
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
             </div>
         </nav>
     </header>

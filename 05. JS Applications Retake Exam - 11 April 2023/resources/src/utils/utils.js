@@ -1,16 +1,22 @@
-import { render } from "../lib/lit-html.min.js";
+import {render} from "../lib/lit-html.min.js";
 import page from "../lib/page.mjs";
 
 const item = "userData";
 
-export function saveUserData(data) { sessionStorage.setItem(item, JSON.stringify(data)); }
+export function saveUserData(data) {
+    sessionStorage.setItem(item, JSON.stringify(data));
+}
 
-export function getUserData() { return JSON.parse(sessionStorage.getItem(item)); }
+export function getUserData() {
+    return JSON.parse(sessionStorage.getItem(item));
+}
 
-export function clearUserData() { sessionStorage.removeItem(item); }
+export function clearUserData() {
+    sessionStorage.removeItem(item);
+}
 
 export function setNavigation() {
-    const isLoggedIn = getUserData();
+    const isLoggedIn = Boolean(getUserData);
     const [_, authDiv] = document.getElementsByTagName('nav')[0].getElementsByTagName('div');
     const [a1, a2] = authDiv.getElementsByTagName('a');
 
