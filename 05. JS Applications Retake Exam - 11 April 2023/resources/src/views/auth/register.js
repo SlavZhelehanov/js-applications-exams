@@ -1,11 +1,12 @@
 import {html} from "../../lib/lit-html.min.js";
+import {registerUser} from "../../services/authService.js";
 
-function template() {
+function template(onRegister) {
     return html`
         <section id="register">
             <div class="form">
                 <h2>Register</h2>
-                <form class="register-form">
+                <form class="register-form" @submit=${onRegister}>
                     <input
                             type="text"
                             name="email"
@@ -32,5 +33,26 @@ function template() {
 }
 
 export function registerPage(ctx) {
-    ctx.render(template());
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const repass = formData.get('re-password');
+
+        if (email === '' || password === '') return alert('All fields are required');
+        if (password !== repass) return alert("Passwords don't match");
+
+        try {
+            await registerUser(email, password);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if(err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onRegister));
 }
