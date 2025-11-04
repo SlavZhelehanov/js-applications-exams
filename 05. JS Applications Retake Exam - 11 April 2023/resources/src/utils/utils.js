@@ -16,7 +16,7 @@ export function clearUserData() {
 }
 
 export function setNavigation() {
-    const isLoggedIn = Boolean(getUserData);
+    const isLoggedIn = Boolean(getUserData());
     const [_, authDiv] = document.getElementsByTagName('nav')[0].getElementsByTagName('div');
     const [a1, a2] = authDiv.getElementsByTagName('a');
 
