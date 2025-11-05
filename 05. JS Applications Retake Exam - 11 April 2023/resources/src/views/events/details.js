@@ -25,7 +25,7 @@ function template() {
 
                 <!--Edit and Delete are only for creator-->
                 <div id="action-buttons">
-                    <a href="" id="edit-btn">Edit</a>
+                    <a href="/edit/neshto-si" id="edit-btn">Edit</a>
                     <a href="" id="delete-btn">Delete</a>
 
                     <!--Bonus - Only for logged-in users ( not authors )-->
