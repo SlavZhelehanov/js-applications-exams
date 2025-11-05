@@ -20,7 +20,7 @@ page("/fruits", dashboardPage);
 page("/register", guardRoute("guest"), registerPage);
 page("/login", guardRoute("guest"), loginPage);
 page("/logout", guardRoute("user"), logoutAction);
-page("/addFruit", guardRoute("user"), createPage)
+page("/addFruit", guardRoute("user"), createPage);
 page("/edit/:id", guardRoute("user"), editPage);
 page("/details/:id", detailsPage);
 page("/search", searchPage);
