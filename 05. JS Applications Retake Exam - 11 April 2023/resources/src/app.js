@@ -7,6 +7,7 @@ import {loginPage} from "./views/auth/login.js";
 import {logoutAction} from "./views/auth/logout.js";
 import {dashboardPage} from "./views/events/dashboard.js";
 import {createPage} from "./views/events/create.js";
+import {detailsPage} from "./views/events/details.js";
 
 setNavigation();
 
@@ -18,5 +19,6 @@ page("/login", guardRoute("guest"), loginPage);
 page("/logout", guardRoute("user"), logoutAction);
 page("/events", dashboardPage);
 page("/addEvent", guardRoute("user"), createPage);
+page("/details/:id", detailsPage);
 
 page.start();

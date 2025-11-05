@@ -11,7 +11,7 @@ function template() {
                     Robert De Niro Themed Party
                 </p>
                 <p class="date">15.04.2023 from 17:00</p>
-                <a class="details-btn" href="">Details</a>
+                <a class="details-btn" href="/details/neshto-si">Details</a>
             </div>
             <div class="event">
                 <img src="./images/pexels-run-ffwpu-2530130 (1).jpg" alt="example1"/>
