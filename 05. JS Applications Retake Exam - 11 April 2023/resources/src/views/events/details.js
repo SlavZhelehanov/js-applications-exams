@@ -16,6 +16,13 @@ function template(event, goings, isCreator, isLoggedIn, canGo, onDelete, goTo) {
 
                 <!--Edit and Delete are only for creator-->
                 <div id="action-buttons">
+                    ${!isLoggedIn
+                            ? null
+                            : isCreator
+                                    ? html`
+                                        <a href="/edit/${event._id}" id="edit-btn">Edit</a>
+                                        <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
+                                    `
                 </div>
             </div>
         </section>`;
@@ -29,6 +36,8 @@ export async function detailsPage(ctx) {
     try {
         event = await get(`/data/events/${id}`);
         goings = await get(`/data/going?where=eventId%3D%22${id}%22&distinct=_ownerId&count`);
+        if (userId) {
+            isCreator = event._ownerId === userId;
         }
     } catch (err) {
         return alert(err.message);
