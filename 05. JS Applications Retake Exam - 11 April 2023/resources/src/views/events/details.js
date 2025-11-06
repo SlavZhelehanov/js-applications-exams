@@ -1,6 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del, post} from '../../utils/api.js';
 
+function template(event, goings, isCreator, isLoggedIn, canGo, onDelete, goTo) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -11,6 +12,7 @@ import {get, del, post} from '../../utils/api.js';
                 <div id="info-wrapper">
                     <div id="details-description"><span>${event.description}</span></div>
                 </div>
+                <h3>Going: <span id="go">${goings}</span> times.</h3>
 
                 <!--Edit and Delete are only for creator-->
                 <div id="action-buttons">
@@ -26,6 +28,7 @@ export async function detailsPage(ctx) {
 
     try {
         event = await get(`/data/events/${id}`);
+        goings = await get(`/data/going?where=eventId%3D%22${id}%22&distinct=_ownerId&count`);
         }
     } catch (err) {
         return alert(err.message);
