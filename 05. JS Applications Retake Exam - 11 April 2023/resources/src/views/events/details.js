@@ -49,6 +49,15 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function goTo() {
+        try {
+            await post(`/data/going`, {eventId: id});
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     try {
         event = await get(`/data/events/${id}`);
         goings = await get(`/data/going?where=eventId%3D%22${id}%22&distinct=_ownerId&count`);
