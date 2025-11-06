@@ -36,6 +36,18 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id, userId = ctx?.userData?._id;
     let event = {}, goings = 0, isCreator = false, isLoggedIn = !!userId, canGo = false;
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/events/${id}`);
+                ctx.page.redirect('/events');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
 
     try {
         event = await get(`/data/events/${id}`);
