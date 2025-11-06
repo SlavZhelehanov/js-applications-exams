@@ -23,6 +23,10 @@ function template(event, goings, isCreator, isLoggedIn, canGo, onDelete, goTo) {
                                         <a href="/edit/${event._id}" id="edit-btn">Edit</a>
                                         <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
                                     `
+                                    : canGo === 0
+                                            ? html`<a @click=${goTo} href="javascript:void(0)" id="go-btn">Going</a>`
+                                            : null
+                    }
                 </div>
             </div>
         </section>`;
@@ -36,7 +40,9 @@ export async function detailsPage(ctx) {
     try {
         event = await get(`/data/events/${id}`);
         goings = await get(`/data/going?where=eventId%3D%22${id}%22&distinct=_ownerId&count`);
+
         if (userId) {
+            canGo = await get(`/data/going?where=eventId%3D%22${id}%22%20and%20_ownerId%3D%22${userId}%22&count`);
             isCreator = event._ownerId === userId;
         }
     } catch (err) {
