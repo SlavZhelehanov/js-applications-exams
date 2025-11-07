@@ -6,3 +6,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 03. JS Applications Retake Exam - 9 April 2024
 - [x] 04. JS Applications Regular Exam - 1 April 2023
 - [x] 05. JS Applications Retake Exam - 11 April 2023
+- [ ] 06. JS Applications Retake Exam - 13 December 2022
