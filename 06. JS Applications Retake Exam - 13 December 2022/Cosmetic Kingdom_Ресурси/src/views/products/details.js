@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get} from '../../utils/api.js';
 
-function template(product) {
+function template(product, isCreator) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -26,25 +26,35 @@ function template(product) {
 
                 <!--Edit and Delete are only for creator-->
                 <div id="action-buttons">
-                    <a href="" id="edit-btn">Edit</a>
-                    <a href="" id="delete-btn">Delete</a>
+                    ${isCreator
+                            ? html`
+                                <a href="/edit/${product._id}" id="edit-btn">Edit</a>
+                                <a href="/delete" id="delete-btn">Delete</a>
+                            `
+                            : null
+                    }
+
 
                     <!--Bonus - Only for logged-in users ( not authors )-->
-                    <a href="" id="buy-btn">Buy</a>
+<!--                    <a href="" id="buy-btn">Buy</a>-->
                 </div>
             </div>
         </section>`;
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id
-    let product = {};
+    const id = ctx.params.id, userId = ctx?.userData?._id
+    let product = {}, isCreator = false;
 
     try {
         product = await get(`/data/products/${id}`);
+
+        if (userId) {
+            isCreator = userId === product._ownerId;
+        }
     } catch (err) {
         return alert(err.message);
     }
 
-    ctx.render(template(product));
+    ctx.render(template(product, isCreator));
 }
