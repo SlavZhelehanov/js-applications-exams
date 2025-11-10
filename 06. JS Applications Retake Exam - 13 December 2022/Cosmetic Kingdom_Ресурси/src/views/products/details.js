@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from '../../utils/api.js';
+import {get, del} from '../../utils/api.js';
 
-function template(product, isCreator) {
+function template(product, isCreator, onDelete) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -29,7 +29,7 @@ function template(product, isCreator) {
                     ${isCreator
                             ? html`
                                 <a href="/edit/${product._id}" id="edit-btn">Edit</a>
-                                <a href="/delete" id="delete-btn">Delete</a>
+                                <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
                             `
                             : null
                     }
@@ -46,6 +46,19 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id, userId = ctx?.userData?._id
     let product = {}, isCreator = false;
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/products/${id}`);
+                ctx.page.redirect('/products');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
+
     try {
         product = await get(`/data/products/${id}`);
 
@@ -56,5 +69,5 @@ export async function detailsPage(ctx) {
         return alert(err.message);
     }
 
-    ctx.render(template(product, isCreator));
+    ctx.render(template(product, isCreator, onDelete));
 }
