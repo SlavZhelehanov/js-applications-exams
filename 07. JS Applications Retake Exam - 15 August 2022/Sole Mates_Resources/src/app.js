@@ -6,6 +6,7 @@ import {registerPage} from "./views/auth/register.js";
 import {loginPage} from "./views/auth/login.js";
 import {logoutAction} from "./views/auth/logout.js";
 import {dashboardPage} from "./views/shoes/dashboard.js";
+import {createPage} from "./views/shoes/create.js";
 
 setNavigation();
 
@@ -16,5 +17,6 @@ page("/register", guardRoute("guest"), registerPage);
 page("/login", guardRoute("guest"), loginPage);
 page("/logout", guardRoute("user"), logoutAction);
 page("/shoes", dashboardPage);
+page("/addPair", guardRoute("user"), createPage);
 
 page.start();
