@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get} from "../../utils/api.js";
 
-function template(shoe) {
+function template(shoe, isOwner) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -21,8 +21,12 @@ function template(shoe) {
 
                 <!--Edit and Delete are only for creator-->
                 <div id="action-buttons">
-                    <a href="" id="edit-btn">Edit</a>
-                    <a href="" id="delete-btn">Delete</a>
+                    ${isOwner
+                            ? html`
+                                <a href="/edit/${shoe._id}" id="edit-btn">Edit</a>
+                                <a href="/delete/${shoe._id}" id="delete-btn">Delete</a>`
+                            : null
+                    }
                 </div>
             </div>
         </section>`;
@@ -30,13 +34,14 @@ function template(shoe) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id;
-    let shoe = {};
+    let shoe = {}, isOwner = false;
 
     try {
         shoe = await get(`/data/shoes/${id}`);
+        isOwner = ctx.userData && shoe._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(shoe));
+    ctx.render(template(shoe, isOwner));
 }
