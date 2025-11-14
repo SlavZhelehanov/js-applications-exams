@@ -41,7 +41,7 @@ export async function searchPage(ctx) {
     let fruits = '';
 
     if (fruit && 0 < fruit.length) fruits = await searchFruit(fruit.trim());
-    console.log(fruit)
+
     async function onSearch() {
         const query = document.querySelector('#search-input').value;
 

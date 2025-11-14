@@ -1,6 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
+import {get} from "../../utils/api.js";
 
-function template() {
+function template(onSearch, shoes, isLoggedIn) {
     return html`
         <section id="search">
             <h2>Search by Brand</h2>
@@ -13,35 +14,54 @@ function template() {
                         placeholder="Search here..."
                         required
                 />
-                <button type="submit">Search</button>
+                <button @click=${onSearch} type="submit">Search</button>
             </form>
 
             <h3>Results:</h3>
 
             <div id="search-container">
-                <ul class="card-wrapper">
-                    <!-- Display a li with information about every post (if any)-->
-                    <li class="card">
-                        <img src="./images/travis.jpg" alt="travis"/>
-                        <p>
-                            <strong>Brand: </strong><span class="brand">Air Jordan</span>
-                        </p>
-                        <p>
-                            <strong>Model: </strong
-                            ><span class="model">1 Retro High TRAVIS SCOTT</span>
-                        </p>
-                        <p><strong>Value:</strong><span class="value">2000</span>$</p>
-                        <a class="details-btn" href="">Details</a>
-                    </li>
-                </ul>
-
-                <!-- Display an h2 if there are no posts -->
-                <!-- <h2>There are no results found.</h2> -->
+                ${0 < shoes.length
+                        ? html`
+                            <ul class="card-wrapper">
+                                ${shoes.map(s => html`
+                                    <li class="card">
+                                        <img src=${s.imageUrl} alt="travis"/>
+                                        <p>
+                                            <strong>Brand: </strong><span class="brand">${s.brand}</span>
+                                        </p>
+                                        <p>
+                                            <strong>Model: </strong><span class="model">${s.model}</span>
+                                        </p>
+                                        <p><strong>Value:</strong><span class="value">${s.value}</span>$</p>
+                                        ${isLoggedIn && html`<a class="details-btn" href="/details/${s._id}">Details</a>`}
+                                    </li>`)}                                
+                            </ul>`
+                        : html`<h2>There are no results found.</h2>`
+                }
             </div>
         </section>
     `
 }
 
 export async function searchPage(ctx) {
-    ctx.render(template());
+    const shoe = ctx.querystring.split('=')[1], isLoggedIn = !!ctx.userData;
+    let shoes = '';
+
+    try {
+        if (shoe && 0 < shoe.length) shoes = await get(`/data/shoes?where=brand%20LIKE%20%22${shoe.trim()}%22`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    async function onSearch(e) {
+        e.preventDefault();
+
+        const query = document.getElementById('#search-input').value;
+
+        if (query.trim() === '') return alert('All fields are required!');
+
+        ctx.page.redirect(`/search?query=${query}`);
+    }
+
+    ctx.render(template(onSearch, shoes, isLoggedIn));
 }
