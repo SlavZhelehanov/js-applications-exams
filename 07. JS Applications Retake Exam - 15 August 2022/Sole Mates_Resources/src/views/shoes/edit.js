@@ -1,12 +1,12 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from "../../utils/api.js";
+import {get, put} from "../../utils/api.js";
 
-function template(shoe) {
+function template(shoe, onEdit) {
     return html`
         <section id="edit">
             <div class="form">
                 <h2>Edit item</h2>
-                <form class="edit-form">
+                <form class="edit-form" @submit=${onEdit}>
                     <input
                             type="text"
                             name="brand"
@@ -59,11 +59,31 @@ export async function editPage(ctx) {
     const id = ctx.params.id;
     let shoe = {};
 
+    async function onEdit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const newPair = {
+            brand: formData.get('brand').trim(),
+            model: formData.get('model').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            release: formData.get('release').trim(),
+            designer: formData.get('designer').trim(),
+            value: formData.get('value').trim()
+        }
+
+        if (Object.values(newPair).some((x) => !x)) return alert("All fields are required!");
+
+        await put(`/data/shoes/${id}`, newPair);
+        e.target.reset();
+        ctx.page.redirect(`/details/${id}`);
+    }
+
     try {
         shoe = await get(`/data/shoes/${id}`);
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(shoe));
+    ctx.render(template(shoe, onEdit));
 }
