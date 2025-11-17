@@ -21,7 +21,7 @@ export function setNavigation() {
     const [a1, a2] = authDiv.getElementsByTagName('a');
 
     isLoggedIn
-        ? [authDiv.className = 'user', a1.href = '/addPair', a2.href = '/logout', a1.textContent = 'Add Pair', a2.textContent = 'Logout']
+        ? [authDiv.className = 'user', a1.href = '/createOffer', a2.href = '/logout', a1.textContent = 'Create Offer', a2.textContent = 'Logout']
         : [authDiv.className = 'guest', a1.href = '/login', a2.href = '/register', a1.textContent = 'Login', a2.textContent = 'Register'];
 }
 
