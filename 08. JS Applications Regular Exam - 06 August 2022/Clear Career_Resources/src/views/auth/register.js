@@ -58,6 +58,6 @@ export function registerPage(ctx) {
             else alert(err);
         }
     }
-    
+
     ctx.render(template(onRegister));
 }
