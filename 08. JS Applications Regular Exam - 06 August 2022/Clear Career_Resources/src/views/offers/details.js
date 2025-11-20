@@ -39,7 +39,7 @@ function template(offer, isOwner, onDelete, isAuth, appCount, canApply, applyOff
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id, isAuth = ctx.userData !== undefined;
+    const id = ctx.params.id, isAuth = !!ctx.userData;
     let offer = {}, isOwner = false, appCount = 0, canApply = 0;
 
     async function onDelete() {
