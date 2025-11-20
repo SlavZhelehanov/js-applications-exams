@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del} from "../../utils/api.js";
 
-function template(offer, isOwner) {
+function template(offer, isOwner, onDelete) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -26,7 +26,7 @@ function template(offer, isOwner) {
                     ${isOwner
                             ? html`
                                 <a href="/edit/${offer._id}" id="edit-btn">Edit</a>
-                                <a href="" id="delete-btn">Delete</a>`
+                                <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>`
                             : null
                     }
                     
@@ -42,6 +42,15 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id;
     let offer = {}, isOwner = false;
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await del(`/data/offers/${id}`);
+            ctx.page.redirect('/offers');
+        }
+    }
+
     try {
         offer = await get(`/data/offers/${id}`);
         isOwner = ctx.userData && offer._ownerId === ctx.userData._id;
@@ -49,5 +58,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template(offer, isOwner));
+    ctx.render(template(offer, isOwner, onDelete));
 }
