@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del} from "../../utils/api.js";
 
-function template(offer, isOwner, onDelete) {
+function template(offer, isOwner, onDelete, isAuth, appCount) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -19,17 +19,19 @@ function template(offer, isOwner, onDelete) {
                         <span>${offer.requirements}</span>
                     </div>
                 </div>
-                <p>Applications: <strong id="applications">1</strong></p>
+                <p>Applications: <strong id="applications">${appCount}</strong></p>
 
                 <!--Edit and Delete are only for creator-->
                 <div id="action-buttons">
-                    ${isOwner
-                            ? html`
-                                <a href="/edit/${offer._id}" id="edit-btn">Edit</a>
-                                <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>`
-                            : null
+                    ${!isAuth
+                            ? null
+                            : isOwner
+                                    ? html`
+                                        <a href="/edit/${offer._id}" id="edit-btn">Edit</a>
+                                        <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>`
+                                    : null
                     }
-                    
+
 
                     <!--Bonus - Only for logged-in users ( not authors )-->
                     <!--                    <a href="" id="apply-btn">Apply</a>-->
@@ -39,8 +41,8 @@ function template(offer, isOwner, onDelete) {
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id;
-    let offer = {}, isOwner = false;
+    const id = ctx.params.id, isAuth = ctx.userData !== undefined;
+    let offer = {}, isOwner = false, appCount = 0;
 
     async function onDelete() {
         const choice = confirm('Are you sure?');
@@ -53,10 +55,11 @@ export async function detailsPage(ctx) {
 
     try {
         offer = await get(`/data/offers/${id}`);
+        appCount = await get(`/data/applications?where=offerId%3D%22${id}%22&distinct=_ownerId&count`);
         isOwner = ctx.userData && offer._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(offer, isOwner, onDelete));
+    ctx.render(template(offer, isOwner, onDelete, isAuth, appCount));
 }
