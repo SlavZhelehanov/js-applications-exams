@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get, del} from "../../utils/api.js";
+import {get, del, post} from "../../utils/api.js";
 
-function template(offer, isOwner, onDelete, isAuth, appCount) {
+function template(offer, isOwner, onDelete, isAuth, appCount, canApply, applyOffer) {
     return html`
         <section id="details">
             <div id="details-wrapper">
@@ -29,12 +29,10 @@ function template(offer, isOwner, onDelete, isAuth, appCount) {
                                     ? html`
                                         <a href="/edit/${offer._id}" id="edit-btn">Edit</a>
                                         <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>`
-                                    : null
+                                    : canApply === 0
+                                            ? html`<a @click=${applyOffer} href="javascript:void(0)" id="apply-btn">Apply</a>`
+                                            : null
                     }
-
-
-                    <!--Bonus - Only for logged-in users ( not authors )-->
-                    <!--                    <a href="" id="apply-btn">Apply</a>-->
                 </div>
             </div>
         </section>`;
@@ -42,7 +40,7 @@ function template(offer, isOwner, onDelete, isAuth, appCount) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = ctx.userData !== undefined;
-    let offer = {}, isOwner = false, appCount = 0;
+    let offer = {}, isOwner = false, appCount = 0, canApply = 0;
 
     async function onDelete() {
         const choice = confirm('Are you sure?');
@@ -53,13 +51,24 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function applyOffer() {
+        try {
+            await post('/data/applications', {offerId: id});
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     try {
         offer = await get(`/data/offers/${id}`);
         appCount = await get(`/data/applications?where=offerId%3D%22${id}%22&distinct=_ownerId&count`);
-        isOwner = ctx.userData && offer._ownerId === ctx.userData._id;
+        isOwner = isAuth && offer._ownerId === ctx.userData._id;
+
+        if (isAuth) canApply = await get(`/data/applications?where=offerId%3D%22${id}%22%20and%20_ownerId%3D%22${ctx.userData._id}%22&count`);
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(offer, isOwner, onDelete, isAuth, appCount));
+    ctx.render(template(offer, isOwner, onDelete, isAuth, appCount, canApply, applyOffer));
 }
