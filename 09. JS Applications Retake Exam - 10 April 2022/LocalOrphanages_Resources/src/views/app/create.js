@@ -1,9 +1,10 @@
 import {html} from "../../lib/lit-html.min.js";
+import {post} from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="create-page" class="auth">
-            <form id="create">
+            <form id="create" @submit=${onCreate}>
                 <h1 class="title">Create Post</h1>
 
                 <article class="input-group">
@@ -37,5 +38,28 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const offer = {
+            title: formData.get('title').trim(),
+            description: formData.get('description').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            address: formData.get('address').trim(),
+            phone: formData.get('phone').trim()
+        }
+
+        if (Object.values(offer).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/posts", offer);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
