@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from "../../utils/api.js";
+import {get, del} from "../../utils/api.js";
 
-function template(data, isOwner) {
+function template(data, isOwner, onDelete) {
     return html`
         <section id="details-page">
             <h1 class="title">Post Details</h1>
@@ -20,8 +20,8 @@ function template(data, isOwner) {
 
                         <div class="btns">
                             ${isOwner
-                                    ? html`<a href="#" class="edit-btn btn">Edit</a>
-                                    <a href="#" class="delete-btn btn">Delete</a>`
+                                    ? html`<a href="/edit/${data._id}" class="edit-btn btn">Edit</a>
+                                    <a @click=${onDelete} href="javascript:void(0)" class="delete-btn btn">Delete</a>`
                                     : null
                             }
 
@@ -39,6 +39,15 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id;
     let data = {}, isOwner = false;
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await del(`/data/posts/${id}`);
+            ctx.page.redirect('/');
+        }
+    }
+
     try {
         data = await get(`/data/posts/${id}`);
         isOwner = !!ctx.userData && data._ownerId === ctx.userData._id;
@@ -46,5 +55,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template(data, isOwner));
+    ctx.render(template(data, isOwner, onDelete));
 }
