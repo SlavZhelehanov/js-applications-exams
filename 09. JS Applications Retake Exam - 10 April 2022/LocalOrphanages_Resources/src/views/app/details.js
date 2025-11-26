@@ -1,6 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
+import {get} from "../../utils/api.js";
 
-function template() {
+function template(data) {
     return html`
         <section id="details-page">
             <h1 class="title">Post Details</h1>
@@ -8,13 +9,13 @@ function template() {
             <div id="container">
                 <div id="details">
                     <div class="image-wrapper">
-                        <img src="./images/clothes.jpeg" alt="Material Image" class="post-image">
+                        <img src=${data.imageUrl} alt="Material Image" class="post-image">
                     </div>
                     <div class="info">
-                        <h2 class="title post-title">Clothes</h2>
-                        <p class="post-description">Description: We need warm winter clothes. The sizes are for children from 2 to 14 years old. If possible, made from cotton materials, no superficial ones.</p>
-                        <p class="post-address">Address: ul. Hristo Smirnenski 18, Sofia</p>
-                        <p class="post-number">Phone number: 0888222345</p>
+                        <h2 class="title post-title">${data.title}</h2>
+                        <p class="post-description">Description: ${data.description}</p>
+                        <p class="post-address">Address: ${data.address}</p>
+                        <p class="post-number">Phone number: ${data.phone}</p>
                         <p class="donate-Item">Donate Materials: 0</p>
 
                         <!--Edit and Delete are only for creator-->
@@ -33,5 +34,14 @@ function template() {
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id;
+    let data = {};
+
+    try {
+        data = await get(`/data/posts/${id}`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(data));
 }
