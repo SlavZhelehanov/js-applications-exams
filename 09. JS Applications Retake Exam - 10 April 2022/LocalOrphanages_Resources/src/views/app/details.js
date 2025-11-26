@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del, post} from "../../utils/api.js";
 
-function template(data, isOwner, onDelete, isAuth, canDonate, makeDonation) {
+function template(data, isOwner, onDelete, isAuth, canDonate, makeDonation, appCount) {
     return html`
         <section id="details-page">
             <h1 class="title">Post Details</h1>
@@ -16,7 +16,7 @@ function template(data, isOwner, onDelete, isAuth, canDonate, makeDonation) {
                         <p class="post-description">Description: ${data.description}</p>
                         <p class="post-address">Address: ${data.address}</p>
                         <p class="post-number">Phone number: ${data.phone}</p>
-                        <p class="donate-Item">Donate Materials: 0</p>
+                        <p class="donate-Item">Donate Materials: ${appCount}</p>
 
                         <div class="btns">
                             ${!isAuth
@@ -38,7 +38,7 @@ function template(data, isOwner, onDelete, isAuth, canDonate, makeDonation) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
-    let data = {}, isOwner = false, canDonate = 0;
+    let data = {}, isOwner = false, canDonate = 0, appCount = 0;
 
     async function onDelete() {
         const choice = confirm('Are you sure?');
@@ -60,6 +60,7 @@ export async function detailsPage(ctx) {
 
     try {
         data = await get(`/data/posts/${id}`);
+        appCount = await get(`/data/donations?where=postId%3D%22${id}%22&distinct=_ownerId&count`);
         isOwner = isAuth && data._ownerId === ctx.userData._id;
 
         if (isAuth) canDonate = await get(`/data/donations?where=postId%3D%22${id}%22%20and%20_ownerId%3D%22${ctx.userData._id}%22&count`);
@@ -67,5 +68,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template(data, isOwner, onDelete, isAuth, canDonate, makeDonation));
+    ctx.render(template(data, isOwner, onDelete, isAuth, canDonate, makeDonation, appCount));
 }
