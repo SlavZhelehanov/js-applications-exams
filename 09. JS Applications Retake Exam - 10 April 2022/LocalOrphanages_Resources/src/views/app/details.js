@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get} from "../../utils/api.js";
 
-function template(data) {
+function template(data, isOwner) {
     return html`
         <section id="details-page">
             <h1 class="title">Post Details</h1>
@@ -18,15 +18,17 @@ function template(data) {
                         <p class="post-number">Phone number: ${data.phone}</p>
                         <p class="donate-Item">Donate Materials: 0</p>
 
-                        <!--Edit and Delete are only for creator-->
                         <div class="btns">
-                            <a href="#" class="edit-btn btn">Edit</a>
-                            <a href="#" class="delete-btn btn">Delete</a>
+                            ${isOwner
+                                    ? html`<a href="#" class="edit-btn btn">Edit</a>
+                                    <a href="#" class="delete-btn btn">Delete</a>`
+                                    : null
+                            }
+
 
                             <!--Bonus - Only for logged-in users ( not authors )-->
-                            <a href="#" class="donate-btn btn">Donate</a>
+<!--                            <a href="#" class="donate-btn btn">Donate</a>-->
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -35,13 +37,14 @@ function template(data) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id;
-    let data = {};
+    let data = {}, isOwner = false;
 
     try {
         data = await get(`/data/posts/${id}`);
+        isOwner = !!ctx.userData && data._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(data));
+    ctx.render(template(data, isOwner));
 }
