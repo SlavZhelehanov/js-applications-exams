@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get, del} from "../../utils/api.js";
+import {get, del, post} from "../../utils/api.js";
 
-function template(data, isOwner, onDelete) {
+function template(data, isOwner, onDelete, isAuth, canDonate, makeDonation) {
     return html`
         <section id="details-page">
             <h1 class="title">Post Details</h1>
@@ -19,15 +19,16 @@ function template(data, isOwner, onDelete) {
                         <p class="donate-Item">Donate Materials: 0</p>
 
                         <div class="btns">
-                            ${isOwner
-                                    ? html`<a href="/edit/${data._id}" class="edit-btn btn">Edit</a>
-                                    <a @click=${onDelete} href="javascript:void(0)" class="delete-btn btn">Delete</a>`
-                                    : null
+                            ${!isAuth
+                                    ? null
+                                    : isOwner
+                                            ? html`<a href="/edit/${data._id}" class="edit-btn btn">Edit</a>
+                                            <a @click=${onDelete} href="javascript:void(0)" class="delete-btn btn">Delete</a>`
+                                            : canDonate === 0
+                                                    ? html`<a @click=${makeDonation} href="javascript:void(0)"
+                                                              class="donate-btn btn">Donate</a>`
+                                                    : null
                             }
-
-
-                            <!--Bonus - Only for logged-in users ( not authors )-->
-<!--                            <a href="#" class="donate-btn btn">Donate</a>-->
                         </div>
                     </div>
                 </div>
@@ -36,8 +37,8 @@ function template(data, isOwner, onDelete) {
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id;
-    let data = {}, isOwner = false;
+    const id = ctx.params.id, isAuth = !!ctx.userData;
+    let data = {}, isOwner = false, canDonate = 0;
 
     async function onDelete() {
         const choice = confirm('Are you sure?');
@@ -48,12 +49,23 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function makeDonation() {
+        try {
+            await post('/data/donations', {postId: id});
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     try {
         data = await get(`/data/posts/${id}`);
-        isOwner = !!ctx.userData && data._ownerId === ctx.userData._id;
+        isOwner = isAuth && data._ownerId === ctx.userData._id;
+
+        if (isAuth) canDonate = await get(`/data/donations?where=postId%3D%22${id}%22%20and%20_ownerId%3D%22${ctx.userData._id}%22&count`);
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(data, isOwner, onDelete));
+    ctx.render(template(data, isOwner, onDelete, isAuth, canDonate, makeDonation));
 }
