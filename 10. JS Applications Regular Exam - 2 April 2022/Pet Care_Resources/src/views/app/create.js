@@ -1,9 +1,10 @@
 import {html} from "../../lib/lit-html.min.js";
+import {post} from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="createPage">
-            <form class="createForm">
+            <form class="createForm" @submit=${onCreate}>
                 <img src="./images/cat-create.jpg">
                 <div>
                     <h2>Create PetPal</h2>
@@ -34,5 +35,28 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            name: formData.get('name').trim(),
+            breed: formData.get('breed').trim(),
+            age: formData.get('age').trim(),
+            weight: formData.get('weight').trim(),
+            image: formData.get('image').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/pets", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
