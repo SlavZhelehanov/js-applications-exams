@@ -1,18 +1,19 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template() {
+function template(item) {
     return html`
         <section id="detailsPage">
             <div class="details">
                 <div class="animalPic">
-                    <img src="./images/Shiba-Inu.png">
+                    <img src=${item.image}>
                 </div>
                 <div>
                     <div class="animalInfo">
-                        <h1>Name: Max</h1>
-                        <h3>Breed: Shiba Inu</h3>
-                        <h4>Age: 2 years</h4>
-                        <h4>Weight: 5kg</h4>
+                        <h1>Name: ${item.name}</h1>
+                        <h3>Breed: ${item.breed}</h3>
+                        <h4>Age: ${item.age}</h4>
+                        <h4>Weight: ${item.weight}</h4>
                         <h4 class="donation">Donation: 0$</h4>
                     </div>
                     <!-- if there is no registered user, do not display div-->
@@ -29,5 +30,14 @@ function template() {
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id;
+    let item = {};
+
+    try {
+        item = await get(`/data/pets/${id}`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(item));
 }
