@@ -8,6 +8,7 @@ import {logoutAction} from "./views/auth/logout.js";
 import {createPage} from "./views/app/create.js";
 import {editPage} from "./views/app/edit.js";
 import {detailsPage} from "./views/app/details.js";
+import {dashboardPage} from "./views/app/dashboard.js";
 
 setNavigation();
 
@@ -20,4 +21,5 @@ page("/logout", guardRoute("user"), logoutAction);
 page("/create", guardRoute("user"), createPage);
 page("/edit/:id", guardRoute("user"), editPage);
 page("/details/:id", detailsPage);
+page("/app", dashboardPage);
 page.start();
