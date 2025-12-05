@@ -19,6 +19,14 @@ function template(item, isOwner, onDelete, isAuth, comments, makeComment) {
                 <!-- Bonus ( for Guests and Users ) -->
                 <div class="details-comments">
                     <h2>Comments:</h2>
+                    ${0 < comments.length
+            ? html`<ul>
+                        ${comments.map(c => html`<li class="comment">
+                            <p>Content: ${c.comment}</p>
+                        </li>`)}
+                    </ul>`
+            : html`<p class="no-comment">No comments.</p>`
+        }
                 </div>
 
                 <!-- Edit/Delete buttons ( Only for creator of this game )  -->
@@ -57,6 +65,7 @@ export async function detailsPage(ctx) {
 
     try {
         item = await get(`/data/games/${id}`);
+        comments = await get(`/data/comments?where=gameId%3D%22${id}%22`);        
         isOwner = isAuth && item._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
