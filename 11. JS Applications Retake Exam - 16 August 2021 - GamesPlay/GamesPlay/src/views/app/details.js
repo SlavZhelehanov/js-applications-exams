@@ -14,6 +14,7 @@ function template(item, isOwner, onDelete, isAuth, comments, makeComment) {
                     <p class="type">${item.category}</p>
                 </div>
 
+                <p class="text">${item.summary}</p>
 
                 <!-- Bonus ( for Guests and Users ) -->
                 <div class="details-comments">
@@ -43,6 +44,15 @@ function template(item, isOwner, onDelete, isAuth, comments, makeComment) {
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
     let item = {}, isOwner = false, comments = [];
+
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await del(`/data/games/${id}`);
+            ctx.page.redirect('/');
+        }
+    }
 
 
     try {
