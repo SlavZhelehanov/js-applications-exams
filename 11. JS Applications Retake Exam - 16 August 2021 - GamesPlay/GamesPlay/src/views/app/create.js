@@ -1,9 +1,10 @@
 import {html} from "../../lib/lit-html.min.js";
+import {post} from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="create-page" class="auth">
-            <form id="create">
+            <form id="create" @submit=${onCreate}>
                 <div class="container">
 
                     <h1>Create Game</h1>
@@ -28,5 +29,28 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            title: formData.get('title').trim(),
+            category: formData.get('category').trim(),
+            maxLevel: formData.get('maxLevel').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            summary: formData.get('summary').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/games", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
