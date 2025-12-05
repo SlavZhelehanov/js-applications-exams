@@ -36,16 +36,20 @@ function template(item, isOwner, onDelete, isAuth, comments, makeComment) {
                     <a @click=${onDelete} href="javascript:void(0)" class="button">Delete</a>`
             : null
         }
+                    
                 </div>
             </div>
 
+            ${!isOwner && isAuth
+            ? html`<article class="create-comment">
                 <label>Add new comment:</label>
-                <form class="form">
+                <form class="form" @submit=${makeComment}>
                     <textarea name="comment" placeholder="Comment......"></textarea>
                     <input class="btn submit" type="submit" value="Add Comment">
                 </form>
-            </article>
-
+            </article>`
+            : null
+        }
         </section>`;
 }
 
@@ -62,6 +66,22 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function makeComment(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const cmnt = { comment: formData.get('comment').trim() }
+
+        if (Object.values(cmnt).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/comments", { gameId: id, comment: cmnt.comment });
+            e.target.reset();
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
 
     try {
         item = await get(`/data/games/${id}`);
