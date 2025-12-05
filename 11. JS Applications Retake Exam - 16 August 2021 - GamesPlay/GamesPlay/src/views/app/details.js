@@ -22,6 +22,11 @@ function template(item, isOwner, onDelete, isAuth, comments, makeComment) {
 
                 <!-- Edit/Delete buttons ( Only for creator of this game )  -->
                 <div class="buttons">
+                ${isOwner
+            ? html`<a href="/edit/${item._id}" class="button">Edit</a>
+                    <a @click=${onDelete} href="javascript:void(0)" class="button">Delete</a>`
+            : null
+        }
                 </div>
             </div>
 
@@ -42,6 +47,7 @@ export async function detailsPage(ctx) {
 
     try {
         item = await get(`/data/games/${id}`);
+        isOwner = isAuth && item._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
