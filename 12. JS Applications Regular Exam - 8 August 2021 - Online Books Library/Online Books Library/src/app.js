@@ -8,6 +8,7 @@ import {logoutAction} from "./views/auth/logout.js";
 import {detailsPage} from "./views/app/details.js";
 import {createPage} from "./views/app/create.js";
 import {editPage} from "./views/app/edit.js";
+import {myBooksPage} from "./views/app/my-books-page.js";
 
 setNavigation();
 
@@ -20,4 +21,5 @@ page("/logout", guardRoute("user"), logoutAction);
 page("/details/:id", detailsPage);
 page("/create", guardRoute("user"), createPage);
 page("/edit/:id", guardRoute("user"), editPage);
+page("/my-books", guardRoute("user"), myBooksPage)
 page.start();
