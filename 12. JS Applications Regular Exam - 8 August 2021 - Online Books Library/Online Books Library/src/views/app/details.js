@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from "../../utils/api.js";
+import {get, post} from "../../utils/api.js";
 
-function template(item, isOwner, isAuth, likesCount) {
+function template(item, isOwner, isAuth, likesCount, canLike, onLike) {
     return html`
         <section id="details-page" class="details">
             <div class="book-information">
@@ -14,7 +14,9 @@ function template(item, isOwner, isAuth, likesCount) {
                             : isOwner
                                     ? html`<a class="button" href="/edit/${book._id}">Edit</a>
                                     <a class="button" href="/delete">Delete</a>`
-                                    : html`<a class="button" href="/like">Like</a>`
+                                    : canLike === 0
+                                            ? html`<a class="button" @click=${onLike} href="javascript:void(0)">Like</a>`
+                                            : null
                     }
                     <div class="likes">
                         <img class="hearts" src="/images/heart.png">
@@ -32,15 +34,26 @@ function template(item, isOwner, isAuth, likesCount) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
-    let item = {}, isOwner = false, likesCount = 0;
+    let item = {}, isOwner = false, likesCount = 0, canLike = 0;
+
+    async function onLike() {
+        try {
+            await post('/data/likes', { bookId: id });
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
 
     try {
         item = await get(`/data/books/${id}`);
-        likesCount = await get(`/data/likes?where=bookId%3D%22{bookId}%22&distinct=_ownerId&count`);
+        likesCount = await get(`/data/likes?where=bookId%3D%22${id}%22&distinct=_ownerId&count`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
+
+        if(isAuth && !isOwner) canLike = await get(`/data/likes?where=bookId%3D%22${id}%22%20and%20_ownerId%3D%22${ctx.userData._id}%22&count`);
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(item, isOwner, isAuth, likesCount));
+    ctx.render(template(item, isOwner, isAuth, likesCount, canLike, onLike));
 }
