@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get} from "../../utils/api.js";
 
-function template(item, isOwner, isAuth) {
+function template(item, isOwner, isAuth, likesCount) {
     return html`
         <section id="details-page" class="details">
             <div class="book-information">
@@ -18,7 +18,7 @@ function template(item, isOwner, isAuth) {
                     }
                     <div class="likes">
                         <img class="hearts" src="/images/heart.png">
-                        <span id="total-likes">Likes: 0</span>
+                        <span id="total-likes">Likes: ${likesCount}</span>
                     </div>
                     <!-- Bonus -->
                 </div>
@@ -32,14 +32,15 @@ function template(item, isOwner, isAuth) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
-    let item = {}, isOwner = false;
+    let item = {}, isOwner = false, likesCount = 0;
 
     try {
         item = await get(`/data/books/${id}`);
+        likesCount = await get(`/data/likes?where=bookId%3D%22{bookId}%22&distinct=_ownerId&count`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(item, isOwner, isAuth));
+    ctx.render(template(item, isOwner, isAuth, likesCount));
 }
