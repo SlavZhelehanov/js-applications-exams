@@ -1,39 +1,35 @@
 import {html} from '../../lib/lit-html.min.js';
+import {get, put} from "../../utils/api.js";
 
-function template() {
+function template(item, onEdit, selection) {
     return html`
         <section id="edit-page" class="edit">
-            <form id="edit-form" action="#" method="">
+            <form id="edit-form" @submit=${onEdit}>
                 <fieldset>
                     <legend>Edit my Book</legend>
                     <p class="field">
                         <label for="title">Title</label>
                         <span class="input">
-                            <input type="text" name="title" id="title" value="A Court of Thorns and Roses">
+                            <input type="text" name="title" id="title" value=${item.title}>
                         </span>
                     </p>
                     <p class="field">
                         <label for="description">Description</label>
                         <span class="input">
-                            <textarea name="description"
-                                id="description">Feyre's survival rests upon her ability to hunt and kill – the forest where she lives is a cold, bleak place in the long winter months. So when she spots a deer in the forest being pursued by a wolf, she cannot resist fighting it for the flesh. But to do so, she must kill the predator and killing something so precious comes at a price ...</textarea>
+                            <textarea name="description" id="description">${item.description}</textarea>
                         </span>
                     </p>
                     <p class="field">
                         <label for="image">Image</label>
                         <span class="input">
-                            <input type="text" name="imageUrl" id="image" value="/images/book1.png">
+                            <input type="text" name="imageUrl" id="image" value=${item.imageUrl}>
                         </span>
                     </p>
                     <p class="field">
                         <label for="type">Type</label>
                         <span class="input">
                             <select id="type" name="type" value="Fiction">
-                                <option value="Fiction" selected>Fiction</option>
-                                <option value="Romance">Romance</option>
-                                <option value="Mistery">Mistery</option>
-                                <option value="Classic">Clasic</option>
-                                <option value="Other">Other</option>
+                                ${selection.map(x => html`<option value=${x.key} ?selected=${x.selected}>${x.key}</option>`)}
                             </select>
                         </span>
                     </p>
@@ -44,5 +40,37 @@ function template() {
 }
 
 export async function editPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id, options = ['Fiction', 'Romance', 'Mistery', 'Classic', 'Other'];
+    let item = {}, selection = [];
+
+    async function onEdit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const newItem = {
+            title: formData.get('title').trim(),
+            description: formData.get('description').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            type: formData.get('type').trim()
+        }
+
+        if (Object.values(newItem).some((x) => !x)) return alert("All fields are required!");
+
+        await put(`/data/books/${id}`, newItem);
+        e.target.reset();
+        ctx.page.redirect(`/details/${id}`);
+    }
+
+    try {
+        item = await get(`/data/books/${id}`);
+
+        for (let opt of options) {
+            if (item.type === opt) selection.push({key: opt, selected: true});
+            else selection.push({key: opt, selected: false});
+        }
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(item, onEdit, selection));
 }
