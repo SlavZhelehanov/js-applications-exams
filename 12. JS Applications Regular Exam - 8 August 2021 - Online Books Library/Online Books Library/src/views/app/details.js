@@ -1,7 +1,7 @@
-import { html } from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import {html} from '../../lib/lit-html.min.js';
+import {get} from "../../utils/api.js";
 
-function template(item, isOwner) {
+function template(item, isOwner, isAuth) {
     return html`
         <section id="details-page" class="details">
             <div class="book-information">
@@ -9,17 +9,13 @@ function template(item, isOwner) {
                 <p class="type">Type: ${item.type}</p>
                 <p class="img"><img src=${item.imageUrl}></p>
                 <div class="actions">
-                    ${isOwner
-    ? html`<a class="button" href="/edit/${book._id}">Edit</a>
-                            <a class="button" href="/delete">Delete</a>`
-    : null}
-                    
-
-                    <!-- Bonus -->
-                    <!-- Like button ( Only for logged-in users, which is not creators of the current book ) -->
-                    <a class="button" href="#">Like</a>
-
-                    <!-- ( for Guests and Users )  -->
+                    ${!isAuth
+                            ? null
+                            : isOwner
+                                    ? html`<a class="button" href="/edit/${book._id}">Edit</a>
+                                    <a class="button" href="/delete">Delete</a>`
+                                    : html`<a class="button" href="/like">Like</a>`
+                    }
                     <div class="likes">
                         <img class="hearts" src="/images/heart.png">
                         <span id="total-likes">Likes: 0</span>
@@ -45,5 +41,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template(item, isOwner));
+    ctx.render(template(item, isOwner, isAuth));
 }
