@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get, post} from "../../utils/api.js";
+import {get, post, del} from "../../utils/api.js";
 
-function template(item, isOwner, isAuth, likesCount, canLike, onLike) {
+function template(item, isOwner, isAuth, likesCount, canLike, onLike, onDelete) {
     return html`
         <section id="details-page" class="details">
             <div class="book-information">
@@ -12,8 +12,8 @@ function template(item, isOwner, isAuth, likesCount, canLike, onLike) {
                     ${!isAuth
                             ? null
                             : isOwner
-                                    ? html`<a class="button" href="/edit/${book._id}">Edit</a>
-                                    <a class="button" href="/delete">Delete</a>`
+                                    ? html`<a class="button" href="/edit/${item._id}">Edit</a>
+                                    <a class="button" @click=${onDelete} href="javascript:void(0)">Delete</a>`
                                     : canLike === 0
                                             ? html`<a class="button" @click=${onLike} href="javascript:void(0)">Like</a>`
                                             : null
@@ -45,6 +45,19 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/books/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
+
     try {
         item = await get(`/data/books/${id}`);
         likesCount = await get(`/data/likes?where=bookId%3D%22${id}%22&distinct=_ownerId&count`);
@@ -55,5 +68,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template(item, isOwner, isAuth, likesCount, canLike, onLike));
+    ctx.render(template(item, isOwner, isAuth, likesCount, canLike, onLike, onDelete));
 }
