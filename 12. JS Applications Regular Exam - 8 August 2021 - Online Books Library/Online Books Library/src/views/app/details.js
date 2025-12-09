@@ -1,7 +1,7 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get } from "../../utils/api.js";
 
-function template(item) {
+function template(item, isOwner) {
     return html`
         <section id="details-page" class="details">
             <div class="book-information">
@@ -9,9 +9,11 @@ function template(item) {
                 <p class="type">Type: ${item.type}</p>
                 <p class="img"><img src=${item.imageUrl}></p>
                 <div class="actions">
-                    <!-- Edit/Delete buttons ( Only for creator of this book )  -->
-                    <a class="button" href="#">Edit</a>
-                    <a class="button" href="#">Delete</a>
+                    ${isOwner
+    ? html`<a class="button" href="/edit/${book._id}">Edit</a>
+                            <a class="button" href="/delete">Delete</a>`
+    : null}
+                    
 
                     <!-- Bonus -->
                     <!-- Like button ( Only for logged-in users, which is not creators of the current book ) -->
@@ -34,13 +36,14 @@ function template(item) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
-    let item = {};
+    let item = {}, isOwner = false;
 
     try {
         item = await get(`/data/books/${id}`);
+        isOwner = isAuth && item._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(item));
+    ctx.render(template(item, isOwner));
 }
