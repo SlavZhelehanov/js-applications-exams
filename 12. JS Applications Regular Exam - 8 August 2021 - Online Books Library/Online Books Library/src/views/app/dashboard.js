@@ -13,7 +13,7 @@ function template(data) {
                                     <h3>${book.title}</h3>
                                     <p>Type:${book.type}</p>
                                     <p class="img"><img src=${book.imageUrl}></p>
-                                    <a class="button" href="/details/${book.id}">Details</a>
+                                    <a class="button" href="/details/${book._id}">Details</a>
                                 </li>`)}
                         </ul>`
                     : html`<p class="no-books">No books in database!</p>`

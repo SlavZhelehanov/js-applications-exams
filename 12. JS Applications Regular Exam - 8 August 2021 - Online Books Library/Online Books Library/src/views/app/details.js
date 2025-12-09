@@ -1,12 +1,13 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template() {
+function template(item) {
     return html`
         <section id="details-page" class="details">
             <div class="book-information">
-                <h3>A Court of Thorns and Roses</h3>
-                <p class="type">Type: Fiction</p>
-                <p class="img"><img src="/images/book1.png"></p>
+                <h3>${item.title}</h3>
+                <p class="type">Type: ${item.type}</p>
+                <p class="img"><img src=${item.imageUrl}></p>
                 <div class="actions">
                     <!-- Edit/Delete buttons ( Only for creator of this book )  -->
                     <a class="button" href="#">Edit</a>
@@ -26,14 +27,20 @@ function template() {
             </div>
             <div class="book-description">
                 <h3>Description:</h3>
-                <p>Feyre's survival rests upon her ability to hunt and kill – the forest where she lives is a cold,
-                    bleak place in the long winter months. So when she spots a deer in the forest being pursued by a
-                    wolf, she cannot resist fighting it for the flesh. But to do so, she must kill the predator and
-                    killing something so precious comes at a price ...</p>
+                <p>${item.description}</p>
             </div>
         </section>`;
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id, isAuth = !!ctx.userData;
+    let item = {};
+
+    try {
+        item = await get(`/data/books/${id}`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(item));
 }
