@@ -1,30 +1,33 @@
 import {html} from '../../lib/lit-html.min.js';
+import {get} from '../../utils/api.js';
 
-function template() {
+function template(data) {
     return html`
         <section id="my-books-page" class="my-books">
             <h1>My Books</h1>
-            <!-- Display ul: with list-items for every user's books (if any) -->
-            <ul class="my-books-list">
-                <li class="otherBooks">
-                    <h3>Outlander</h3>
-                    <p>Type: Other</p>
-                    <p class="img"><img src="/images/book2.png"></p>
-                    <a class="button" href="#">Details</a>
-                </li>
-                <li class="otherBooks">
-                    <h3>A Court of Thorns and Roses</h3>
-                    <p>Type: Fiction</p>
-                    <p class="img"><img src="/images/book1.png"></p>
-                    <a class="button" href="#">Details</a>
-                </li>
-            </ul>
-
-            <!-- Display paragraph: If the user doesn't have his own books  -->
-            <p class="no-books">No books in database!</p>
+            ${0 < data.length
+                    ? html`
+                        <ul class="my-books-list">
+                            ${data.map(book => html`<li class="otherBooks">
+                                <h3>${book.title}</h3>
+                                <p>Type: ${book.type}</p>
+                                <p class="img"><img src=${book.imageUrl}></p>
+                                <a class="button" href="/details/${book._id}">Details</a>
+                            </li>`)}
+                        </ul>`
+                    : html`<p class="no-books">No books in database!</p>`
+            }
         </section>`;
 }
 
 export async function myBooksPage(ctx) {
-    ctx.render(template());
+    let data = [];
+
+    try{
+        data = await get(`/data/books?where=_ownerId%3D%22${ctx.userData._id}%22&sortBy=_createdOn%20desc`);
+    } catch(err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(data));
 }
