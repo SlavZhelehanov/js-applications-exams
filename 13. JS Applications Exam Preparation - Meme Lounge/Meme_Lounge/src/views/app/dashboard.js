@@ -1,72 +1,39 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
+import { showError } from "../../utils/utils.js";
 
-function template() {
+function template(data) {
     return html`
         <section id="meme-feed">
             <h1>All Memes</h1>
             <div id="memes">
-                <!-- Display : All memes in database ( If any ) -->
-                <div class="meme">
+				${0 < data.length
+            ? data.map(m => html`<div class="meme">
                     <div class="card">
                         <div class="info">
-                            <p class="meme-title">Debugging</p>
-                            <img class="meme-image" alt="meme-img" src="/images/2.png">
+                            <p class="meme-title">${m.title}</p>
+                            <img class="meme-image" alt="meme-img" src=${m.imageUrl}>
                         </div>
                         <div id="data-buttons">
-                            <a class="button" href="#">Details</a>
+                            <a class="button" href="/details/${m._id}">Details</a>
                         </div>
                     </div>
-                </div>
-                <div class="meme">
-                    <div class="card">
-                        <div class="info">
-                            <p class="meme-title">Java Script</p>
-                            <img class="meme-image" alt="meme-img" src="/images/4.png">
-                        </div>
-                        <div id="data-buttons">
-                            <a class="button" href="#">Details</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="meme">
-                    <div class="card">
-                        <div class="info">
-                            <p class="meme-title">Yes, arrays are objects</p>
-                            <img class="meme-image" alt="meme-img" src="/images/6.png">
-                        </div>
-                        <div id="data-buttons">
-                            <a class="button" href="#">Details</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="meme">
-                    <div class="card">
-                        <div class="info">
-                            <p class="meme-title">Java Script joke</p>
-                            <img class="meme-image" alt="meme-img" src="/images/1.png">
-                        </div>
-                        <div id="data-buttons">
-                            <a class="button" href="#">Details</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="meme">
-                    <div class="card">
-                        <div class="info">
-                            <p class="meme-title">Bad code can present some problems</p>
-                            <img class="meme-image" alt="meme-img" src="/images/3.png">
-                        </div>
-                        <div id="data-buttons">
-                            <a class="button" href="#">Details</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Display : If there are no memes in database -->
-                <p class="no-memes">No memes in database.</p>
-            </div>
-        </section>`;
+                </div>`)
+            : html`<p class="no-memes">No memes in database.</p>`
+        }				
+			</div>
+        </section>
+    `;
 }
 
 export async function dashboardPage(ctx) {
-    ctx.render(template());
+    let data = [];
+
+    try {
+        data = await get('/data/memes?sortBy=_createdOn%20desc');
+    } catch (err) {
+        showError(err.message);
+    }
+
+    ctx.render(template(data));
 }
