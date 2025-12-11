@@ -1,9 +1,11 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
+import { saveUserData, showError } from "../../utils/utils.js";
 
-function template() {
+function template(onRegister) {
     return html`
         <section id="register">
-            <form id="register-form">
+            <form id="register-form" @submit=${onRegister}>
                 <div class="container">
                     <h1>Register</h1>
                     <label for="username">Username</label>
@@ -22,7 +24,7 @@ function template() {
                     </div>
                     <input type="submit" class="registerbtn button" value="Register">
                     <div class="container signin">
-                        <p>Already have an account?<a href="#">Sign in</a>.</p>
+                        <p>Already have an account?<a href="/login">Sign in</a>.</p>
                     </div>
                 </div>
             </form>
@@ -30,5 +32,35 @@ function template() {
 }
 
 export function registerPage(ctx) {
-    ctx.render(template());
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const gender = formData.get('gender');
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const repass = formData.get('repeatPass');
+
+        console.log(gender);
+
+
+        if (email === '' || password === '') return showError('All fields are required');
+        if (password !== repass) return showError("Passwords don't match");
+
+        try {
+            const user = await post("/users/register", { username, email, password, gender });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/app');
+        } catch (err) {
+            if (err.message) showError(err.message);
+            else showError(err);
+        }
+    }
+
+    ctx.render(template(onRegister));
 }
