@@ -1,5 +1,5 @@
 import {render} from "../lib/lit-html.min.js";
-import page from "../lib/page.js";
+import page from "../lib/page.mjs";
 
 const item = "userData";
 
