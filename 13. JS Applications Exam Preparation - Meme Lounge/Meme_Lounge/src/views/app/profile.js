@@ -1,36 +1,42 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
+import { showError } from '../../utils/utils.js';
 
-function template() {
+function template(user, memes) {
     return html`
         <section id="user-profile-page" class="user-profile">
-        <article class="user-info">
-            <img id="user-avatar-url" alt="user-profile" src="/images/female.png">
-            <div class="user-content">
-                <p>Username: Mary</p>
-                <p>Email: mary@abv.bg</p>
-                <p>My memes count: 2</p>
+            <article class="user-info">
+                <img id="user-avatar-url" alt="user-profile" src="/images/${user.gender === 'male' ? 'male.png' : 'female.png'}">
+                <div class="user-content">
+                    <p>Username: ${user.username}</p>
+                    <p>Email: ${user.email}</p>
+                    <p>My memes count: ${memes.length}</p>
+                </div>
+            </article>
+            <h1 id="user-listings-title">User Memes</h1>
+            <div class="user-meme-listings">
+                ${0 < memes.length
+            ? memes.map(m => html`<div class="user-meme">
+                    <p class="user-meme-title">${m.title}</p>
+                    <img class="userProfileImage" alt="meme-img" src=${m.imageUrl}>
+                    <a class="button" href="/details/${m._id}">Details</a>
+                </div>`)
+            : html`<p class="no-memes">No memes in database.</p>`
+        } 
             </div>
-        </article>
-        <h1 id="user-listings-title">User Memes</h1>
-        <div class="user-meme-listings">
-            <!-- Display : All created memes by this user (If any) -->
-            <div class="user-meme">
-                <p class="user-meme-title">Java Script joke</p>
-                <img class="userProfileImage" alt="meme-img" src="/images/1.png">
-                <a class="button" href="#">Details</a>
-            </div>
-            <div class="user-meme">
-                <p class="user-meme-title">Bad code can present some problems</p>
-                <img class="userProfileImage" alt="meme-img" src="/images/3.png">
-                <a class="button" href="#">Details</a>
-            </div>
-
-            <!-- Display : If user doesn't have own memes  -->
-            <p class="no-memes">No memes in database.</p>
-        </div>
-    </section>`;
+        </section>
+    `
 }
 
 export async function profilePage(ctx) {
-    ctx.render(template());
+    const user = ctx.userData;
+    let memes = [];
+
+    try {
+        memes = await get(`/data/memes?where=_ownerId%3D%22${user._id}%22&sortBy=_createdOn%20desc`);
+    } catch (err) {
+        showError(err.message);
+    }
+
+    ctx.render(template(user, memes));
 }
