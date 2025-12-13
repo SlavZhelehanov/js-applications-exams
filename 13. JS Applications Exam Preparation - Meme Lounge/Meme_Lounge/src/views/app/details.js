@@ -1,7 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get, del } from "../../utils/api.js";
 
-function template() {
 function template(item, isOwner, onDelete) {
     return html`
         <section id="meme-details">
@@ -14,13 +13,16 @@ function template(item, isOwner, onDelete) {
                     <h2>Meme Description</h2>
                     <p>${item.description}</p>
 
+                    ${isOwner
+            ? html`<a class="button warning" href="/edit/${item._id}">Edit</a>
+                    <button @click=${onDelete} class="button danger">Delete</button>`
+            : null}
                 </div>
             </div>
         </section>`;
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
     const id = ctx.params.id, isAuth = !!ctx.userData;
     let item = {}, isOwner = false;
     try {
