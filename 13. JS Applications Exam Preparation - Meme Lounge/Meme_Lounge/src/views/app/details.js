@@ -1,5 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get, del } from "../../utils/api.js";
+import { showError } from '../../utils/utils.js';
 
 function template(item, isOwner, onDelete) {
     return html`
@@ -25,6 +26,16 @@ function template(item, isOwner, onDelete) {
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
     let item = {}, isOwner = false;
+
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await del(`/data/memes/${id}`);
+            ctx.page.redirect('/app');
+        }
+    }
+
     try {
         item = await get(`/data/memes/${id}`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
