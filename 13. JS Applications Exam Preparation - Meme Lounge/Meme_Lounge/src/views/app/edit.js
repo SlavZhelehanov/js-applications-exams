@@ -1,24 +1,18 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get, put } from "../../utils/api.js";
+import { showError } from '../../utils/utils.js';
 
-function template() {
+function template(item, onEdit) {
     return html`
         <section id="edit-meme">
-            <form id="edit-form">
                 <h1>Edit Meme</h1>
                 <div class="container">
                     <label for="title">Title</label>
-                    <input id="title" type="text" placeholder="Enter Title" name="title">
+                    <input id="title" type="text" placeholder="Enter Title" name="title" value=${item.title}>
                     <label for="description">Description</label>
-                    <textarea id="description" placeholder="Enter Description" name="description">
-                            Programming is often touted as a smart and lucrative career path.
-                            It's a job that (sometimes) offers flexibility and great benefits.
-                            But it's far from sunshine and Nyan Cat rainbows. The hours are long.
-                            The mistakes are frustrating. And your eyesight is almost guaranteed to suffer.
-                            These memes cover most of the frustration (and funny moments) of programming.
-                            At least we can laugh through the pain. 
-                        </textarea>
+                    <textarea id="description" placeholder="Enter Description" name="description">${item.description}</textarea>
                     <label for="imageUrl">Image Url</label>
-                    <input id="imageUrl" type="text" placeholder="Enter Meme ImageUrl" name="imageUrl">
+                    <input id="imageUrl" type="text" placeholder="Enter Meme ImageUrl" name="imageUrl" value=${item.imageUrl}>
                     <input type="submit" class="registerbtn button" value="Edit Meme">
                 </div>
             </form>
@@ -26,5 +20,11 @@ function template() {
 }
 
 export async function editPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id;
+    let item = {};
+    try {
+        item = await get(`/data/memes/${id}`);
+    } catch (err) {
+        showError(err.message);
+    }
 }
