@@ -1,26 +1,18 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get, del } from "../../utils/api.js";
 
 function template() {
+function template(item, isOwner, onDelete) {
     return html`
         <section id="meme-details">
-            <h1>Meme Title: Bad code can present some problems
-
-            </h1>
+            <h1>Meme Title: ${item.title}</h1>
             <div class="meme-details">
                 <div class="meme-img">
-                    <img alt="meme-alt" src="/images/3.png">
+                    <img alt="meme-alt" src=${item.imageUrl}>
                 </div>
                 <div class="meme-description">
                     <h2>Meme Description</h2>
-                    <p>
-                        Being a programmer is a fun job. And many funny incidents occur throughout a
-                        programmer’s career.
-                        Here are a few jokes that can be relatable to you as a programmer.
-                    </p>
-
-                    <!-- Buttons Edit/Delete should be displayed only for creator of this meme  -->
-                    <a class="button warning" href="#">Edit</a>
-                    <button class="button danger">Delete</button>
+                    <p>${item.description}</p>
 
                 </div>
             </div>
@@ -29,4 +21,14 @@ function template() {
 
 export async function detailsPage(ctx) {
     ctx.render(template());
+    const id = ctx.params.id, isAuth = !!ctx.userData;
+    let item = {}, isOwner = false;
+    try {
+        item = await get(`/data/memes/${id}`);
+        isOwner = isAuth && item._ownerId === ctx.userData._id;
+    } catch (err) {
+        showError(err.message);
+    }
+
+    ctx.render(template(item, isOwner, onDelete));
 }
