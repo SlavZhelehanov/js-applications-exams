@@ -5,6 +5,7 @@ import { showError } from '../../utils/utils.js';
 function template(item, onEdit) {
     return html`
         <section id="edit-meme">
+            <form id="edit-form" @submit=${onEdit}>
                 <h1>Edit Meme</h1>
                 <div class="container">
                     <label for="title">Title</label>
@@ -22,9 +23,29 @@ function template(item, onEdit) {
 export async function editPage(ctx) {
     const id = ctx.params.id;
     let item = {};
+
+    async function onEdit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const newItem = {
+            title: formData.get('title').trim(),
+            description: formData.get('description').trim(),
+            imageUrl: formData.get('imageUrl').trim()
+        }
+
+        if (Object.values(newItem).some((x) => !x)) return showError("All fields are required!");
+
+        await put(`/data/memes/${id}`, newItem);
+        e.target.reset();
+        ctx.page.redirect(`/details/${id}`);
+    }
+
     try {
         item = await get(`/data/memes/${id}`);
     } catch (err) {
         showError(err.message);
     }
+
+    ctx.render(template(item, onEdit));
 }

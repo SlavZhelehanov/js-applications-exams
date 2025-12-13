@@ -30,4 +30,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 10. JS Applications Regular Exam - 2 April 2022 - "Pet Care" - Bonus: Donate Action
 - [x] 11. JS Applications Retake Exam - 16 August 2021 - "GamesPlay" - Bonus: Comments
 - [x] 12. JS Applications Regular Exam - 8 August 2021 - "Online Books Library" - Bonus: Like a book
-- [ ] 13. JS Applications Exam Preparation - "Meme Lounge" - Bonus: Notifications
+- [x] 13. JS Applications Exam Preparation - "Meme Lounge" - Bonus: Notifications
