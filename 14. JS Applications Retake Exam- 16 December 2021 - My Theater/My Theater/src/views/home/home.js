@@ -1,4 +1,5 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
 
 function template(data) {
     return html`
@@ -18,57 +19,35 @@ function template(data) {
             <div id="events">
                 <h1>Future Events</h1>
                 <div class="theaters-container">
-
-                    <!--Created Events-->
-                    <div class="eventsInfo">
+                    ${0 < data.length
+            ? data.map(e => html`<div class="eventsInfo">
                         <div class="home-image">
-                            <img src="./images/Pretty-Woman.jpg">
+                            <img src=${e.imageUrl}>
                         </div>
                         <div class="info">
-                            <h4 class="title">Pretty Woman - The Musical</h4>
-                            <h6 class="date">March 13, 2018</h6>
-                            <h6 class="author">J. F. Lawton, Garry Marshall</h6>
+                            <h4 class="title">${e.title}</h4>
+                            <h6 class="date">${e.date}</h6>
+                            <h6 class="author">${e.author}</h6>
                             <div class="info-buttons">
-                                <a class="btn-details" href="#">Details</a>
+                                <a class="btn-details" href="/details/${e._id}">Details</a>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="eventsInfo">
-                        <div class="home-image">
-                            <img src="./images/Moulin-Rouge!-The-Musical.jpg">
-                        </div>
-                        <div class="info">
-                            <h4 class="title">Moulin Rouge! - The Musical</h4>
-                            <h6 class="date">July 10, 2018</h6>
-                            <h6 class="author">Baz Luhrmann, Craig Pearce</h6>
-                            <div class="info-buttons">
-                                <a class="btn-details" href="#">Details</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="eventsInfo">
-                        <div class="home-image">
-                            <img src="./images/To-kill-a-mockingbird.jpg">
-                        </div>
-                        <div class="info">
-                            <h4 class="title">To Kill A Mockingbird</h4>
-                            <h6 class="date">December 13, 2018</h6>
-                            <h6 class="author">Aaron Sorkin, Fred Fordham</h6>
-                            <div class="info-buttons">
-                                <a class="btn-details" href="#">Details</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--No Theaters-->
-                    <h4 class="no-event">No Events Yet...</h4>
+                    </div>`)
+            : html`<h4 class="no-event">No Events Yet...</h4>`
+        }
                 </div>
             </div>
         </section>`;
 }
 
 export async function homePage(ctx) {
-    ctx.render(template());
+    let data = [];
+
+    try {
+        data = await get(`/data/theaters?sortBy=_createdOn%20desc&distinct=title`);
+    } catch (error) {
+        alert(error.message);
+    }
+
+    ctx.render(template(data));
 }
