@@ -34,6 +34,15 @@ function template(item, isOwner, onDelete, isAuth, likes, onLike, canLike) {
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
     let item = {}, isOwner = false, likes = 0, canLike = 0;
+
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await del(`/data/theaters/${id}`);
+            ctx.page.redirect('/');
+        }
+    }
     try {
         item = await get(`/data/theaters/${id}`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
