@@ -1,9 +1,10 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="createPage">
-            <form class="create-form">
+            <form class="create-form" @submit=${onCreate}>
                 <h1>Create Theater</h1>
                 <div>
                     <label for="title">Title:</label>
@@ -31,5 +32,28 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            title: formData.get('title').trim(),
+            date: formData.get('date').trim(),
+            author: formData.get('author').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            description: formData.get('description').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/theaters", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
