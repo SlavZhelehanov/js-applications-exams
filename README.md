@@ -31,4 +31,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 11. JS Applications Retake Exam - 16 August 2021 - "GamesPlay" - Bonus: Comments
 - [x] 12. JS Applications Regular Exam - 8 August 2021 - "Online Books Library" - Bonus: Like a book
 - [x] 13. JS Applications Exam Preparation - "Meme Lounge" - Bonus: Notifications
-- [ ] 14. JS Applications Retake Exam- 16 December 2021 - "My Theater" - Bonus: Like Action
+- [x] 14. JS Applications Retake Exam- 16 December 2021 - "My Theater" - Bonus: Like Action
