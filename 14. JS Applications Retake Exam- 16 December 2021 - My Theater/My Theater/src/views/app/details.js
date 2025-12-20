@@ -1,23 +1,22 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get, del, post } from "../../utils/api.js";
 
-function template() {
+function template(item, isOwner, onDelete, isAuth, likes, onLike, canLike) {
     return html`
         <section id="detailsPage">
             <div id="detailsBox">
                 <div class="detailsInfo">
-                    <h1>Title: Moulin Rouge! - The Musical</h1>
+                    <h1>Title: ${item.title}</h1>
                     <div>
-                        <img src="./images/Moulin-Rouge!-The-Musical.jpg" />
+                        <img src=${item.imageUrl} />
                     </div>
                 </div>
 
                 <div class="details">
                     <h3>Theater Description</h3>
-                    <p>The Musical is a jukebox musical with a book by John Logan. The musical is based on the 2001 film
-                        Moulin Rouge! directed by Baz Luhrmann and written by Luhrmann and Craig Pearce. The musical
-                        premiered on July 10, 2018, at the Emerson Colonial Theatre in Boston.</p>
-                    <h4>Date: July 10, 2018</h4>
-                    <h4>Author: Baz Luhrmann, Craig Pearce</h4>
+                    <p>${item.description}</p>
+                    <h4>Date: ${item.date}</h4>
+                    <h4>Author: ${item.author}</h4>
                     <div class="buttons">
                         <a class="btn-delete" href="#">Delete</a>
                         <a class="btn-edit" href="#">Edit</a>
@@ -30,5 +29,13 @@ function template() {
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id, isAuth = !!ctx.userData;
+    let item = {}, isOwner = false, likes = 0, canLike = 0;
+    try {
+        item = await get(`/data/theaters/${id}`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(item, isOwner, onDelete, isAuth, likes, onLike, canLike));
 }
