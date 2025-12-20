@@ -18,11 +18,17 @@ function template(item, isOwner, onDelete, isAuth, likes, onLike, canLike) {
                     <h4>Date: ${item.date}</h4>
                     <h4>Author: ${item.author}</h4>
                     <div class="buttons">
+                        ${!isAuth
+            ? null
             : isOwner
                 ? html`<a class="btn-delete" @click=${onDelete} href="javascript:void(0)">Delete</a>
                         <a class="btn-edit" href="/edit/${item._id}">Edit</a>`
+                : canLike === 0
+                    ? html`<a class="btn-like" @click=${onLike} href="javascript:void(0)">Like</a>`
+                    : null
+        }                        
+                        
                     </div>
-                    <p class="likes">Likes: 0</p>
                     <p class="likes">Likes: ${likes}</p>
                 </div>
             </div>
@@ -41,10 +47,22 @@ export async function detailsPage(ctx) {
             ctx.page.redirect('/');
         }
     }
+
+    async function onLike() {
+        try {
+            await post("/data/likes", { theaterId: id });
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     try {
         item = await get(`/data/theaters/${id}`);
         likes = await get(`/data/likes?where=theaterId%3D%22${id}%22&distinct=_ownerId&count`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
+
+        if (isAuth && !isOwner) canLike = await get(`/data/likes?where=theaterId%3D%22${id}%22%20and%20_ownerId%3D%22${ctx.userData._id}%22&count`);
     } catch (err) {
         alert(err.message);
     }
