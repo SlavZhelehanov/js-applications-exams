@@ -21,6 +21,9 @@ function template(item, isOwner, onDelete, isAuth, likes, onLike, canLike) {
                         <a class="btn-delete" href="#">Delete</a>
                         <a class="btn-edit" href="#">Edit</a>
                         <a class="btn-like" href="#">Like</a>
+            : isOwner
+                ? html`<a class="btn-delete" @click=${onDelete} href="javascript:void(0)">Delete</a>
+                        <a class="btn-edit" href="/edit/${item._id}">Edit</a>`
                     </div>
                     <p class="likes">Likes: 0</p>
                 </div>
@@ -33,6 +36,7 @@ export async function detailsPage(ctx) {
     let item = {}, isOwner = false, likes = 0, canLike = 0;
     try {
         item = await get(`/data/theaters/${id}`);
+        isOwner = isAuth && item._ownerId === ctx.userData._id;
     } catch (err) {
         alert(err.message);
     }
