@@ -8,6 +8,7 @@ import {loginPage} from "./views/auth/login.js";
 import {createPage} from "./views/app/create.js";
 import {editPage} from "./views/app/edit.js";
 import {detailsPage} from "./views/app/details.js";
+import {searchPage} from "./views/home/search.js";
 
 setNavigation();
 
@@ -20,5 +21,6 @@ page("/login", guardRoute("guest"), loginPage);
 page("/create", guardRoute("user"), createPage);
 page("/edit/:id", guardRoute("user"), editPage);
 page("/details/:id", detailsPage);
+page("/search", searchPage);
 
 page.start();
