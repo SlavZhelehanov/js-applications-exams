@@ -1,12 +1,12 @@
 import {html} from "../../lib/lit-html.min.js";
+import {post} from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section class="createPage">
-            <form>
+            <form @submit=${onCreate}>
                 <fieldset>
                     <legend>Add Album</legend>
-
                     <div class="container">
                         <label for="name" class="vhide">Album name</label>
                         <input id="name" name="name" class="name" type="text" placeholder="Album name">
@@ -37,5 +37,30 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            name: formData.get('name').trim(),
+            imgUrl: formData.get('imgUrl').trim(),
+            price: formData.get('price').trim(),
+            releaseDate: formData.get('releaseDate').trim(),
+            artist: formData.get('artist').trim(),
+            genre: formData.get('genre').trim(),
+            description: formData.get('description').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/albums", item);
+            e.target.reset();
+            ctx.page.redirect('/app');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
