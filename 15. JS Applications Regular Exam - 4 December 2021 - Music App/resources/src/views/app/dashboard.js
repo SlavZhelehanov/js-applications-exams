@@ -1,64 +1,42 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
 
-function template() {
+function template(data, isAuth) {
     return html`
         <section id="catalogPage">
             <h1>All Albums</h1>
-
-            <div class="card-box">
-                <img src="./images/BrandiCarlile.png">
+            ${0 < data.length
+                    ? data.map(a => html`<div class="card-box">
+                <img src=${a.imgUrl}>
                 <div>
                     <div class="text-center">
-                        <p class="name">Name: In These Silent Days</p>
-                        <p class="artist">Artist: Brandi Carlile</p>
-                        <p class="genre">Genre: Low Country Sound Music</p>
-                        <p class="price">Price: $12.80</p>
-                        <p class="date">Release Date: October 1, 2021</p>
+                        <p class="name">Name: ${a.name}</p>
+                        <p class="artist">Artist: ${a.artist}</p>
+                        <p class="genre">Genre: ${a.genre}</p>
+                        <p class="price">Price: $${a.price}</p>
+                        <p class="date">Release Date: ${a.releaseDate}</p>
                     </div>
-                    <div class="btn-group">
-                        <a href="#" id="details">Details</a>
-                    </div>
+                    ${isAuth
+                            ? html`<div class="btn-group">
+                        <a href="/details/${a._id}" id="details">Details</a>
+                    </div>`
+                            : null
+                    }                    
                 </div>
-            </div>
-
-            <div class="card-box">
-                <img src="./images/pinkFloyd.jpg">
-                <div>
-                    <div class="text-center">
-                        <p class="name">Name: The Dark Side of the Moon</p>
-                        <p class="artist">Artist: Pink Floyd</p>
-                        <p class="genre">Genre: Rock Music</p>
-                        <p class="price">Price: $28.75</p>
-                        <p class="date">Release Date: March 1, 1973</p>
-                    </div>
-                    <div class="btn-group">
-                        <a href="#" id="details">Details</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-box">
-                <img src="./images/Lorde.jpg">
-                <div>
-                    <div class="text-center">
-                        <p class="name">Name: Melodrama</p>
-                        <p class="artist">Artist: Lorde</p>
-                        <p class="genre">Genre: Pop Music</p>
-                        <p class="price">Price: $7.33</p>
-                        <p class="date">Release Date: June 16, 2017</p>
-                    </div>
-                    <div class="btn-group">
-                        <a href="#" id="details">Details</a>
-                    </div>
-                </div>
-            </div>
-
-            <!--No albums in catalog-->
-            <p>No Albums in Catalog!</p>
-
+            </div>`)
+                    : html`<p>No Albums in Catalog!</p>`
+            }
         </section>`;
 }
 
 export async function dashboardPage(ctx) {
-    ctx.render(template());
+    let data = [], isAuth = !!ctx.userData;
+
+    try {
+        data = await get("/data/albums?sortBy=_createdOn%20desc&distinct=name");
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(data, isAuth));
 }
