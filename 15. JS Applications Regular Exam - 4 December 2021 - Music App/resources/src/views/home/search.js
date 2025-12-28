@@ -1,42 +1,63 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template() {
+function template(onSearch, data, isLoggedIn) {
     return html`
         <section id="searchPage">
             <h1>Search by Name</h1>
 
             <div class="search">
                 <input id="search-input" type="text" name="search" placeholder="Enter desired albums's name">
-                <button class="button-list">Search</button>
+                <button @click=${onSearch} class="button-list">Search</button>
             </div>
 
             <h2>Results:</h2>
-
-            <!--Show after click Search button-->
+            
             <div class="search-result">
-                <!--If have matches-->
-                <div class="card-box">
-                    <img src="./images/BrandiCarlile.png">
+                ${0 < data.length
+        ? data.map(a => html`<div class="card-box">
+                    <img src=${a.imgUrl}>
                     <div>
                         <div class="text-center">
-                            <p class="name">Name: In These Silent Days</p>
-                            <p class="artist">Artist: Brandi Carlile</p>
-                            <p class="genre">Genre: Low Country Sound Music</p>
-                            <p class="price">Price: $12.80</p>
-                            <p class="date">Release Date: October 1, 2021</p>
+                            <p class="name">Name: ${a.name}</p>
+                            <p class="artist">Artist: ${a.artist}</p>
+                            <p class="genre">Genre: ${a.genre}</p>
+                            <p class="price">Price: $${a.price}</p>
+                            <p class="date">Release Date: ${a.releaseDate}</p>
                         </div>
-                        <div class="btn-group">
-                            <a href="#" id="details">Details</a>
-                        </div>
+                        ${isLoggedIn
+            ? html`<div class="btn-group">
+                            <a href="/details/${a._id}" id="details">Details</a>
+                        </div>`
+            : null
+        }                        
                     </div>
-                </div>
-
-                <!--If there are no matches-->
-                <p class="no-result">No result.</p>
+                </div>`)
+        : html`<p class="no-result">No result.</p>`
+    }                
             </div>
-        </section>`;
+        </section>`
 }
 
 export async function searchPage(ctx) {
-    ctx.render(template());
+    const item = ctx.querystring.split('=')[1], isLoggedIn = !!ctx.userData;
+    let data = '';
+
+    try {
+        if (item && 0 < item.length) data = await get(`/data/albums?where=name%20LIKE%20%22${item}%22`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    async function onSearch(e) {
+        e.preventDefault();
+
+        const query = document.getElementById('search-input').value;
+
+        if (query.trim() === '') return alert('All fields are required!');
+
+        ctx.page.redirect(`/search?query=${query}`);
+    }
+
+    ctx.render(template(onSearch, data, isLoggedIn));
 }
