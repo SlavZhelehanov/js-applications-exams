@@ -1,6 +1,6 @@
-import { html } from '../../lib/lit-html.min.js';
+import {html} from '../../lib/lit-html.min.js';
 
-function template() {
+function template(isCreator) {
     return html`
         <section id="detailsPage">
             <div class="wrapper">
@@ -20,8 +20,11 @@ function template() {
                     </div>
                     <!-- Only for registered user and creator of the album-->
                     <div class="actionBtn">
-                        <a href="#" class="edit">Edit</a>
-                        <a href="#" class="remove">Delete</a>
+                        ${isCreator
+                                ? html`<a href="/edit/126777f5-3277-42ad-b874-76d043b069cb" class="edit">Edit</a>
+                                <a href="#" class="remove">Delete</a>`
+                                : null
+                        }
                     </div>
                 </div>
             </div>
@@ -29,5 +32,16 @@ function template() {
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id;
+    let item = {}, isCreator = false;
+
+    try {
+        item = await get(`/data/albums/${id}`);
+
+        if (item._ownerId === ctx.userData.id) isCreator = true;
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(isCreator));
 }
