@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import {get, del} from "../../utils/api.js";
 
-function template(item, isCreator) {
+function template(item, isCreator, onDelete) {
     return html`
         <section id="detailsPage">
             <div class="wrapper">
@@ -21,7 +21,7 @@ function template(item, isCreator) {
                     <div class="actionBtn">
                         ${isCreator
                                 ? html`<a href="/edit/${item._id}" class="edit">Edit</a>
-                                <a href="#" class="remove">Delete</a>`
+                                <a @click=${onDelete} href="javascript:void(0)" class="remove">Delete</a>`
                                 : null
                         }
                     </div>
@@ -31,16 +31,29 @@ function template(item, isCreator) {
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id;
+    const id = ctx.params.id, isAuth = !!ctx.userData;
     let item = {}, isCreator = false;
+
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/albums/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
 
     try {
         item = await get(`/data/albums/${id}`);
 
-        if (item._ownerId === ctx.userData.id) isCreator = true;
+        if (isAuth && item._ownerId === ctx.userData._id) isCreator = true;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(item, isCreator));
+    ctx.render(template(item, isCreator, onDelete));
 }
