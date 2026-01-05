@@ -10,6 +10,7 @@ import {detailsPage} from "./views/app/details.js";
 import {editPage} from "./views/app/edit.js";
 import {myListingsPage} from "./views/app/my-listings.js";
 import {searchPage} from "./views/home/search.js";
+import {logoutAction} from "./views/auth/logout.js";
 
 setNavigation();
 
@@ -19,6 +20,7 @@ page("/", homePage);
 page("/app", dashboardPage);
 page("/login", guardRoute("guest"), loginPage);
 page("/register", guardRoute("guest"), registerPage);
+page("/logout", guardRoute("user"), logoutAction);
 page("/create", guardRoute("user"), createPage);
 page("/details/:id", detailsPage);
 page("/edit/:id", guardRoute("user"), editPage);
