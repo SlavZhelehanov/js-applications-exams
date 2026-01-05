@@ -25,7 +25,7 @@ function template(onRegister) {
                 </form>
                 <div class="signin">
                     <p>Already have an account?
-                        <a href="/register">Sign in</a>.
+                        <a href="/login">Sign in</a>.
                     </p>
                 </div>
             </div>
