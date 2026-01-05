@@ -1,10 +1,12 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
+import { saveUserData } from "../../utils/utils.js";
 
-function template() {
+function template(onRegister) {
     return html`
         <section id="register">
             <div class="container">
-                <form id="register-form">
+                <form id="register-form" @submit=${onRegister}>
                     <h1>Register</h1>
                     <p>Please fill in this form to create an account.</p>
                     <hr>
@@ -23,7 +25,7 @@ function template() {
                 </form>
                 <div class="signin">
                     <p>Already have an account?
-                        <a href="#">Sign in</a>.
+                        <a href="/register">Sign in</a>.
                     </p>
                 </div>
             </div>
@@ -31,5 +33,30 @@ function template() {
 }
 
 export function registerPage(ctx) {
-    ctx.render(template());
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const password = formData.get('password');
+        const repass = formData.get('repeatPass');
+
+        if (username === '' || password === '') return alert('All fields are required');
+        if (password !== repass) return alert("Passwords don't match");
+
+        try {
+            const user = await post("/users/register", { username, password });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/app');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onRegister));
 }
