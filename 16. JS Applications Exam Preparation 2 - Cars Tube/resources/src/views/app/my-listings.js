@@ -1,34 +1,41 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template() {
+function template(data) {
     return html`
         <section id="my-listings">
             <h1>My car listings</h1>
             <div class="listings">
-
-                <!-- Display all records -->
-                <div class="listing">
+                ${0 < data.length
+                        ? data.map(s => html`<div class="listing">
                     <div class="preview">
-                        <img src="/images/audia3.jpg">
+                        <img src=${s.imageUrl}>
                     </div>
-                    <h2>Audi A3</h2>
+                    <h2>${s.brand} ${s.model}</h2>
                     <div class="info">
                         <div class="data-info">
-                            <h3>Year: 2018</h3>
-                            <h3>Price: 25000 $</h3>
+                            <h3>Year: ${s.year}</h3>
+                            <h3>Price: ${s.price} $</h3>
                         </div>
                         <div class="data-buttons">
-                            <a href="#" class="button-carDetails">Details</a>
+                            <a href="/details/${s._id}" class="button-carDetails">Details</a>
                         </div>
                     </div>
-                </div>
-
-                <!-- Display if there are no records -->
-                <p class="no-cars"> You haven't listed any cars yet.</p>
+                </div>`)
+                        : html`<p class="no-cars"> You haven't listed any cars yet.</p>`
+                }
             </div>
         </section>`;
 }
 
 export async function myListingsPage(ctx) {
-    ctx.render(template());
+    let data = [];
+
+    try {
+        data = await get(`/data/cars?where=_ownerId%3D%22${ctx.userData._id}%22&sortBy=_createdOn%20desc2`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(data));
 }
