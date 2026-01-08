@@ -1,22 +1,21 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template(isOwner) {
+function template(item, isOwner) {
     return html`
         <section id="listing-details">
             <h1>Details</h1>
             <div class="details-info">
-                <img src="/images/audia3.jpg">
+                <img src=${item.imageUrl}>
                 <hr>
                 <ul class="listing-props">
-                    <li><span>Brand:</span>Audi</li>
-                    <li><span>Model:</span>A3</li>
-                    <li><span>Year:</span>2018</li>
-                    <li><span>Price:</span>25000$</li>
+                    <li><span>Brand:</span>${item.brand}</li>
+                    <li><span>Model:</span>${item.model}</li>
+                    <li><span>Year:</span>${item.year}</li>
+                    <li><span>Price:</span>${item.price}$</li>
                 </ul>
 
-                <p class="description-para">Some description of this car. Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Sunt voluptate quam nesciunt ipsa veritatis voluptas optio debitis repellat porro
-                    sapiente.</p>
+                <p class="description-para">${item.description}</p>
 
                 <div class="listings-buttons">
                     ${isOwner
@@ -30,7 +29,15 @@ function template(isOwner) {
 }
 
 export async function detailsPage(ctx) {
-    let isOwner = false;
+    const id = ctx.params.id, isAuth = !!ctx.userData;
+    let item = {}, isOwner = false;
 
-    ctx.render(template(isOwner));
+    try {
+        item = await get(`/data/cars/${id}`);
+        isOwner = isAuth && item._ownerId === ctx.userData._id;
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template(item, isOwner));
 }
