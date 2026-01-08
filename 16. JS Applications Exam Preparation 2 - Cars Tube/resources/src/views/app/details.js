@@ -1,6 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 
-function template() {
+function template(isOwner) {
     return html`
         <section id="listing-details">
             <h1>Details</h1>
@@ -19,13 +19,18 @@ function template() {
                     sapiente.</p>
 
                 <div class="listings-buttons">
-                    <a href="#" class="button-list">Edit</a>
-                    <a href="#" class="button-list">Delete</a>
+                    ${isOwner
+                            ? html`<a href="#" class="button-list">Edit</a>
+                            <a href="#" class="button-list">Delete</a>`
+                            : null
+                    }
                 </div>
             </div>
         </section>`;
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    let isOwner = false;
+
+    ctx.render(template(isOwner));
 }
