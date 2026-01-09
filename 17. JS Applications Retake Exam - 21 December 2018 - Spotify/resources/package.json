@@ -1,7 +1,18 @@
 {
-  "dependencies": {
-    "handlebars": "^4.0.11",
-    "jquery": "^3.3.1",
-    "sammy": "^0.7.6"
-  }
+    "name": "spotify",
+    "version": "1.0.0",
+    "description": "Spotify Single Page Application that keeps users and songs",
+    "main": "index.html",
+    "scripts": {
+        "test": "mocha tests/e2e.test.js",
+        "start": "http-server -a localhost -p 3000 -P http://localhost:3000?"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "chai": "4.3.4",
+        "http-server": "^14.1.1",
+        "mocha": "^11.7.5",
+        "playwright-chromium": "1.9.2"
+    }
 }
