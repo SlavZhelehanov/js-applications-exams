@@ -34,3 +34,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 14. JS Applications Retake Exam- 16 December 2021 - "My Theater" - Bonus: Like Action
 - [x] 15. JS Applications Regular Exam - 4 December 2021 - "Music App" - Bonus: Search Page
 - [x] 16. JS Applications Exam Preparation 2 - "Cars Tube" - Bonus: Search
+- [ ] 17. JS Applications Retake Exam - 21 December 2018 - "Spotify" - Bonus: Notifications
