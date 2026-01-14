@@ -1,7 +1,7 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get } from "../../utils/api.js";
 
-function template(data) {
+function template(data, isAuth) {
     return html`
         <section id="allSongsView">
             <div class="background-spotify">
@@ -16,12 +16,13 @@ function template(data) {
                         <h5>Artist: ${m.artist}</h5>
                         <img class="cover" src=${m.imageUrl}/>
 
-                        <p>Likes: 100; Listened 1500 times</p>
+                                ${isAuth?._id === m._ownerId
+                                ? html`<p>Likes: 100; Listened 1500 times</p>
                         <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
-                        <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>
-                        <p>Likes: 100</p>
-                        <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>`)
-                        : null
+                        <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>`
+                        : html`<p>Likes: 100</p>
+                        <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>`
+                            })
                     }
                     <div class="song">
                         <h5>Title: When The Sun Goes Down</h5>
@@ -59,6 +60,7 @@ function template(data) {
 }
 
 export async function dashboardPage(ctx) {
+    const isAuth = ctx.userData;
     let data = [];
 
     try {
@@ -67,5 +69,5 @@ export async function dashboardPage(ctx) {
         console.log(err.message);
     }
 
-    ctx.render(template(data));
+    ctx.render(template(data, isAuth));
 }
