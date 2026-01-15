@@ -12,17 +12,18 @@ function template(data, isAuth) {
                     </a>
                     ${0 < data.length
                             ? data.map(m => html`<div class="song">
-                        <h5>Title: ${m.title}</h5>
-                        <h5>Artist: ${m.artist}</h5>
-                        <img class="cover" src=${m.imageUrl}/>
+                                    <h5>Title: ${m.title}</h5>
+                                    <h5>Artist: ${m.artist}</h5>
+                                    <img class="cover" src=${m.imageUrl}/>
 
-                                ${isAuth?._id === m._ownerId
-                                ? html`<p>Likes: 100; Listened 1500 times</p>
-                        <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
-                        <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>`
-                        : html`<p>Likes: 100</p>
-                        <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>`
-                            })
+                                    ${isAuth?._id === m._ownerId
+                                            ? html`<p>Likes: ${m.likes}; Listened 1500 times</p>
+                                                <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
+                                                <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>`
+                                            : html`<p>Likes: ${m.likes}</p>
+                                                <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>`
+                                    }`)
+                            :null
                     }
                     <div class="song">
                         <h5>Title: When The Sun Goes Down</h5>
@@ -61,10 +62,17 @@ function template(data, isAuth) {
 
 export async function dashboardPage(ctx) {
     const isAuth = ctx.userData;
-    let data = [];
+    let data = [], totalLikes;
 
     try {
         data = await get('/data/songs?sortBy=_createdOn%20desc');
+        totalLikes = await get("/data/likes");
+
+        for (let i = 0; i < data.length; i++) {
+            for (let j = 0; j < totalLikes.length; j++) {
+                if(data[i]._id === totalLikes[j].songId) data[i].likes++;
+            }
+        }
     } catch (err) {
         console.log(err.message);
     }

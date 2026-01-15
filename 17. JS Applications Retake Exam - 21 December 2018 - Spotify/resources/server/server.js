@@ -1373,7 +1373,8 @@
                 "listened": 22000,
                 "_createdOn": 1616162253496
             }
-    	}
+    	},
+        likes: {}
     };
     var rules$1 = {
     	users: {
