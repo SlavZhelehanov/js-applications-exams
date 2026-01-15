@@ -1,7 +1,7 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get } from "../../utils/api.js";
 
-function template(data, isAuth) {
+function template(data, isAuth, onLike) {
     return html`
         <section id="allSongsView">
             <div class="background-spotify">
@@ -21,7 +21,7 @@ function template(data, isAuth) {
                                                 <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
                                                 <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>`
                                             : html`<p>Likes: ${m.likes}</p>
-                                                <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>`
+                                            <a><button @click=${() => onLike(m._id)} type="button" class="btn btn-primary mt-4">Like</button></a>`
                                     }`)
                             :null
                     }
@@ -64,6 +64,15 @@ export async function dashboardPage(ctx) {
     const isAuth = ctx.userData;
     let data = [], totalLikes;
 
+    async function onLike(id) {
+        try {
+            await post(`/data/likes`, { songId: id });
+            ctx.page.redirect('/app');
+        } catch (err) {
+            console.log(err.message);
+        }
+    }
+
     try {
         data = await get('/data/songs?sortBy=_createdOn%20desc');
         totalLikes = await get("/data/likes");
@@ -77,5 +86,5 @@ export async function dashboardPage(ctx) {
         console.log(err.message);
     }
 
-    ctx.render(template(data, isAuth));
+    ctx.render(template(data, isAuth, onLike));
 }
