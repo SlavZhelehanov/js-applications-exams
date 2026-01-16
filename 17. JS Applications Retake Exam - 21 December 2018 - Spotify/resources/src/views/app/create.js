@@ -1,12 +1,13 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="createSongView">
             <div class="background-spotify">
                 <div class="song-container">
                     <h1>Create new song</h1>
-                    <form action="#" method="POST">
+                    <form @submit=${onCreate}>
                         <div class="form-group">
                             <label for="title" class="white-labels">Title</label>
                             <input id="title" type="text" name="title" class="form-control" placeholder="Title">
@@ -27,5 +28,26 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            title: formData.get('title').trim(),
+            artist: formData.get('artist').trim(),
+            imageUrl: formData.get('imageURL').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/songs", { ...item, likes: 0, listened: 0 });
+            e.target.reset();
+            ctx.page.redirect('/app');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
