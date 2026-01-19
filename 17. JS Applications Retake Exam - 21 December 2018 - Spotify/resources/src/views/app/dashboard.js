@@ -1,8 +1,8 @@
 import {html} from "../../lib/lit-html.min.js";
-import {get} from "../../utils/api.js";
-import {showMessage} from "../../utils/utils";
+import {get, post, put, del} from "../../utils/api.js";
+import {showMessage} from "../../utils/utils.js";
 
-function template(data, isAuth, onLike, onDelete) {
+function template(data, isAuth, onLike, onDelete, onListen) {
     return html`
         <section id="allSongsView">
             <div class="background-spotify">
@@ -19,11 +19,9 @@ function template(data, isAuth, onLike, onDelete) {
                                     <img class="cover" src=${m.imageUrl}/>
 
                                     ${isAuth?._id === m._ownerId
-                                            ? html`<p>Likes: ${m.likes}; Listened 1500 times</p>
+                                            ? html`<p>Likes: ${m.likes}; Listened ${m.listened} times</p>
                                             <a><button @click=${() => onDelete(m._id)} type="button" class="btn btn-danger mt-4">Remove</button></a>
-                                            <a href="#">
-                                                <button type="button" class="btn btn-success mt-4">Listen</button>
-                                            </a>`
+                                            <a><button @click=${() => onListen(m)} type="button" class="btn btn-success mt-4">Listen</button></a>`
                                             : html`<p>Likes: ${m.likes}</p>
                                             <a>
                                                 <button @click=${() => onLike(m._id)} type="button"
@@ -58,6 +56,7 @@ export async function dashboardPage(ctx) {
 
         if (choice) {
             try {
+                showMessage( "loading", 'Loading...');
                 await del(`/data/songs/${id}`);
                 await showMessage("info", "Song removed successfully!");
                 ctx.page.redirect('/app');
@@ -65,6 +64,19 @@ export async function dashboardPage(ctx) {
                 if (err.message) showMessage("err", err.message);
                 else showMessage("err", err);
             }
+        }
+    }
+
+    async function onListen(song) {
+        let { title, artist, imageUrl, listened, likes } = song;
+
+        try {
+            await put(`/data/songs/${song._id}`, { title, artist, imageUrl, listened: listened + 1, likes });
+            showMessage("info", `You just listened ${title}`);
+            ctx.page.redirect('/app');
+        } catch (err) {
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
         }
     }
 
@@ -82,5 +94,5 @@ export async function dashboardPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template(data, isAuth, onLike, onDelete));
+    ctx.render(template(data, isAuth, onLike, onDelete, onListen));
 }

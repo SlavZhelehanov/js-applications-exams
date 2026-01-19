@@ -23,8 +23,6 @@ export function setNavigation() {
     const [tl1, tl2] = tu.getElementsByTagName('li');
     const username = getUserData() ? getUserData().username : null;
 
-    console.log(isLoggedIn, username)
-
     isLoggedIn
         ? [fu.style.display = "block",
             su.style.display = "block",
