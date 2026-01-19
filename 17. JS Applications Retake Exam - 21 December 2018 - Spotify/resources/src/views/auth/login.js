@@ -1,6 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { post } from "../../utils/api.js";
-import { saveUserData, showError } from "../../utils/utils.js";
+import { saveUserData, showMessage } from "../../utils/utils.js";
 
 function template(onLogin) {
     return html`
@@ -33,21 +33,21 @@ export function loginPage(ctx) {
         const username = formData.get('username');
         const password = formData.get('password');
 
-        if (username.trim() === '' || password.trim() === '') return showError('All fields are required!');
+        if (username.trim() === '' || password.trim() === '') return showMessage("err",'All fields are required!');
 
         try {
             const user = await post("/users/login", { username, password });
 
-            console.log(user);
-
             if (399 < user.status) throw user.statusText;
 
             saveUserData(user);
+            await showMessage("info", 'Login successful.');
             e.target.reset();
             ctx.setNavigation();
             ctx.page.redirect('/app');
         } catch (err) {
-            showError(err);
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
         }
     }
 

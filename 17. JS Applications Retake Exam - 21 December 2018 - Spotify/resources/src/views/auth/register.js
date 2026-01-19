@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
-import { saveUserData, showError } from "../../utils/utils.js";
+import { saveUserData, showMessage } from "../../utils/utils.js";
 
 function template(onRegister) {
     return html`
@@ -32,21 +32,23 @@ export function registerPage(ctx) {
         const username = formData.get('username');
         const password = formData.get('password');
 
-        // if (email === '' || password === '') return showError('All fields are required');
-        // if (password !== repass) return showError("Passwords don't match");
+        if (username.length < 3) return showMessage( "err",'The username should be at least 3 characters long');
+        if (password.length < 6) return showMessage( "err",'The password should be at least 6 characters long');
 
         try {
+            showMessage("loading", 'Loading...');
             const user = await post("/users/register", { username, password });
 
             if (399 < user.status) throw user.statusText;
 
             saveUserData(user);
+            await showMessage("info", 'User registration successful.');
             e.target.reset();
             ctx.setNavigation();
             ctx.page.redirect('/app');
         } catch (err) {
-            if (err.message) showError(err.message);
-            else showError(err);
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
         }
     }
 

@@ -14,20 +14,15 @@ async function request(method, url, data) {
         options.body = JSON.stringify(data);
     }
 
-    try {
-        const response = await fetch(URL + url, options);
+    const response = await fetch(URL + url, options);
 
-        if (response.ok === false) {
-            throw await response.json();
-        }
-        try {
-            return await response.json();
-        } catch (err) {
-            return response;
-        }
-    } catch (error) {
-        alert(error.message);
-        throw error;
+    if (response.ok === false) {
+        throw await response.json();
+    }
+    try {
+        return await response.json();
+    } catch (err) {
+        return response;
     }
 }
 

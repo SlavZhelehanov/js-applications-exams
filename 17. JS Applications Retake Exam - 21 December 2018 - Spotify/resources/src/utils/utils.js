@@ -63,13 +63,27 @@ export function guardRoute(status) {
     };
 }
 
-export function showError(message) {
-    const errorBox = document.querySelector('.notification');
+export async function showMessage(id, message) {
+    // const errorBox = document.querySelector('.notification');
+    const notificationDiv = document.getElementById("notifications").getElementsByTagName('div')[0];
 
-    errorBox.querySelector('span').textContent = message;
-    errorBox.style.display = 'block';
+    if(id === 'loading') {
+        notificationDiv.id = 'loadingBox';
+    } else if (id === 'info') {
+        notificationDiv.id = 'infoBox';
+    } else {
+        notificationDiv.id = 'errorBox';
+    }
 
-    setTimeout(() => {
-        errorBox.style.display = 'none';
-    }, 3000);
+    notificationDiv.innerHTML = `<span>${message}</span>`;
+    notificationDiv.style.display = 'block';
+    notificationDiv.addEventListener('click', () => notificationDiv.style.display = 'none');
+    // errorBox.querySelector('span').textContent = message;
+    // errorBox.style.display = 'block';
+    if(id !== 'loading') {
+        return new Promise((resolve, reject) => setTimeout(() => {
+            resolve(notificationDiv.style.display = 'none');
+        }, 3000));
+    }
+
 }

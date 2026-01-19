@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
+import { showMessage } from "../../utils/utils.js";
 
 function template(onCreate) {
     return html`
@@ -38,14 +39,19 @@ export async function createPage(ctx) {
             imageUrl: formData.get('imageURL').trim()
         }
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        // if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        if(item.title.length < 6) return showMessage( "err",'The title should be at least 6 characters long');
+        if(item.artist.length < 3) return showMessage( "err",'The artist should be at least 3 characters long');
+        if(!item.imageUrl.startsWith('http://') && !item.imageUrl.startsWith('https://')) return showMessage( "err",'The image should start with http:// or https://');
 
         try {
             await post("/data/songs", { ...item, likes: 0, listened: 0 });
+            await showMessage("info", 'Song created successfully.');
             e.target.reset();
             ctx.page.redirect('/app');
         } catch (err) {
-            alert(err.message);
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
         }
     }
 

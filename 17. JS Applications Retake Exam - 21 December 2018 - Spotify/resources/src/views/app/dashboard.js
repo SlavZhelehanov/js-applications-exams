@@ -1,5 +1,6 @@
-import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import {html} from "../../lib/lit-html.min.js";
+import {get} from "../../utils/api.js";
+import {showMessage} from "../../utils/utils";
 
 function template(data, isAuth, onLike) {
     return html`
@@ -11,50 +12,29 @@ function template(data, isAuth, onLike) {
                         <button type="button" class="btn-lg btn-block new-song-btn">Add a new song</button>
                     </a>
                     ${0 < data.length
-                            ? data.map(m => html`<div class="song">
+                            ? data.map(m => html`
+                                <div class="song">
                                     <h5>Title: ${m.title}</h5>
                                     <h5>Artist: ${m.artist}</h5>
                                     <img class="cover" src=${m.imageUrl}/>
 
                                     ${isAuth?._id === m._ownerId
                                             ? html`<p>Likes: ${m.likes}; Listened 1500 times</p>
-                                                <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
-                                                <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>`
+                                            <a href="#">
+                                                <button type="button" class="btn btn-danger mt-4">Remove</button>
+                                            </a>
+                                            <a href="#">
+                                                <button type="button" class="btn btn-success mt-4">Listen</button>
+                                            </a>`
                                             : html`<p>Likes: ${m.likes}</p>
-                                            <a><button @click=${() => onLike(m._id)} type="button" class="btn btn-primary mt-4">Like</button></a>`
+                                            <a>
+                                                <button @click=${() => onLike(m._id)} type="button"
+                                                        class="btn btn-primary mt-4">Like
+                                                </button>
+                                            </a>`
                                     }`)
-                            :null
+                            : html`<h2>There are no songs yet!</h2>`
                     }
-                    <div class="song">
-                        <h5>Title: When The Sun Goes Down</h5>
-                        <h5>Artist: Zeni N, The Distance, Igi</h5>
-                        <img class="cover" src="https://images-na.ssl-images-amazon.com/images/I/51MGXCdrUpL._SS500.jpg"/>
-                        <p>Likes: 100; Listened 1500 times</p>
-                        <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
-                        <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>
-                        <p>Likes: 100</p>
-                        <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>
-                    </div>
-                    <div class="song">
-                        <h5>Title: Insomnia 2.0 (Avicci Remix)</h5>
-                        <h5>Artist: Faithless, Avicci</h5>
-                        <img class="cover" src="https://static.qobuz.com/images/covers/58/22/0886445392258_600.jpg"/>
-                        <p>Likes: 2000; Listened 100000 times</p>
-                        <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
-                        <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>
-                        <p>Likes: 2000</p>
-                        <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>
-                    </div>
-                    <div class="song">
-                        <h5>Title: Coffee Shop</h5>
-                        <h5>Artist: Sunnery James & Ryan Marciano</h5>
-                        <img class="cover" src="https://images-na.ssl-images-amazon.com/images/I/51RO-2AhZEL._SS500.jpg"/>
-                        <p>Likes: 1234; Listened 5000 times</p>
-                        <a href="#"><button type="button" class="btn btn-danger mt-4">Remove</button></a>
-                        <a href="#"><button type="button" class="btn btn-success mt-4">Listen</button></a>
-                        <p>Likes: 1234</p>
-                        <a href="#"><button type="button" class="btn btn-primary mt-4">Like</button></a>
-                    </div>
                 </div>
             </div>
         </section>`;
@@ -66,7 +46,8 @@ export async function dashboardPage(ctx) {
 
     async function onLike(id) {
         try {
-            await post(`/data/likes`, { songId: id });
+            await post(`/data/likes`, {songId: id});
+            showMessage("info", "Liked!");
             ctx.page.redirect('/app');
         } catch (err) {
             console.log(err.message);
@@ -79,11 +60,12 @@ export async function dashboardPage(ctx) {
 
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < totalLikes.length; j++) {
-                if(data[i]._id === totalLikes[j].songId) data[i].likes++;
+                if (data[i]._id === totalLikes[j].songId) data[i].likes++;
             }
         }
     } catch (err) {
-        console.log(err.message);
+        if (err.message) showMessage("err", err.message);
+        else showMessage("err", err);
     }
 
     ctx.render(template(data, isAuth, onLike));

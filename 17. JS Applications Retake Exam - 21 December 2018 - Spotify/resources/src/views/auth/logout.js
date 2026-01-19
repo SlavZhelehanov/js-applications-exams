@@ -1,13 +1,15 @@
 import { get } from "../../utils/api.js";
-import { clearUserData, showError } from "../../utils/utils.js";
+import { clearUserData, showMessage } from "../../utils/utils.js";
 
 export async function logoutAction(ctx) {
     try {
         await get("/users/logout");
         clearUserData();
+        await showMessage("info", "Logout successful.");
         ctx.setNavigation();
     } catch (err) {
-        showError(err.message);
+        if (err.message) showMessage("err", err.message);
+        else showMessage("err", err);
     }
     return ctx.page.redirect('/');
 }
