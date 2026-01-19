@@ -2,7 +2,7 @@ import {html} from '../../lib/lit-html.min.js';
 import {get} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils";
 
-function template(songs) {
+function template(songs, onDelete) {
     return html`
         <section id="mySongsView">
             <div class="background-spotify">
@@ -15,9 +15,7 @@ function template(songs) {
                                     <h5>Artist: ${m.artist}</h5>
                                     <img class="cover" src=${m.imageUrl}/>
                                     <p>Likes: ${m.likes}; Listened ${m.listened} times</p>
-                                    <a href="/delete/${m._id}">
-                                        <button type="button" class="btn btn-danger mt-4">Remove</button>
-                                    </a>
+                                    <a><button @click=${() => onDelete(m._id)} type="button" class="btn btn-danger mt-4">Remove</button></a>                                    
                                     <a href="/listen/${m._id}">
                                         <button type="button" class="btn btn-success mt-4">Listen</button>
                                     </a>
@@ -36,6 +34,21 @@ function template(songs) {
 export async function myProfilePage(ctx) {
     let songs = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/songs/${id}`);
+                await showMessage("info", "Song removed successfully!");
+                ctx.page.redirect('/app');
+            } catch (err) {
+                if (err.message) showMessage("err", err.message);
+                else showMessage("err", err);
+            }
+        }
+    }
+
     try {
         songs = await get(`/data/songs?where=_ownerId%3D%22${ctx.userData._id}%22&sortBy=_createdOn%20desc`);
     } catch (err) {
@@ -43,5 +56,5 @@ export async function myProfilePage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template(songs));
+    ctx.render(template(songs, onDelete));
 }

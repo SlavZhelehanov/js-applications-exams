@@ -2,7 +2,7 @@ import {html} from "../../lib/lit-html.min.js";
 import {get} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils";
 
-function template(data, isAuth, onLike) {
+function template(data, isAuth, onLike, onDelete) {
     return html`
         <section id="allSongsView">
             <div class="background-spotify">
@@ -20,9 +20,7 @@ function template(data, isAuth, onLike) {
 
                                     ${isAuth?._id === m._ownerId
                                             ? html`<p>Likes: ${m.likes}; Listened 1500 times</p>
-                                            <a href="#">
-                                                <button type="button" class="btn btn-danger mt-4">Remove</button>
-                                            </a>
+                                            <a><button @click=${() => onDelete(m._id)} type="button" class="btn btn-danger mt-4">Remove</button></a>
                                             <a href="#">
                                                 <button type="button" class="btn btn-success mt-4">Listen</button>
                                             </a>`
@@ -50,7 +48,23 @@ export async function dashboardPage(ctx) {
             showMessage("info", "Liked!");
             ctx.page.redirect('/app');
         } catch (err) {
-            console.log(err.message);
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
+        }
+    }
+
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/songs/${id}`);
+                await showMessage("info", "Song removed successfully!");
+                ctx.page.redirect('/app');
+            } catch (err) {
+                if (err.message) showMessage("err", err.message);
+                else showMessage("err", err);
+            }
         }
     }
 
@@ -68,5 +82,5 @@ export async function dashboardPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template(data, isAuth, onLike));
+    ctx.render(template(data, isAuth, onLike, onDelete));
 }
