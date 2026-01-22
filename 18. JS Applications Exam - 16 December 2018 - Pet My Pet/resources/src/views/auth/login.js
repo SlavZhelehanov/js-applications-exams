@@ -1,0 +1,33 @@
+import { html } from '../../lib/lit-html.min.js';
+
+function template() {
+    return html`
+        <section class="login">
+            <form action="#" method="post">
+                <fieldset>
+                    <legend>Login</legend>
+                    <p class="field">
+                        <label for="username">Username</label>
+                        <span class="input">
+                                <input type="text" name="username" id="username" placeholder="Username"/>
+                                <span class="actions"></span>
+                                <i class="fas fa-user"></i>
+                            </span>
+                    </p>
+                    <p class="field">
+                        <label for="password">Password</label>
+                        <span class="input">
+                                <input type="password" name="password" id="password" placeholder="Password"/>
+                                <span class="actions"></span>
+                                <i class="fas fa-key"></i>
+                            </span>
+                    </p>
+                    <input class="button" type="submit" class="submit" value="Login"/>
+                </fieldset>
+            </form>
+        </section>`;
+}
+
+export function loginPage(ctx) {
+    ctx.render(template());
+}
