@@ -7,6 +7,7 @@ import {loginPage} from "./views/auth/login.js";
 import {createPage} from "./views/app/create.js";
 import {dashboardPage} from "./views/app/dashboard.js";
 import {detailsPage} from "./views/app/details.js";
+import {myProfilePage} from "./views/app/profile.js";
 
 setNavigation();
 
@@ -18,4 +19,5 @@ page("/login", guardRoute("guest"), loginPage);
 page("/create", guardRoute("user"), createPage);
 page("/dashboard", guardRoute("user"), dashboardPage);
 page("/details/:id", guardRoute("user"), detailsPage);
+page("/my-pets", guardRoute("user"), myProfilePage);
 page.start();
