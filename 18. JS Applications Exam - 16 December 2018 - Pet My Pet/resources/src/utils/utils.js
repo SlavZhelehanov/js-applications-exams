@@ -86,5 +86,4 @@ export async function showMessage(id, message) {
             resolve(notificationDiv.style.display = 'none');
         }, 3000));
     }
-
 }
