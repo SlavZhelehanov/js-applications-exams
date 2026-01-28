@@ -1,6 +1,8 @@
 import {html} from "../../lib/lit-html.min.js";
+import {get} from "../../utils/api.js";
+import {showMessage} from "../../utils/utils.js";
 
-function template() {
+function template(data) {
     return html`
         <section class="dashboard">
             <h1>Dashboard</h1>
@@ -14,57 +16,38 @@ function template() {
                     <li><a href="#">Other</a></li>
                 </ul>
             </nav>
-            <ul class="other-pets-list">
-                <li class="otherPet">
-                    <h3>Name: Gosho</h3>
-                    <p>Category: Cat</p>
-                    <p class="img"><img src="https://pics.clipartpng.com/Cat_PNG_Clip_Art-2580.png"></p>
-                    <p class="description">This is not my cat Gosho</p>
-                    <div class="pet-info">
-                        <a href="#">
-                            <button class="button"><i class="fas fa-heart"></i> Pet</button>
-                        </a>
-                        <a href="#">
-                            <button class="button">Details</button>
-                        </a>
-                        <i class="fas fa-heart"></i> <span> 2</span>
-                    </div>
-                </li>
-                <li class="otherPet">
-                    <h3>Name: Gosho</h3>
-                    <p>Category: Cat</p>
-                    <p class="img"><img src="https://pics.clipartpng.com/Cat_PNG_Clip_Art-2580.png"></p>
-                    <p class="description">This is not my cat Gosho</p>
-                    <div class="pet-info">
-                        <a href="#">
-                            <button class="button"><i class="fas fa-heart"></i> Pet</button>
-                        </a>
-                        <a href="#">
-                            <button class="button">Details</button>
-                        </a>
-                        <i class="fas fa-heart"></i> <span> 2</span>
-                    </div>
-
-                </li>
-                <li class="otherPet">
-                    <h3>Name: Kiro</h3>
-                    <p>Category: Dog</p>
-                    <p class="img"><img src="http://www.stickpng.com/assets/images/580b57fbd9996e24bc43bbde.png"></p>
-                    <p class="description">This is my dog Kiro</p>
-                    <div class="pet-info">
-                        <a href="#">
-                            <button class="button"><i class="fas fa-heart"></i> Pet</button>
-                        </a>
-                        <a href="#">
-                            <button class="button">Details</button>
-                        </a>
-                        <i class="fas fa-heart"></i> <span> 4</span>
-                    </div>
-                </li>
-            </ul>
+            ${0 < data.length
+                    ? html`
+                        <ul class="other-pets-list">${data.map(pet => html`
+                            <li class="otherPet">
+                                <h3>Name: ${pet.name}</h3>
+                                <p>Category: ${pet.category}</p>
+                                <p class="img"><img src=${pet.imageURL}></p>
+                                <p class="description">${pet.description}</p>
+                                <div class="pet-info">
+                                    <a href="#">
+                                        <button class="button"><i class="fas fa-heart"></i> Pet</button>
+                                    </a>
+                                    <a href="#">
+                                        <button class="button">Details</button>
+                                    </a>
+                                    <i class="fas fa-heart"></i> <span> ${pet.likes}</span>
+                                </div>
+                            </li>`)}`
+                    : html`<h2>There are no pets yet!</h2>`
+            }
         </section>`;
 }
 
 export async function dashboardPage(ctx) {
-    ctx.render(template());
+    let data = [];
+
+    try {
+        data = await get('/data/pets?sortBy=_createdOn%20desc');
+    } catch (err) {
+        if (err.message) showMessage("err", err.message);
+        else showMessage("err", err);
+    }
+
+    ctx.render(template(data));
 }
