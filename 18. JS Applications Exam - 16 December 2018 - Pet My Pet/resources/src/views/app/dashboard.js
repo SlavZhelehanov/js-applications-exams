@@ -2,18 +2,18 @@ import {html} from "../../lib/lit-html.min.js";
 import {get} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template(data, isAuth) {
+function template({data, isAuth, showAll}) {
     return html`
         <section class="dashboard">
             <h1>Dashboard</h1>
             <nav class="navbar">
                 <ul>
-                    <li><a href="#">All</a></li>
-                    <li><a href="#">Cats</a></li>
-                    <li><a href="#">Dogs</a></li>
-                    <li><a href="#">Parrots</a></li>
-                    <li><a href="#">Reptiles</a></li>
-                    <li><a href="#">Other</a></li>
+                    <li><a @click=${() => showAll()}>All</a></li>
+                    <li><a @click=${() => showAll("Cat")}>Cats</a></li>
+                    <li><a @click=${() => showAll("Dog")}>Dogs</a></li>
+                    <li><a @click=${() => showAll("Parrot")}>Parrots</a></li>
+                    <li><a @click=${() => showAll("Reptile")}>Reptiles</a></li>
+                    <li><a @click=${() => showAll("Other")}>Other</a></li>
                 </ul>
             </nav>
             ${0 < data.length
@@ -48,15 +48,23 @@ function template(data, isAuth) {
 }
 
 export async function dashboardPage(ctx) {
-    const isAuth = ctx.userData;
+    const isAuth = ctx.userData, petStorage = sessionStorage.getItem("pet");
     let data = [];
+
+    function showAll(pet = false) {
+        if (pet) sessionStorage.setItem("pet", pet);
+        else sessionStorage.removeItem("pet");
+        ctx.page.redirect("/app");
+    }
 
     try {
         data = await get('/data/pets?sortBy=_createdOn%20desc');
+
+        if (petStorage) data = data.filter(p => p.category === petStorage);
     } catch (err) {
         if (err.message) showMessage("err", err.message);
         else showMessage("err", err);
     }
 
-    ctx.render(template(data, isAuth));
+    ctx.render(template({data, isAuth, showAll}));
 }
