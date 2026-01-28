@@ -2,7 +2,7 @@ import {html} from "../../lib/lit-html.min.js";
 import {get} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template(data) {
+function template(data, isAuth) {
     return html`
         <section class="dashboard">
             <h1>Dashboard</h1>
@@ -25,12 +25,20 @@ function template(data) {
                                 <p class="img"><img src=${pet.imageURL}></p>
                                 <p class="description">${pet.description}</p>
                                 <div class="pet-info">
-                                    <a href="#">
-                                        <button class="button"><i class="fas fa-heart"></i> Pet</button>
-                                    </a>
-                                    <a href="#">
-                                        <button class="button">Details</button>
-                                    </a>
+                                    ${!isAuth._id
+                                            ? null
+                                            : isAuth._id !== pet._ownerId
+                                            ? html`
+                                                <a href="#">
+                                                    <button class="button"><i class="fas fa-heart"></i> Pet</button>
+                                                </a>
+                                                <a href="#">
+                                                    <button class="button">Details</button>
+                                                </a>`
+                                                    : html`<a href="#">
+                                                        <button class="button">Details</button>
+                                                    </a>`
+                                    }
                                     <i class="fas fa-heart"></i> <span> ${pet.likes}</span>
                                 </div>
                             </li>`)}`
@@ -40,6 +48,7 @@ function template(data) {
 }
 
 export async function dashboardPage(ctx) {
+    const isAuth = ctx.userData;
     let data = [];
 
     try {
@@ -49,5 +58,5 @@ export async function dashboardPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template(data));
+    ctx.render(template(data, isAuth));
 }
