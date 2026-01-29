@@ -2,7 +2,7 @@ import {html} from "../../lib/lit-html.min.js";
 import {get} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template({data, isAuth, showAll}) {
+function template({data, onDetails, isAuth, showAll}) {
     return html`
         <section class="dashboard">
             <h1>Dashboard</h1>
@@ -35,9 +35,7 @@ function template({data, isAuth, showAll}) {
                                                 <a href="#">
                                                     <button class="button">Details</button>
                                                 </a>`
-                                                    : html`<a href="#">
-                                                        <button class="button">Details</button>
-                                                    </a>`
+                                                    : html`<a><button @click=${() => onDetails(m._id)} class="button">Details</button></a>`
                                     }
                                     <i class="fas fa-heart"></i> <span> ${pet.likes}</span>
                                 </div>
@@ -57,6 +55,10 @@ export async function dashboardPage(ctx) {
         ctx.page.redirect("/app");
     }
 
+    function onDetails(id) {
+        ctx.page.redirect(`/details/${id}`);
+    }
+
     try {
         data = await get('/data/pets?sortBy=_createdOn%20desc');
 
@@ -66,5 +68,5 @@ export async function dashboardPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template({data, isAuth, showAll}));
+    ctx.render(template({data, onDetails, isAuth, showAll}));
 }
