@@ -42,7 +42,7 @@ function template({data, onDetails, onPet, isAuth, showAll}) {
 
 export async function dashboardPage(ctx) {
     const isAuth = ctx.userData, petStorage = sessionStorage.getItem("pet");
-    let data = [];
+    let data = [], totalLikes;
 
     function showAll(pet = false) {
         if (pet) sessionStorage.setItem("pet", pet);
@@ -69,6 +69,14 @@ export async function dashboardPage(ctx) {
         data = await get('/data/pets?sortBy=_createdOn%20desc');
 
         if (petStorage) data = data.filter(p => p.category === petStorage);
+
+        totalLikes = await get("/data/likes");
+
+        for (let i = 0; i < data.length; i++) {
+            for (let j = 0; j < totalLikes.length; j++) {
+                if (data[i]._id === totalLikes[j].petId) data[i].likes++;
+            }
+        }
     } catch (err) {
         if (err.message) showMessage("err", err.message);
         else showMessage("err", err);
