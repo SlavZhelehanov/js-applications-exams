@@ -2,7 +2,7 @@ import {html} from "../../lib/lit-html.min.js";
 import {get, post} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template({data, onDetails, onPet, isAuth, showAll}) {
+function template({data, onPet, isAuth, showAll}) {
     return html`
         <section class="dashboard">
             <h1>Dashboard</h1>
@@ -28,9 +28,9 @@ function template({data, onDetails, onPet, isAuth, showAll}) {
                                     ${!isAuth._id
                                             ? null
                                             : isAuth._id !== pet._ownerId
-                                            ? html`<a><button @click=${() => onPet(m._id)} class="button"><i class="fas fa-heart"></i> Pet</button></a>
-                                                    <a><button @click=${() => onDetails(m._id)} class="button">Details</button></a>`
-                                                    : html`<a><button @click=${() => onDetails(m._id)} class="button">Details</button></a>`
+                                            ? html`<a><button @click=${() => onPet(pet._id)} class="button"><i class="fas fa-heart"></i> Pet</button></a>
+                                                    <a href="/details/${pet._id}"><button class="button">Details</button></a>`
+                                                    : html`<a href="/details/${pet._id}"><button class="button">Details</button></a>`
                                     }
                                     <i class="fas fa-heart"></i> <span> ${pet.likes}</span>
                                 </div>
@@ -48,10 +48,6 @@ export async function dashboardPage(ctx) {
         if (pet) sessionStorage.setItem("pet", pet);
         else sessionStorage.removeItem("pet");
         ctx.page.redirect("/app");
-    }
-
-    function onDetails(id) {
-        ctx.page.redirect(`/details/${id}`);
     }
 
     async function onPet(id) {
@@ -82,5 +78,5 @@ export async function dashboardPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template({onPet, data, onDetails, isAuth, showAll}));
+    ctx.render(template({onPet, data, isAuth, showAll}));
 }
