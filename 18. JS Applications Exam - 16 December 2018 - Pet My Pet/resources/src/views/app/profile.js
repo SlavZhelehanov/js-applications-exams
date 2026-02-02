@@ -1,8 +1,8 @@
 import {html} from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import { get, del } from "../../utils/api.js";
 import { showMessage } from "../../utils/utils.js";
 
-function template({pets}) {
+function template({pets, onDelete}) {
     return html`
         <section class="my-pets">
             <h1>My Pets</h1>
@@ -18,7 +18,7 @@ function template({pets}) {
                                 <button class="button">Details</button>
                             </a>
                             <a href="#">
-                                <button class="button">Delete</button>
+                                <button @click=${() => onDelete(m._id)} class="button">Delete</button>
                             </a>
                             <i class="fas fa-heart"></i> <span>${pet.likes}</span>
                         </div>
@@ -79,6 +79,22 @@ function template({pets}) {
 export async function myProfilePage(ctx) {
     let pets = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                showMessage("loading", 'Loading...');
+                await del(`/data/pets/${id}`);
+                await showMessage("info", "Pet removed successfully!");
+                ctx.page.redirect('/my-pets');
+            } catch (err) {
+                if (err.message) showMessage("err", err.message);
+                else showMessage("err", err);
+            }
+        }
+    }
+
     try {
         pets = await get(`/data/pets?where=_ownerId%3D%22${ctx.userData._id}%22&sortBy=_createdOn%20desc`);
     } catch (err) {
@@ -86,5 +102,5 @@ export async function myProfilePage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template({pets}));
+    ctx.render(template({pets, onDelete}));
 }
