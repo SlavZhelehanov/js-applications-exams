@@ -2,13 +2,13 @@ import {html} from '../../lib/lit-html.min.js';
 import {get} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template({isOwner, pet}) {
+function template({isOwner, pet, likes}) {
     return html`
         ${isOwner
                 ? html`
                     <section class="detailsMyPet">
                         <h3>${pet.name}</h3>
-                        <p>Pet counter: <i class="fas fa-heart"></i> 6</p>
+                        <p>Pet counter: <i class="fas fa-heart"></i> ${likes}</p>
                         <p class="img"><img src=${pet.imageURL}>
                         </p>
                         <form action="#" method="POST">
@@ -19,7 +19,7 @@ function template({isOwner, pet}) {
                 : html`
                     <section class="detailsOtherPet">
                         <h3>${pet.name}</h3>
-                        <p>Pet counter: 7 <a href="#">
+                        <p>Pet counter: ${likes} <a href="#">
                             <button class="button"><i class="fas fa-heart"></i>
                                 Pet
                             </button>
@@ -33,15 +33,17 @@ function template({isOwner, pet}) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id;
-    let pet = {}, isOwner = false;
+    let pet = {}, isOwner = false, likes = 0;
 
     try {
         pet = await get(`/data/pets/${id}`);
+        likes = await get(`/data/likes`);
+        likes = likes.filter(l => l.petId === id).length + +pet.likes;
         isOwner = ctx?.userData && pet._ownerId === ctx.userData._id;
     } catch (err) {
         if (err.message) showMessage("err", err.message);
         else showMessage("err", err);
     }
 
-    ctx.render(template({isOwner, pet}));
+    ctx.render(template({isOwner, likes, pet}));
 }
