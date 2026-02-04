@@ -1,8 +1,8 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get, put} from "../../utils/api.js";
+import {get, put, post} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template({isOwner, onSave, pet, likes}) {
+function template({isOwner, onSave, pet, onPet, likes}) {
     return html`
         ${isOwner
                 ? html`
@@ -11,7 +11,7 @@ function template({isOwner, onSave, pet, likes}) {
                         <p>Pet counter: <i class="fas fa-heart"></i> ${likes}</p>
                         <p class="img"><img src=${pet.imageURL}>
                         </p>
-                        <form  @submit=${onSave}>
+                        <form @submit=${onSave}>
                             <textarea type="text" name="description">${pet.description}</textarea>
                             <button type="submit" class="button"> Save</button>
                         </form>
@@ -20,7 +20,7 @@ function template({isOwner, onSave, pet, likes}) {
                     <section class="detailsOtherPet">
                         <h3>${pet.name}</h3>
                         <p>Pet counter: ${likes} <a href="#">
-                            <button class="button"><i class="fas fa-heart"></i>
+                            <button @click=${() => onPet(pet._id)} class="button"><i class="fas fa-heart"></i>
                                 Pet
                             </button>
                         </a>
@@ -42,10 +42,20 @@ export async function detailsPage(ctx) {
 
         try {
             showMessage("loading", 'Loading...');
-            await put(`/data/pets/${pet._id}`, { ...pet, description: newDescription });
+            await put(`/data/pets/${pet._id}`, {...pet, description: newDescription});
             await showMessage("info", "Pet updated successfuly")
             ctx.page.redirect(`/details/${pet._id}`);
         } catch (err) {
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
+        }
+    }
+
+    async function onPet(petId) {
+        try {
+            await post(`/data/likes`, { petId });
+            ctx.page.redirect(`/details/${petId}`);
+        } catch (error) {
             if (err.message) showMessage("err", err.message);
             else showMessage("err", err);
         }
@@ -61,5 +71,5 @@ export async function detailsPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template({isOwner, likes, pet, onSave}));
+    ctx.render(template({onPet, isOwner, likes, pet, onSave}));
 }
