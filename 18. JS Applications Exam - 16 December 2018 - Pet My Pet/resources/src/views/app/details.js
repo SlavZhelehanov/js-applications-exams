@@ -1,8 +1,8 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from "../../utils/api.js";
+import {get, put} from "../../utils/api.js";
 import {showMessage} from "../../utils/utils.js";
 
-function template({isOwner, pet, likes}) {
+function template({isOwner, onSave, pet, likes}) {
     return html`
         ${isOwner
                 ? html`
@@ -11,9 +11,9 @@ function template({isOwner, pet, likes}) {
                         <p>Pet counter: <i class="fas fa-heart"></i> ${likes}</p>
                         <p class="img"><img src=${pet.imageURL}>
                         </p>
-                        <form action="#" method="POST">
+                        <form  @submit=${onSave}>
                             <textarea type="text" name="description">${pet.description}</textarea>
-                            <button class="button"> Save</button>
+                            <button type="submit" class="button"> Save</button>
                         </form>
                     </section>`
                 : html`
@@ -35,6 +35,22 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id;
     let pet = {}, isOwner = false, likes = 0;
 
+    async function onSave(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const newDescription = formData.get('description');
+
+        try {
+            showMessage("loading", 'Loading...');
+            await put(`/data/pets/${pet._id}`, { ...pet, description: newDescription });
+            await showMessage("info", "Pet updated successfuly")
+            ctx.page.redirect(`/details/${pet._id}`);
+        } catch (err) {
+            if (err.message) showMessage("err", err.message);
+            else showMessage("err", err);
+        }
+    }
+
     try {
         pet = await get(`/data/pets/${id}`);
         likes = await get(`/data/likes`);
@@ -45,5 +61,5 @@ export async function detailsPage(ctx) {
         else showMessage("err", err);
     }
 
-    ctx.render(template({isOwner, likes, pet}));
+    ctx.render(template({isOwner, likes, pet, onSave}));
 }
