@@ -1,0 +1,20 @@
+import { html } from "../../lib/lit-html.min.js";
+
+function template() {
+    return html`
+        <div id="main">
+            <div id="welcome-container">
+                <h1>Welcome To Meme Lounge</h1>
+                <img src="https://i.kym-cdn.com/photos/images/original/001/218/908/247.gif" alt="carIntro">
+                <h2>Login to see our memes right away!</h2>
+                <div id="button-div">
+                    <a href="/login" class="button">Login</a>
+                    <a href="/register" class="button">Register</a>
+                </div>
+            </div>
+        </div>`;
+}
+
+export async function homePage(ctx) {
+    ctx.render(template());
+}
