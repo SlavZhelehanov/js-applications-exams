@@ -1,0 +1,40 @@
+import { html } from "../../lib/lit-html.min.js";
+
+function template() {
+    return html`
+        <div id="register">
+            <form action="#" method="post">
+                <div class="container">
+                    <h1>Register</h1>
+                    <p id="details">Please fill in this form to create an account.</p>
+                    <hr id="login-register-hr">
+
+                    <p id="username">Username</p>
+                    <input type="text" placeholder="Enter Username" name="username">
+
+                    <p>Password</p>
+                    <input type="password" placeholder="Enter Password" name="password">
+
+                    <p>Repeat Password</p>
+                    <input type="password" placeholder="Repeat Password" name="repeatPass">
+
+                    <p>Email</p>
+                    <input type="email" placeholder="Enter Email" name="email">
+
+                    <p>Avatar Url</p>
+                    <input type="text" placeholder="Enter AvatarUrl" name="avatarUrl">
+                    <hr>
+
+                    <button type="submit" class="registerbtn">Register</button>
+                </div>
+                <div class="container signin">
+                    <p>Already have an account?
+                        <a href="#">Sign in</a>.</p>
+                </div>
+            </form>
+        </div>`;
+}
+
+export function registerPage(ctx) {
+    ctx.render(template());
+}
