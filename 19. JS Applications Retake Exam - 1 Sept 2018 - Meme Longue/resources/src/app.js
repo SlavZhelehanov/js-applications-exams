@@ -4,6 +4,7 @@ import {decorateCTX, guardRoute, setNavigation} from "./utils/utils.js";
 import {homePage} from "./views/home/home.js";
 import {loginPage} from "./views/auth/login.js";
 import {registerPage} from "./views/auth/register.js";
+import {dashboardPage} from "./views/app/dashboard.js";
 
 setNavigation();
 
@@ -12,5 +13,6 @@ page("/index.html", "/");
 page("/", homePage);
 page("/login", guardRoute("guest"), loginPage);
 page("/register", guardRoute("guest"), registerPage);
+page("/app", guardRoute("user"), dashboardPage);
 
 page.start();
