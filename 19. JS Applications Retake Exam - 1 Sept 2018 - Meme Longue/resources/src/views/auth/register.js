@@ -1,40 +1,69 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
+import { saveUserData } from "../../utils/utils.js";
 
-function template() {
+function template(onRegister) {
     return html`
         <div id="register">
-            <form action="#" method="post">
-                <div class="container">
-                    <h1>Register</h1>
-                    <p id="details">Please fill in this form to create an account.</p>
-                    <hr id="login-register-hr">
+            <form @submit=${onRegister}
+            <div class="container">
+                <h1>Register</h1>
+                <p id="details">Please fill in this form to create an account.</p>
+                <hr id="login-register-hr">
 
-                    <p id="username">Username</p>
-                    <input type="text" placeholder="Enter Username" name="username">
+                <p id="username">Username</p>
+                <input type="text" placeholder="Enter Username" name="username">
 
-                    <p>Password</p>
-                    <input type="password" placeholder="Enter Password" name="password">
+                <p>Password</p>
+                <input type="password" placeholder="Enter Password" name="password">
 
-                    <p>Repeat Password</p>
-                    <input type="password" placeholder="Repeat Password" name="repeatPass">
+                <p>Repeat Password</p>
+                <input type="password" placeholder="Repeat Password" name="repeatPass">
 
-                    <p>Email</p>
-                    <input type="email" placeholder="Enter Email" name="email">
+                <p>Email</p>
+                <input type="email" placeholder="Enter Email" name="email">
 
-                    <p>Avatar Url</p>
-                    <input type="text" placeholder="Enter AvatarUrl" name="avatarUrl">
-                    <hr>
+                <p>Avatar Url</p>
+                <input type="text" placeholder="Enter AvatarUrl" name="avatarUrl">
+                <hr>
 
-                    <button type="submit" class="registerbtn">Register</button>
-                </div>
-                <div class="container signin">
-                    <p>Already have an account?
-                        <a href="#">Sign in</a>.</p>
-                </div>
+                <button type="submit" class="registerbtn">Register</button>
+            </div>
+            <div class="container signin">
+                <p>Already have an account?
+                    <a href="/login">Sign in</a>.</p>
+            </div>
             </form>
         </div>`;
 }
 
 export function registerPage(ctx) {
-    ctx.render(template());
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const email = formData.get('email');
+        const avatarUrl = formData.get('avatarUrl');
+        const password = formData.get('password');
+        const repass = formData.get('repeatPass');
+
+        if (email === '' || password === '') return alert('All fields are required');
+        if (password !== repass) return alert("Passwords don't match");
+
+        try {
+            const user = await post("/users/register", { username, email, password, avatarUrl });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/app');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onRegister));
 }
