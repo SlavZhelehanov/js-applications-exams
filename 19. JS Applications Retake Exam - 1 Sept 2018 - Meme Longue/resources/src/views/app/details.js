@@ -1,7 +1,7 @@
-import { html } from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import {html} from '../../lib/lit-html.min.js';
+import {get, del} from "../../utils/api.js";
 
-function template({item, isOwner}) {
+function template({item, onDelete, isOwner}) {
     return html`
         <div class="meme-details">
             <div class="my-meme-details">
@@ -15,8 +15,8 @@ function template({item, isOwner}) {
                 <div class="meme-details-buttons">
                     <a class="meme-details-button" href="#">Created by ${item.creator}</a>
                     ${isOwner
-                            ? html`<a href="#" class="meme-details-button">Edit</a>
-                            <a href="#" class="meme-details-button">Delete</a>`
+                            ? html`<a href="/edit/${item._id}" class="meme-details-button">Edit</a>
+                            <a @click=${onDelete} href="javascript:void(0)" class="meme-details-button">Delete</a>`
                             : null
                     }
                 </div>
@@ -29,6 +29,19 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
     let item = {}, isOwner = false;
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/memes/${id}`);
+                ctx.page.redirect('/app');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
+
     try {
         item = await get(`/data/memes/${id}`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
@@ -36,5 +49,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template({isOwner, item}));
+    ctx.render(template({onDelete, isOwner, item}));
 }
