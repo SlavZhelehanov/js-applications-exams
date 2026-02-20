@@ -1,7 +1,7 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, del } from "../../utils/api.js";
 
-function template(data) {
+function template({data, onDelete}) {
     return html`
         <div id="meme-feed">
             <h1>Meme Feed</h1>
@@ -15,7 +15,7 @@ function template(data) {
                         <div id="data-buttons">
                             <a href="#" class="custom-button">Check Out</a>
                             <a href="/edit/${m._id}" class="custom-button">Edit</a>
-                            <a href="#" class="custom-button">Delete</a>
+                            <a @click=${() => onDelete(m._id)} href="javascript:void(0)" class="custom-button">Delete</a>
                             <a href="#" class="creator">Creator: ${m.creator}</a>
                         </div>
                     </div>
@@ -30,11 +30,24 @@ function template(data) {
 export async function dashboardPage(ctx) {
     let data = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/memes/${id}`);
+                ctx.page.redirect('/app');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
+
     try {
         data = await get('/data/memes?sortBy=_createdOn%20desc');
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template(data));
+    ctx.render(template({data, onDelete}));
 }
