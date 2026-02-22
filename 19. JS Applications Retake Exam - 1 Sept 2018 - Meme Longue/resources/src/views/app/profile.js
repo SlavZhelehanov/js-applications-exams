@@ -1,35 +1,41 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template() {
+function template({user, memes}) {
     return html`
         <div class="user-profile">
-            <img id="user-avatar-url" src="https://i.pinimg.com/originals/7c/c7/a6/7cc7a630624d20f7797cb4c8e93c09c1.png"
-                 alt="user-profile">
-            <h1>user</h1>
-            <h2>user@abv.bg</h2>
+            <img id="user-avatar-url" src=${user.avatarUrl} alt="user-profile">
+            <h1>${user.username}</h1>
+            <h2>${user.email}</h2>
 
-            <a id="deleteUserButton" href="#">DELETE USER!</a>
-
-            <p id="user-listings-title">User Memes
-            </p>
+            <p id="user-listings-title">User Memes</p>
             <div class="user-meme-listings">
-                <div class="user-meme">
-                    <a href="#" class="user-meme-title">Разбираемо...</a>
-                    <a href=""> <img class="userProfileImage"
-                                     src="https://scontent.fsof3-1.fna.fbcdn.net/v/t1.0-9/31924539_2110321352572189_5652160133854134272_n.jpg?_nc_cat=0&oh=dc73aad9af411f76454dd70ea1ab2775&oe=5C2FB35A"></a>
-
-                    <div class="user-memes-buttons">
-
-                        <a href="#" class="user-meme-btn">Edit</a>
-                        <a href="#" class="user-meme-btn">Delete</a>
-
-                    </div>
-                </div>
-                <p class="no-memes">No memes in database.</p>
+                ${0 < memes.length
+                        ? memes.map(m => html`
+                            <div class="user-meme">
+                                <a href="#" class="user-meme-title">${m.title}</a>
+                                <a href=""> <img class="userProfileImage" src=${m.imageUrl}></a>
+                                <div class="user-memes-buttons">
+                                    <a href="/edit/${m._id}" class="user-meme-btn">Edit</a>
+                                    <a href="#" class="user-meme-btn">Delete</a>
+                                </div>
+                            </div>`)
+                        : html`<p class="no-memes">No memes in database.</p>`
+                }
             </div>
         </div>`;
 }
 
 export async function profilePage(ctx) {
-    ctx.render(template());
+    const user = ctx.userData;
+    let memes = [];
+
+    try {
+        memes = await get(`/data/memes?where=_ownerId%3D%22${user._id}%22&sortBy=_createdOn%20desc`);
+        console.log(memes);
+
+    } catch (err) {
+        alert(err.message);
+    }
+    ctx.render(template({user, memes}));
 }
