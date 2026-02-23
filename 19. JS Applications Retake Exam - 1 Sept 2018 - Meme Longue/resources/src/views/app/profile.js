@@ -1,7 +1,7 @@
-import { html } from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import {html} from '../../lib/lit-html.min.js';
+import {get, del} from "../../utils/api.js";
 
-function template({user, memes}) {
+function template({user, onDelete, memes}) {
     return html`
         <div class="user-profile">
             <img id="user-avatar-url" src=${user.avatarUrl} alt="user-profile">
@@ -17,7 +17,7 @@ function template({user, memes}) {
                                 <a href=""> <img class="userProfileImage" src=${m.imageUrl}></a>
                                 <div class="user-memes-buttons">
                                     <a href="/edit/${m._id}" class="user-meme-btn">Edit</a>
-                                    <a href="#" class="user-meme-btn">Delete</a>
+                                    <a @click=${() => onDelete(m._id)} href="javascript:void(0)" class="user-meme-btn">Delete</a>
                                 </div>
                             </div>`)
                         : html`<p class="no-memes">No memes in database.</p>`
@@ -30,6 +30,19 @@ export async function profilePage(ctx) {
     const user = ctx.userData;
     let memes = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/memes/${id}`);
+                ctx.page.redirect('/app');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
+
     try {
         memes = await get(`/data/memes?where=_ownerId%3D%22${user._id}%22&sortBy=_createdOn%20desc`);
         console.log(memes);
@@ -37,5 +50,5 @@ export async function profilePage(ctx) {
     } catch (err) {
         alert(err.message);
     }
-    ctx.render(template({user, memes}));
+    ctx.render(template({onDelete, user, memes}));
 }
