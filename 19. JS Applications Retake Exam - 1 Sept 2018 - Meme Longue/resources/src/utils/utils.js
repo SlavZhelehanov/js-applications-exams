@@ -1,4 +1,4 @@
-import { render } from "../lib/lit-html.min.js";
+import {render} from "../lib/lit-html.min.js";
 import page from "../lib/page.js";
 
 const item = "userData";
@@ -47,13 +47,19 @@ export function guardRoute(status) {
     };
 }
 
-export function showError(message) {
-    const errorBox = document.querySelector('.notification');
+export function showMessage(msgType, msgText) {
+    const box = document.querySelector('.notification');
 
-    errorBox.querySelector('span').textContent = message;
-    errorBox.style.display = 'block';
+    box.id = msgType;
+    box.querySelector('span').textContent = msgText;
+    box.style.display = 'block';
 
-    setTimeout(() => {
-        errorBox.style.display = 'none';
-    }, 3000);
+    if (msgType === 'loadingBox') return;
+
+    return new Promise(resolve => {
+        setTimeout(() => {
+            box.style.display = 'none';
+            resolve();
+        }, 3000);
+    });
 }
