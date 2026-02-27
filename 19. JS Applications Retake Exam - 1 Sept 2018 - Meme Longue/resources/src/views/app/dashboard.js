@@ -1,5 +1,6 @@
 import {html} from "../../lib/lit-html.min.js";
 import {get, del} from "../../utils/api.js";
+import { showMessage} from "../../utils/utils.js";
 
 function template({data, onDelete, isAuth}) {
     return html`
@@ -44,18 +45,25 @@ export async function dashboardPage(ctx) {
 
         if (choice) {
             try {
+                showMessage("loadingBox", "Loading...");
                 await del(`/data/memes/${id}`);
+                await showMessage("infoBox", "Meme deleted.");
                 ctx.page.redirect('/app');
             } catch (err) {
-                alert(err.message);
+                if (err.message) showMessage("errorBox", err.message);
+                else showMessage("errorBox", err);
             }
         }
     }
 
     try {
+        showMessage("loadingBox", "Loading...");
+
         data = await get('/data/memes?sortBy=_createdOn%20desc');
+        showMessage("x", "x");
     } catch (err) {
-        alert(err.message);
+        if (err.message) showMessage("errorBox", err.message);
+        else showMessage("errorBox", err);
     }
 
     ctx.render(template({data, isAuth, onDelete}));
