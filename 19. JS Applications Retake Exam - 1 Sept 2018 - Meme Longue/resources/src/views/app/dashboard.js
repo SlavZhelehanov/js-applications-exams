@@ -9,12 +9,12 @@ function template({data, onDelete, isAuth}) {
                 ${0 < data.length
                         ? data.map(m => html`
                             <div class="meme">
-                                <a href="#" class="meme-title">${m.title}</a>
+                                <a href="/details/${m._id}" class="meme-title">${m.title}</a>
                                 <br>
-                                <a href="#"><img class="meme-image" src=${m.imageUrl}></a>
+                                <a href="/details/${m._id}"><img class="meme-image" src=${m.imageUrl}></a>
                                 <div class="info">
                                     <div id="data-buttons">
-                                        <a href="#" class="custom-button">Check Out</a>
+                                        <a href="/details/${m._id}" class="custom-button">Check Out</a>
                                         ${isAuth
                                                 ? html`<a href="/edit/${m._id}" class="custom-button">Edit</a>
                                                 <a @click=${() => onDelete(m._id)} href="javascript:void(0)"
