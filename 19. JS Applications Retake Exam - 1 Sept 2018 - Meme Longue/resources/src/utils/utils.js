@@ -19,9 +19,10 @@ export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
     const nav = document.getElementsByTagName('nav')[0];
     const username = getUserData() ? getUserData().username : null;
+    const id = getUserData() ? getUserData().id : null;
 
     isLoggedIn
-        ? nav.innerHTML = `<a class="active" href="/app">Home</a><a href="/create">Create Meme</a><div id="profile"><a>Welcome ${username}</a><a href="/my-profile">My Profile</a><a href="/logout">logout</a></div>`
+        ? nav.innerHTML = `<a class="active" href="/app">Home</a><a href="/create">Create Meme</a><div id="profile"><a>Welcome ${username}</a><a href="/my-profile/${id}">My Profile</a><a href="/logout">logout</a></div>`
         : nav.innerHTML = `<a class="active" href="/">Home</a>`
 }
 

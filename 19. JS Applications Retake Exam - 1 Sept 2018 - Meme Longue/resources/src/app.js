@@ -23,6 +23,6 @@ page("/app", guardRoute("user"), dashboardPage);
 page("/create", guardRoute("user"), createPage);
 page("/edit/:id", guardRoute("user"), editPage);
 page("/details/:id", guardRoute("user"), detailsPage);
-page("/my-profile", guardRoute("user"), profilePage);
+page("/my-profile/:id", guardRoute("user"), profilePage);
 
 page.start();
