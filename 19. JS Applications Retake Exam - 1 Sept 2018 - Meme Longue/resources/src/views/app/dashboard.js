@@ -25,7 +25,7 @@ function template({data, onDelete, isAuth}) {
                                         <a href="/edit/${m._id}" class="custom-button">Edit</a>
                                         <a @click=${() => onDelete(m._id)} href="javascript:void(0)"
                                            class="custom-button">Delete</a>
-                                        <a href="#" class="creator">Creator: ${m.creator}</a>
+                                        <a href="/my-profile/${m.creator}" class="creator">Creator: ${m.creator}</a>
                                     </div>
                                 </div>
                                 <hr>
