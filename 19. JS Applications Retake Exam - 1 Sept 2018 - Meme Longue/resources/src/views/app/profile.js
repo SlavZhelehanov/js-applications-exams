@@ -1,5 +1,6 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del} from "../../utils/api.js";
+import { showMessage} from "../../utils/utils.js";
 
 function template({user, onDelete, memes, isOwner}) {
     return html`
@@ -39,22 +40,26 @@ export async function profilePage(ctx) {
 
         if (choice) {
             try {
+                showMessage("loadingBox", "Loading...");
                 await del(`/data/memes/${id}`);
+                await showMessage("infoBox", "Meme deleted.");
                 ctx.page.redirect('/app');
             } catch (err) {
-                alert(err.message);
+                if (err.message) showMessage("errorBox", err.message);
+                else showMessage("errorBox", err);
             }
         }
     }
 
     try {
         isOwner = visitor._id === userId;
+        showMessage("loadingBox", "Loading...");
         user = isOwner ? visitor : await get(`/data/users/${userId}`);
         memes = await get(`/data/memes?where=_ownerId%3D%22${userId}%22&sortBy=_createdOn%20desc`);
-        console.log(memes);
-
+        showMessage("endLoadingBox", "...");
     } catch (err) {
-        alert(err.message);
+        if (err.message) showMessage("errorBox", err.message);
+        else showMessage("errorBox", err);
     }
     ctx.render(template({onDelete, isOwner, user, memes}));
 }
