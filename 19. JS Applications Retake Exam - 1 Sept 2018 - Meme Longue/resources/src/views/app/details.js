@@ -47,10 +47,13 @@ export async function detailsPage(ctx) {
     }
 
     try {
+        showMessage("loadingBox", "Loading...");
         item = await get(`/data/memes/${id}`);
         isOwner = isAuth && item._ownerId === ctx.userData._id;
+        showMessage("infoBox", "End Loading...");
     } catch (err) {
-        alert(err.message);
+        if (err.message) showMessage("errorBox", err.message);
+        else showMessage("errorBox", err);
     }
 
     ctx.render(template({onDelete, isOwner, item}));

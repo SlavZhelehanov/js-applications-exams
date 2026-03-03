@@ -36,4 +36,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 16. JS Applications Exam Preparation 2 - "Cars Tube" - Bonus: Search
 - [x] 17. JS Applications Retake Exam - 21 December 2018 - "Spotify" - Bonus: Notifications
 - [x] 18. JS Applications Exam - 16 December 2018 - "Pet My Pet" - Bonus: Notifications
-- [ ] 19. JS Applications Retake Exam - 1 Sept 2018 - "Meme Lounge" - Bonus: Notifications
+- [x] 19. JS Applications Retake Exam - 1 Sept 2018 - "Meme Lounge" - Bonus: Notifications
