@@ -1,5 +1,6 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del} from "../../utils/api.js";
+import {showMessage} from "../../utils/utils.js";
 
 function template({item, onDelete, isOwner}) {
     return html`
@@ -34,10 +35,13 @@ export async function detailsPage(ctx) {
 
         if (choice) {
             try {
+                showMessage("loadingBox", "Loading...");
                 await del(`/data/memes/${id}`);
+                await showMessage("infoBox", "Meme deleted.");
                 ctx.page.redirect('/app');
             } catch (err) {
-                alert(err.message);
+                if (err.message) showMessage("errorBox", err.message);
+                else showMessage("errorBox", err);
             }
         }
     }

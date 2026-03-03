@@ -1,6 +1,6 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get, del} from "../../utils/api.js";
-import { showMessage} from "../../utils/utils.js";
+import {showMessage} from "../../utils/utils.js";
 
 function template({user, onDelete, memes, isOwner}) {
     return html`
