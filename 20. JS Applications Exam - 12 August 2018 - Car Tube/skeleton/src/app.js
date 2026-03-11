@@ -7,6 +7,7 @@ import {loginPage} from "./views/auth/login.js";
 import {profilePage} from "./views/app/profile.js";
 import {detailsPage} from "./views/app/details.js";
 import {createPage} from "./views/app/create.js";
+import {editPage} from "./views/app/edit.js";
 
 setNavigation();
 
@@ -18,5 +19,6 @@ page("/login", guardRoute("guest"), loginPage);
 page("/my-listings", guardRoute("user"), profilePage);
 page("/details/:id", guardRoute("user"), detailsPage);
 page("/create", guardRoute("user"), createPage);
+page("/edit/:id", guardRoute("user"), editPage);
 
 page.start();
