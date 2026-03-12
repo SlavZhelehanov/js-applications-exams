@@ -8,6 +8,7 @@ import {profilePage} from "./views/app/profile.js";
 import {detailsPage} from "./views/app/details.js";
 import {createPage} from "./views/app/create.js";
 import {editPage} from "./views/app/edit.js";
+import {logoutAction} from "./views/auth/logout.js";
 
 setNavigation();
 
@@ -15,6 +16,7 @@ page(decorateCTX);
 page("/index.html", "/");
 page("/", homePage);
 page("/register", guardRoute("guest"), registerPage);
+page("/logout", guardRoute("user"), logoutAction);
 page("/login", guardRoute("guest"), loginPage);
 page("/my-listings", guardRoute("user"), profilePage);
 page("/details/:id", guardRoute("user"), detailsPage);
