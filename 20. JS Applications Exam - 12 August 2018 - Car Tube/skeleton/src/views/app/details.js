@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from "../../utils/api.js";
+import {get, del} from "../../utils/api.js";
 
-function template({item, isOwner}) {
+function template({item, onDelete, isOwner}) {
     return html`
         <div class="listing-details">
             <div class="my-listing-details">
@@ -17,7 +17,7 @@ function template({item, isOwner}) {
                 <div class="listings-buttons">
                     ${isOwner
                             ? html`<a href="/edit/${item._id}" class="button-list">Edit</a>
-                            <a href="#" class="button-list">Delete</a>`
+                            <a @click=${onDelete} href="javascript:void(0)" class="button-list">Delete</a>`
                             : null
                     }
                 </div>
@@ -29,8 +29,21 @@ function template({item, isOwner}) {
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, isAuth = !!ctx.userData;
-    ;
     let item = {}, isOwner = false;
+
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/cars/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+    }
 
     try {
         item = await get(`/data/cars/${id}`);
@@ -40,5 +53,5 @@ export async function detailsPage(ctx) {
         else alert(err);
     }
 
-    ctx.render(template({isOwner, item}));
+    ctx.render(template({onDelete, isOwner, item}));
 }
