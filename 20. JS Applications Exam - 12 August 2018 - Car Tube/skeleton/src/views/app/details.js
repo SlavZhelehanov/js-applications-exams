@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
 import {get} from "../../utils/api.js";
 
-function template(item) {
+function template({item, isOwner}) {
     return html`
         <div class="listing-details">
             <div class="my-listing-details">
@@ -15,11 +15,11 @@ function template(item) {
                     <h3>Price: ${item.price}$</h3>
                 </div>
                 <div class="listings-buttons">
-
-                    <a href="#" class="button-list">Edit</a>
-                    <a href="#" class="button-list">Delete</a>
-
-
+                    ${isOwner
+                            ? html`<a href="/edit/${item._id}" class="button-list">Edit</a>
+                            <a href="#" class="button-list">Delete</a>`
+                            : null
+                    }
                 </div>
                 <p id="description-title">Description:</p>
                 <p id="description-para">${item.description}</p>
@@ -28,15 +28,17 @@ function template(item) {
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id;
-    let item = {};
+    const id = ctx.params.id, isAuth = !!ctx.userData;
+    ;
+    let item = {}, isOwner = false;
 
     try {
         item = await get(`/data/cars/${id}`);
+        isOwner = isAuth && item._ownerId === ctx.userData._id;
     } catch (err) {
         if (err.message) alert(err.message);
         else alert(err);
     }
 
-    ctx.render(template(item));
+    ctx.render(template({isOwner, item}));
 }
