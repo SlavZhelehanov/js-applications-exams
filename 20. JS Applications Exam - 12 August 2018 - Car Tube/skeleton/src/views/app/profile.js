@@ -1,7 +1,7 @@
 import {html} from '../../lib/lit-html.min.js';
-import {get} from "../../utils/api.js";
+import {get, del} from "../../utils/api.js";
 
-function template(items) {
+function template({onDelete, items}) {
     return html`
         <div class="my-listings">
             <h1>My car listings</h1>
@@ -21,7 +21,7 @@ function template(items) {
                                 <div class="my-listing-buttons">
                                     <a href="/details/${i._id}" class="my-button-list">Details</a>
                                     <a href="/edit/${i._id}" class="my-button-list">Edit</a>
-                                    <a href="#" class="my-button-list">Delete</a>
+                                    <a @click=${() => onDelete(i._id)} href="javascript:void(0)" class="my-button-list">Delete</a>
                                 </div>
                             </div>`)
                         : html`<p class="no-cars"> No cars in database.</p>`
@@ -34,12 +34,25 @@ export async function profilePage(ctx) {
     const userId = ctx.userData._id;
     let items = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/cars/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+    }
+
     try {
         items = await get(`/data/cars?where=_ownerId%3D%22${userId}%22&sortBy=_createdOn%20desc`);
     } catch (err) {
         if (err.message) alert(err.message);
         else alert(err);
     }
-
-    ctx.render(template(items));
+    ctx.render(template({ onDelete, items }));
 }
