@@ -1,4 +1,5 @@
 import {html} from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
 
 function homeTemplate() {
     return html`
@@ -15,43 +16,43 @@ function homeTemplate() {
         </div>`;
 }
 
-function dashboardTemplate() {
+function dashboardTemplate(cars) {
     return html`
         <div id="car-listings">
             <h1>Car Listings</h1>
 
             <div id="listings">
+                ${0 < cars.length
+                        ? cars.map(c => html`
+                            <div class="listing">
+                                <p>${c.title}</p>
+                                <img src=${c.imageUrl}>
+                                <h2>Brand: ${c.brand}</h2>
+                                <div class="info">
+                                    <div id="data-info">
+                                        <h3>Seller: ${c.seller}</h3>
+                                        <h3>Fuel: ${c.fuelType}</h3>
+                                        <h3>Year: ${c.year}</h3>
+                                        <h3>Price: ${c.price} $</h3>
+                                    </div>
+                                    <div id="data-buttons">
+                                        <ul>
+                                            <li class="action">
+                                                <a href="/details/${c._id}" class="button-carDetails">Details</a>
+                                            </li>
+                                            <li class="action">
+                                                <a href="/edit/${c._id}" class="button-carDetails">edit</a>
+                                            </li>
+                                            <li class="action">
+                                                <a href="#" class="button-carDetails">delete</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
 
-                <div class="listing">
-                    <p>Audi a3 много запазено</p>
-                    <img src="https://i.imgur.com/drIOsYl.jpg">
-                    <h2>Brand: Audi</h2>
-                    <div class="info">
-                        <div id="data-info">
-                            <h3>Seller: kunio</h3>
-                            <h3>Fuel: Gasoline</h3>
-                            <h3>Year: 1998</h3>
-                            <h3>Price: 2500 $</h3>
-                        </div>
-                        <div id="data-buttons">
-                            <ul>
-                                <li class="action">
-                                    <a href="#" class="button-carDetails">Details</a>
-                                </li>
-                                <li class="action">
-                                    <a href="#" class="button-carDetails">edit</a>
-                                </li>
-                                <li class="action">
-                                    <a href="#" class="button-carDetails">delete</a>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </div>
-
-                </div>
-                <p class="no-cars">No cars in database.</p>
-
+                            </div>`)
+                        : html`<p class="no-cars">No cars in database.</p>`
+                }
             </div>
         </div>`;
 }
@@ -63,5 +64,14 @@ export async function homePage(ctx) {
         return ctx.render(homeTemplate());
     }
 
-    ctx.render(dashboardTemplate());
+    let cars = [];
+
+    try {
+        cars = await get('/data/cars?sortBy=_createdOn%20desc');
+    } catch (err) {
+        if (err.message) alert(err.message);
+        else alert(err);
+    }
+
+    ctx.render(dashboardTemplate(cars));
 }
