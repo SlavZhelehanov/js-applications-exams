@@ -16,7 +16,7 @@ function homeTemplate() {
         </div>`;
 }
 
-function dashboardTemplate(cars) {
+function dashboardTemplate({ cars, isAuth }) {
     return html`
         <div id="car-listings">
             <h1>Car Listings</h1>
@@ -40,12 +40,16 @@ function dashboardTemplate(cars) {
                                             <li class="action">
                                                 <a href="/details/${c._id}" class="button-carDetails">Details</a>
                                             </li>
-                                            <li class="action">
-                                                <a href="/edit/${c._id}" class="button-carDetails">edit</a>
-                                            </li>
-                                            <li class="action">
-                                                <a href="#" class="button-carDetails">delete</a>
-                                            </li>
+                                            ${isAuth._id === c._id
+                                                    ? html`
+                                                        <li class="action">
+                                                            <a href="/edit/${c._id}" class="button-carDetails">edit</a>
+                                                        </li>
+                                                        <li class="action">
+                                                            <a href="#" class="button-carDetails">delete</a>
+                                                        </li>`
+                                                    : null
+                                            }
                                         </ul>
                                     </div>
                                 </div>
@@ -73,5 +77,5 @@ export async function homePage(ctx) {
         else alert(err);
     }
 
-    ctx.render(dashboardTemplate(cars));
+    ctx.render(dashboardTemplate({cars, isAuth}));
 }
