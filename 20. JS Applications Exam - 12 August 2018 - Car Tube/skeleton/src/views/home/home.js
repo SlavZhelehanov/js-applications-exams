@@ -16,7 +16,7 @@ function homeTemplate() {
         </div>`;
 }
 
-function dashboardTemplate({ cars, isAuth }) {
+function carListings({ cars, isAuth, onDelete }) {
     return html`
         <div id="car-listings">
             <h1>Car Listings</h1>
@@ -46,7 +46,7 @@ function dashboardTemplate({ cars, isAuth }) {
                                                             <a href="/edit/${c._id}" class="button-carDetails">edit</a>
                                                         </li>
                                                         <li class="action">
-                                                            <a href="#" class="button-carDetails">delete</a>
+                                                            <a @click=${() => onDelete(c._id)} href="javascript:void(0)" class="button-carDetails">delete</a>
                                                         </li>`
                                                     : null
                                             }
@@ -70,12 +70,26 @@ export async function homePage(ctx) {
 
     let cars = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/memes/${id}`);
+                ctx.page.redirect('/app');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+    }
+
     try {
         cars = await get('/data/cars?sortBy=_createdOn%20desc');
-    } catch (err) {
+    } catch (error) {
         if (err.message) alert(err.message);
         else alert(err);
     }
 
-    ctx.render(dashboardTemplate({cars, isAuth}));
+    return ctx.render(carListings({ cars, isAuth, onDelete }));
 }
