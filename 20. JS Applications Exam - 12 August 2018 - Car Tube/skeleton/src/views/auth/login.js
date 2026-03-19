@@ -1,6 +1,6 @@
-import {html} from '../../lib/lit-html.min.js';
-import {post} from "../../utils/api.js";
-import {saveUserData} from "../../utils/utils.js";
+import { html } from '../../lib/lit-html.min.js';
+import { post } from "../../utils/api.js";
+import { saveUserData, showMessage } from "../../utils/utils.js";
 
 function template(onLogin) {
     return html`
@@ -34,23 +34,25 @@ export function loginPage(ctx) {
         const username = formData.get('username');
         const password = formData.get('password');
 
-        if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
-        if (/^[A-Za-z]{3,}$/.test(username)) return alert('A username should be at least 3 characters long and should contain only english alphabet letters.');
-        if (/^[A-Za-z]{6,}$/.test(password)) return alert('A user‘s password should be at least 6 characters long and should contain only english alphabet letters and digits. ');
+        if (username.trim() === '' || password.trim() === '') return showMessage("errorBox", 'All fields are required!');
+        if (/^[A-Za-z]{3,}$/.test(username)) return showMessage("errorBox", 'A username should be at least 3 characters long and should contain only english alphabet letters.');
+        if (/^[A-Za-z]{6,}$/.test(password)) return showMessage("errorBox", 'A user‘s password should be at least 6 characters long and should contain only english alphabet letters and digits. ');
 
         try {
-            const user = await post("/users/login", {username, password});
+            showMessage("loadingBox", "Loading...");
+
+            const user = await post("/users/login", { username, password });
 
             if (399 < user.status) throw user.statusText;
 
             saveUserData(user);
-            await alert("Login successful.");
+            await showMessage("infoBox", "Login successful.");
             e.target.reset();
             ctx.setNavigation();
             ctx.page.redirect('/');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showMessage("errorBox", err.message);
+            else showMessage("errorBox", err);
         }
     }
 

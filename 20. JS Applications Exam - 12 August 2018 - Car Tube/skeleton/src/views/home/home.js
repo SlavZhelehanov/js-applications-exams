@@ -1,7 +1,8 @@
-import {html} from "../../lib/lit-html.min.js";
+import { html } from "../../lib/lit-html.min.js";
 import { get } from "../../utils/api.js";
+import { showMessage } from "../../utils/utils.js";
 
-function homeTemplate() {
+function main() {
     return html`
         <div id="main">
             <div id="welcome-container">
@@ -23,40 +24,40 @@ function carListings({ cars, isAuth, onDelete }) {
 
             <div id="listings">
                 ${0 < cars.length
-                        ? cars.map(c => html`
-                            <div class="listing">
-                                <p>${c.title}</p>
-                                <img src=${c.imageUrl}>
-                                <h2>Brand: ${c.brand}</h2>
-                                <div class="info">
-                                    <div id="data-info">
-                                        <h3>Seller: ${c.seller}</h3>
-                                        <h3>Fuel: ${c.fuelType}</h3>
-                                        <h3>Year: ${c.year}</h3>
-                                        <h3>Price: ${c.price} $</h3>
-                                    </div>
-                                    <div id="data-buttons">
-                                        <ul>
-                                            <li class="action">
-                                                <a href="/details/${c._id}" class="button-carDetails">Details</a>
-                                            </li>
-                                            ${isAuth._id === c._id
-                                                    ? html`
-                                                        <li class="action">
-                                                            <a href="/edit/${c._id}" class="button-carDetails">edit</a>
-                                                        </li>
-                                                        <li class="action">
-                                                            <a @click=${() => onDelete(c._id)} href="javascript:void(0)" class="button-carDetails">delete</a>
-                                                        </li>`
-                                                    : null
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
+            ? cars.map(c => html`<div class="listing">
+                    <p>${c.title}</p>
+                    <img src=${c.imageUrl}>
+                    <h2>Brand: ${c.brand}</h2>
+                    <div class="info">
+                        <div id="data-info">
+                            <h3>Seller: ${c.seller}</h3>
+                            <h3>Fuel: ${c.fuelType}</h3>
+                            <h3>Year: ${c.year}</h3>
+                            <h3>Price: ${c.price} $</h3>
+                        </div>
+                        <div id="data-buttons">
+                            <ul>
+                                <li class="action">
+                                    <a href="/details/${c._id}" class="button-carDetails">Details</a>
+                                </li>
+                                ${isAuth._id === c._id
+                    ? html`<li class="action">
+                                    <a href="/edit/${c._id}" class="button-carDetails">edit</a>
+                                </li>
+                                <li class="action">
+                                    <a @click=${() => onDelete(c._id)} href="javascript:void(0)" class="button-carDetails">delete</a>
+                                </li>`
+                    : null
+                }                                
 
-                            </div>`)
-                        : html`<p class="no-cars">No cars in database.</p>`
-                }
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>`)
+            : html`<p class="no-cars">No cars in database.</p>`
+        }
+
             </div>
         </div>`;
 }
@@ -64,9 +65,7 @@ function carListings({ cars, isAuth, onDelete }) {
 export async function homePage(ctx) {
     const isAuth = !!ctx.userData;
 
-    if (!isAuth) {
-        return ctx.render(homeTemplate());
-    }
+    if (!isAuth) return ctx.render(main());
 
     let cars = [];
 
@@ -75,20 +74,24 @@ export async function homePage(ctx) {
 
         if (choice) {
             try {
+                showMessage("loadingBox", "Loading...");
                 await del(`/data/memes/${id}`);
+                await showMessage("infoBox", "Listing deleted.");
                 ctx.page.redirect('/app');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showMessage("errorBox", err.message);
+                else showMessage("errorBox", err);
             }
         }
     }
 
     try {
+        showMessage("loadingBox", "Loading...");
         cars = await get('/data/cars?sortBy=_createdOn%20desc');
+        showMessage("fl", ".");
     } catch (error) {
-        if (err.message) alert(err.message);
-        else alert(err);
+        if (err.message) showMessage("errorBox", err.message);
+        else showMessage("errorBox", err);
     }
 
     return ctx.render(carListings({ cars, isAuth, onDelete }));

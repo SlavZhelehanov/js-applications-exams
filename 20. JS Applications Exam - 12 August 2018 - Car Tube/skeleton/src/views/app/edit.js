@@ -1,5 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get, put } from "../../utils/api.js";
+import { showMessage } from "../../utils/utils.js";
 
 function template(item, onEdit) {
     return html`
@@ -61,17 +62,18 @@ export async function editPage(ctx) {
             price: formData.get('price').trim(),
         }
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
-        if (33 < item.title.length) return alert("The title length must not exceed 33 characters!");
-        if (item.description.length < 30 || 450 <= item.description.length) return alert("The description length must not exceed 450 characters and should be at least 30!");
-        if (11 < item.brand.length || 11 < item.brand.length) return alert("The brand and fuelType and length must not exceed 11 characters!");
-        if (item.brand.length < 4 && 11 < item.brand.length) return alert("The model length should be at least 4 characters and must not exceed 11 characters!");
-        if (item.year.length !== 4) return alert("The year must be only 4 chars long!");
-        if (1000000 < +item.price) return alert("The maximum price is 1000000$");
-        if (!item.imageUrl.startsWith("http://") && !item.imageUrl.startsWith("https://")) return alert("Link url should always start with “http”.");
+        if (Object.values(item).some((x) => !x)) return showMessage("errorBox", "All fields are required!");
+        if (33 < item.title.length) return showMessage("errorBox", "The title length must not exceed 33 characters!");
+        if (item.description.length < 30 || 450 <= item.description.length) return showMessage("errorBox", "The description length must not exceed 450 characters and should be at least 30!");
+        if (11 < item.brand.length || 11 < item.brand.length) return showMessage("errorBox", "The brand and fuelType and length must not exceed 11 characters!");
+        if (item.brand.length < 4 && 11 < item.brand.length) return showMessage("errorBox", "The model length should be at least 4 characters and must not exceed 11 characters!");
+        if (item.year.length !== 4) return showMessage("errorBox", "The year must be only 4 chars long!");
+        if (1000000 < +item.price) return showMessage("errorBox", "The maximum price is 1000000$");
+        if (!item.imageUrl.startsWith("http://") && !item.imageUrl.startsWith("https://")) return showMessage("errorBox", "Link url should always start with “http”.");
 
+        showMessage("loadingBox", "Loading...");
         await put(`/data/cars/${id}`, newItem);
-        await alert(`Listing ${newItem.title} updated.`);
+        await showMessage("infoBox", `Listing ${newItem.title} updated.`);
         e.target.reset();
         // ctx.page.redirect(`/details/${id}`);
         ctx.page.redirect(`/`);
@@ -80,8 +82,8 @@ export async function editPage(ctx) {
     try {
         item = await get(`/data/cars/${id}`);
     } catch (err) {
-        if (err.message) alert(err.message);
-        else alert(err);
+        if (err.message) showMessage("errorBox", err.message);
+        else showMessage("errorBox", err);
     }
 
     ctx.render(template(item, onEdit));
