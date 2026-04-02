@@ -2,8 +2,8 @@ import page from "./lib/page.js";
 
 import {decorateCTX, guardRoute, setNavigation} from "./utils/utils.js";
 import {homePage} from "./views/home/home.js";
-import {dashboardPage} from "./views/app/dashboard";
-import {detailsPage} from "./views/app/details";
+import {dashboardPage} from "./views/app/dashboard.js";
+import {detailsPage} from "./views/app/details.js";
 
 setNavigation();
 

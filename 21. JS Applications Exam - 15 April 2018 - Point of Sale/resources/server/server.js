@@ -1434,7 +1434,8 @@
 
     var rules = initPlugin$3;
 
-    var identity = "email";
+    // var identity = "email";
+    var identity = "username";
     var protectedData = {
         users: {
             "5b6cbca357fa3260bf9c6f53": {

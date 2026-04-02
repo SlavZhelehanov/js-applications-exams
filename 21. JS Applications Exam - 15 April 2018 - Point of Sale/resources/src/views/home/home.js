@@ -1,6 +1,8 @@
 import {html} from "../../lib/lit-html.min.js";
+import {post} from "../../utils/api.js";
+import {saveUserData} from "../../utils/utils.js";
 
-function main() {
+function main({onRegister}) {
     return html`
         <section class="clearfix" id="welcome-section">
             <div class="welcome-text">
@@ -30,7 +32,7 @@ function main() {
                 </div>
                 <div class="welcome-rigister-form">
                     <h1>Register</h1>
-                    <form id="register-form">
+                    <form id="register-form" @submit=${onRegister}>
                         <label for="username-register">Username</label>
                         <input type="text" name="username-register" id="username-register" placeholder="Username">
                         <label for="password-register">Password</label>
@@ -117,7 +119,34 @@ function dashboard() {
 export async function homePage(ctx) {
     const isAuth = !!ctx.userData;
 
-    if (!isAuth) return ctx.render(main());
+    if (!isAuth) {
+        async function onRegister(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const username = formData.get('username-register');
+            const password = formData.get('password-register');
+            const repass = formData.get('password-register-check');
+
+            if (username === '' || password === '') return alert('All fields are required');
+            if (password !== repass) return alert("Passwords don't match");
+
+            try {
+                const user = await post("/users/register", {username, password});
+
+                if (399 < user.status) throw user.statusText;
+
+                saveUserData(user);
+                e.target.reset();
+                ctx.setNavigation();
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+
+        return ctx.render(main({onRegister}));
+    }
 
     return ctx.render(dashboard());
 }
