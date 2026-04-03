@@ -2,7 +2,7 @@ import {html} from "../../lib/lit-html.min.js";
 import {post} from "../../utils/api.js";
 import {saveUserData} from "../../utils/utils.js";
 
-function main({onRegister}) {
+function main({onRegister, onLogin}) {
     return html`
         <section class="clearfix" id="welcome-section">
             <div class="welcome-text">
@@ -19,10 +19,10 @@ function main({onRegister}) {
                     Aldus
                     PageMaker including versions of Lorem Ipsum.</p>
             </div>
-            <div class="welcome-forms">
+            <div class="welcome-login-forms">
                 <div class="welcome-login-form">
                     <h1>Sign in</h1>
-                    <form id="login-form">
+                    <form id="login-form" method="POST" @submit=${onLogin}>
                         <label for="username-login">Username</label>
                         <input type="text" name="username-login" id="username-login" placeholder="Username">
                         <label for="password-login">Password</label>
@@ -32,7 +32,7 @@ function main({onRegister}) {
                 </div>
                 <div class="welcome-rigister-form">
                     <h1>Register</h1>
-                    <form id="register-form" @submit=${onRegister}>
+                    <form id="register-form" method="POST" @submit=${onRegister}>
                         <label for="username-register">Username</label>
                         <input type="text" name="username-register" id="username-register" placeholder="Username">
                         <label for="password-register">Password</label>
@@ -119,6 +119,8 @@ function dashboard() {
 export async function homePage(ctx) {
     const isAuth = !!ctx.userData;
 
+    console.log(isAuth)
+
     if (!isAuth) {
         async function onRegister(e) {
             e.preventDefault();
@@ -145,7 +147,32 @@ export async function homePage(ctx) {
             }
         }
 
-        return ctx.render(main({onRegister}));
+        async function onLogin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const username = formData.get('username-login');
+            const password = formData.get('password-login');
+
+            console.log(username, password)
+
+            if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
+
+            try {
+                const user = await post("/users/login", { username, password });
+
+                if (399 < user.status) throw user.statusText;
+
+                saveUserData(user);
+                e.target.reset();
+                ctx.setNavigation();
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+
+        return ctx.render(main({onRegister, onLogin}));
     }
 
     return ctx.render(dashboard());
