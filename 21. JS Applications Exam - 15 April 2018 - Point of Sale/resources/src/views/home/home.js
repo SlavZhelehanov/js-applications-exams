@@ -1,8 +1,8 @@
-import {html} from "../../lib/lit-html.min.js";
-import {post} from "../../utils/api.js";
-import {saveUserData} from "../../utils/utils.js";
+import { html } from "../../lib/lit-html.min.js";
+import { get, post } from "../../utils/api.js";
+import { saveUserData } from "../../utils/utils.js";
 
-function main({onRegister, onLogin}) {
+function main({ onRegister, onLogin }) {
     return html`
         <section class="clearfix" id="welcome-section">
             <div class="welcome-text">
@@ -47,7 +47,7 @@ function main({onRegister, onLogin}) {
         </section>`;
 }
 
-function dashboard() {
+function dashboard({ data, total }) {
     return html`
         <section id="create-receipt-view">
             <h1>Create Receipt</h1>
@@ -60,24 +60,18 @@ function dashboard() {
                     <div class="col">Action</div>
                 </div>
                 <div id="active-entries">
-                    <div class="row">
-                        <div class="col wide">Apple</div>
-                        <div class="col wide">10</div>
-                        <div class="col wide">4.50</div>
-                        <div class="col">45.00</div>
+${0 < data.length
+            ? data.map(r => html`<div class="row">
+                        <div class="col wide">${r.productName}</div>
+                        <div class="col wide">${r.quantity}</div>
+                        <div class="col wide">${r.price}</div>
+                        <div class="col">${r.quantity * r.price}</div>
                         <div class="col right">
                             <a href="#">&#10006;</a>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col wide">Banana</div>
-                        <div class="col wide">9</div>
-                        <div class="col wide">3.50</div>
-                        <div class="col">31.50</div>
-                        <div class="col right">
-                            <a href="#">&#10006;</a>
-                        </div>
-                    </div>
+                    </div>`)
+            : null
+        }
                 </div>
                 <div class="row">
                     <form id="create-entry-form">
@@ -103,7 +97,7 @@ function dashboard() {
                         <div class="col wide">
                         </div>
                         <div class="col wide right">Total:</div>
-                        <div class="col">76.50</div>
+                        <div class="col">${total.toFixed(2)}</div>
                         <div class="col">
                             <input id="checkoutBtn" type="submit" value="Checkout"/>
                         </div>
@@ -133,7 +127,7 @@ export async function homePage(ctx) {
             if (password !== repass) return alert("Passwords don't match");
 
             try {
-                const user = await post("/users/register", {username, password});
+                const user = await post("/users/register", { username, password });
 
                 if (399 < user.status) throw user.statusText;
 
@@ -172,8 +166,18 @@ export async function homePage(ctx) {
             }
         }
 
-        return ctx.render(main({onRegister, onLogin}));
+        return ctx.render(main({ onRegister, onLogin }));
     }
 
-    return ctx.render(dashboard());
+    let data = [], total = 0;
+
+    try {
+        data = await get("/data/receipts?sortBy=_createdOn%20desc");
+        data.forEach(el => total += (el.quantity * el.price));
+    } catch (err) {
+        if (err.message) alert(err.message);
+        else alert(err);
+    }
+
+    return ctx.render(dashboard({ data, total }));
 }
