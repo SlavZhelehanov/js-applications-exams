@@ -47,7 +47,7 @@ function main({ onRegister, onLogin }) {
         </section>`;
 }
 
-function dashboard({ data, total }) {
+function dashboard({ data, onCreate, total }) {
     return html`
         <section id="create-receipt-view">
             <h1>Create Receipt</h1>
@@ -74,15 +74,15 @@ ${0 < data.length
         }
                 </div>
                 <div class="row">
-                    <form id="create-entry-form">
+                    <form id="create-entry-form" method="post" @submit=${onCreate}>
                         <div class="col wide">
                             <input name="type" placeholder="Product name">
                         </div>
                         <div class="col wide">
-                            <input name="qty" placeholder="Quantity">
+                            <input type="number" name="qty" placeholder="Quantity">
                         </div>
                         <div class="col wide">
-                            <input name="price" placeholder="Price per Unit">
+                            <input type="number" name="price" placeholder="Price per Unit">
                         </div>
                         <div class="col">Sub-total</div>
                         <div class="col">
@@ -92,10 +92,8 @@ ${0 < data.length
                 </div>
                 <div class="table-foot">
                     <form id="create-receipt-form">
-                        <div class="col wide">
-                        </div>
-                        <div class="col wide">
-                        </div>
+                        <div class="col wide"></div>
+                        <div class="col wide"></div>
                         <div class="col wide right">Total:</div>
                         <div class="col">${total.toFixed(2)}</div>
                         <div class="col">
@@ -112,8 +110,6 @@ ${0 < data.length
 
 export async function homePage(ctx) {
     const isAuth = !!ctx.userData;
-
-    console.log(isAuth)
 
     if (!isAuth) {
         async function onRegister(e) {
@@ -171,13 +167,38 @@ export async function homePage(ctx) {
 
     let data = [], total = 0;
 
+    async function onCreate(e) {
+        e.preventDefault();
+        console.log(e.method);
+        
+
+        const formData = new FormData(e.target);
+        const item = {
+            productName: formData.get('type').trim(),
+            quantity: formData.get('qty').trim(),
+            price: formData.get('price').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/data/receipts", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     try {
         data = await get("/data/receipts?sortBy=_createdOn%20desc");
+        console.log(data);
+        
         data.forEach(el => total += (el.quantity * el.price));
     } catch (err) {
         if (err.message) alert(err.message);
         else alert(err);
     }
 
-    return ctx.render(dashboard({ data, total }));
+    return ctx.render(dashboard({ data, onCreate, total }));
 }
