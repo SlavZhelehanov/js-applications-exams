@@ -1,5 +1,5 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get, post } from "../../utils/api.js";
+import { get, post, del } from "../../utils/api.js";
 import { saveUserData } from "../../utils/utils.js";
 
 function main({ onRegister, onLogin }) {
@@ -47,7 +47,7 @@ function main({ onRegister, onLogin }) {
         </section>`;
 }
 
-function dashboard({ data, onCreate, total }) {
+function dashboard({ data, onDelete, onCreate, total }) {
     return html`
         <section id="create-receipt-view">
             <h1>Create Receipt</h1>
@@ -67,7 +67,7 @@ ${0 < data.length
                         <div class="col wide">${r.price}</div>
                         <div class="col">${r.quantity * r.price}</div>
                         <div class="col right">
-                            <a href="#">&#10006;</a>
+                            <a @click=${() => onDelete(r._id)} href="javascript:void(0)">&#10006;</a>
                         </div>
                     </div>`)
             : null
@@ -170,7 +170,7 @@ export async function homePage(ctx) {
     async function onCreate(e) {
         e.preventDefault();
         console.log(e.method);
-        
+
 
         const formData = new FormData(e.target);
         const item = {
@@ -190,15 +190,28 @@ export async function homePage(ctx) {
         }
     }
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/data/receipts/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
+
     try {
         data = await get("/data/receipts?sortBy=_createdOn%20desc");
         console.log(data);
-        
+
         data.forEach(el => total += (el.quantity * el.price));
     } catch (err) {
         if (err.message) alert(err.message);
         else alert(err);
     }
 
-    return ctx.render(dashboard({ data, onCreate, total }));
+    return ctx.render(dashboard({ data, onCreate, total, onDelete }));
 }
