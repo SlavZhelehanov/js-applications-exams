@@ -182,7 +182,7 @@ export async function homePage(ctx) {
         if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
 
         try {
-            await post("/data/receipts", item);
+            await post("/jsonstore/receipts", item);
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
@@ -193,9 +193,12 @@ export async function homePage(ctx) {
     async function onDelete(id) {
         const choice = confirm('Are you sure?');
 
+        console.log(id);
+        
+
         if (choice) {
             try {
-                await del(`/data/receipts/${id}`);
+                await del(`/jsonstore/receipts/${id}`);
                 ctx.page.redirect('/');
             } catch (err) {
                 alert(err.message);
@@ -204,8 +207,9 @@ export async function homePage(ctx) {
     }
 
     try {
-        data = await get("/data/receipts?sortBy=_createdOn%20desc");
-        console.log(data);
+        const res = await get("/jsonstore/receipts?sortBy=_createdOn%20desc");
+        console.log(res);
+        Object.keys(res).forEach(k => data.push(res[k]));
 
         data.forEach(el => total += (el.quantity * el.price));
     } catch (err) {

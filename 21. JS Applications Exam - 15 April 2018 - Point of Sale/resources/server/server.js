@@ -1457,24 +1457,6 @@
         sessions: {},
     };
     var seedData = {
-        receipts : {
-            "5b6cbe491d803555d946baab": {
-                "quantity": 10,
-                "productName": "Apple",
-                "price": 4.50,
-                "creator": "5b6cbcbe1ab0f72634aa08c3",
-                _createdOn: 1770295412101,
-                _id: "1",
-            },
-            "5b6cbe491d803555d946abba": {
-                "quantity": 9,
-                "productName": "Banana",
-                "price": 3.50,
-                "creator": "5b6cbcbe1ab0f72634aa08c3",
-                _createdOn: 1770295412101,
-                _id: "2",
-            },
-        },
     };
     var rules$1 = {
         users: {
