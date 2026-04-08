@@ -47,7 +47,7 @@ function main({ onRegister, onLogin }) {
         </section>`;
 }
 
-function dashboard({ data, onDelete, onCreate, total }) {
+function dashboard({ data, onDelete, onCreate, onCheckout, total }) {
     return html`
         <section id="create-receipt-view">
             <h1>Create Receipt</h1>
@@ -91,7 +91,7 @@ ${0 < data.length
                     </form>
                 </div>
                 <div class="table-foot">
-                    <form id="create-receipt-form">
+                    <form id="create-receipt-form" method="post" @submit=${onCheckout}>
                         <div class="col wide"></div>
                         <div class="col wide"></div>
                         <div class="col wide right">Total:</div>
@@ -143,8 +143,6 @@ export async function homePage(ctx) {
             const username = formData.get('username-login');
             const password = formData.get('password-login');
 
-            console.log(username, password)
-
             if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
 
             try {
@@ -165,12 +163,20 @@ export async function homePage(ctx) {
         return ctx.render(main({ onRegister, onLogin }));
     }
 
+    function getCurrentFormattedDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
     let data = [], total = 0;
 
     async function onCreate(e) {
         e.preventDefault();
-        console.log(e.method);
-
 
         const formData = new FormData(e.target);
         const item = {
@@ -182,7 +188,26 @@ export async function homePage(ctx) {
         if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
 
         try {
-            await post("/jsonstore/receipts", item);
+            await post("/jsonstore/products", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    async function onCheckout(e) {
+        e.preventDefault();
+        let items = 0;
+
+        if (data.length === 0) return;
+
+        data.forEach(pr => items += pr.quantity);
+        try {
+            await post("/jsonstore/receipts", { data, total, items, creationDate: getCurrentFormattedDate() });
+            alert("Receipt checked out");
+            for (let i = 0; i < data.length; i++) await del(`/jsonstore/products/${data[i]._id}`);
+
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
@@ -193,12 +218,9 @@ export async function homePage(ctx) {
     async function onDelete(id) {
         const choice = confirm('Are you sure?');
 
-        console.log(id);
-        
-
         if (choice) {
             try {
-                await del(`/jsonstore/receipts/${id}`);
+                await del(`/jsonstore/products/${id}`);
                 ctx.page.redirect('/');
             } catch (err) {
                 alert(err.message);
@@ -207,8 +229,7 @@ export async function homePage(ctx) {
     }
 
     try {
-        const res = await get("/jsonstore/receipts?sortBy=_createdOn%20desc");
-        console.log(res);
+        const res = await get("/jsonstore/products?sortBy=_createdOn%20desc");
         Object.keys(res).forEach(k => data.push(res[k]));
 
         data.forEach(el => total += (el.quantity * el.price));
@@ -217,5 +238,5 @@ export async function homePage(ctx) {
         else alert(err);
     }
 
-    return ctx.render(dashboard({ data, onCreate, total, onDelete }));
+    return ctx.render(dashboard({ onCheckout, data, onCreate, total, onDelete }));
 }
