@@ -6,8 +6,8 @@ export async function logoutAction(ctx) {
     try {
         // showMessage("loadingBox", "Loading...");
 
-        await get("/users/logout");
         clearUserData();
+        await get("/users/logout");
         // await showMessage("infoBox", "Logout successful.");
         ctx.setNavigation();
     } catch (err) {
