@@ -202,11 +202,7 @@ export async function homePage(ctx) {
 
         if (data.length === 0) return;
 
-        data.forEach(pr => {
-            items += pr.quantity;
-            console.log(pr);
-
-        });
+        data.forEach(pr => items += pr.quantity);
         try {
             await post("/jsonstore/receipts", { data, total, items, creationDate: getCurrentFormattedDate() });
             alert("Receipt checked out");

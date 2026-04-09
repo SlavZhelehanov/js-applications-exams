@@ -1,6 +1,7 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
 
-function template() {
+function template({ data, total }) {
     return html`
         <section id="all-receipt-view">
             <h1>All Receipts</h1>
@@ -11,28 +12,23 @@ function template() {
                     <div class="col">Total</div>
                     <div class="col">Actions</div>
                 </div>
-                <div class="row">
-                    <div class="col wide">2018-04-15 14:58</div>
-                    <div class="col wide">10</div>
-                    <div class="col">110.00</div>
+                ${0 < data.length
+            ? data.map(el => html`<div class="row">
+                    <div class="col wide">${el.creationDate}</div>
+                    <div class="col wide">${el.items}</div>
+                    <div class="col">${el.total.toFixed(2)}</div>
                     <div class="col">
                         <a href="#">Details</a>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col wide">2018-04-15 12:33</div>
-                    <div class="col wide">15</div>
-                    <div class="col">160.50</div>
-                    <div class="col">
-                        <a href="#">Details</a>
-                    </div>
-                </div>
+                </div>`)
+            : null
+        }
                 <div class="table-foot">
                     <form id="create-receipt-form">
                         <div class="col wide">
                         </div>
                         <div class="col wide right">Total:</div>
-                        <div class="col">270.50</div>
+                        <div class="col">${total.toFixed(2)}</div>
                         <div class="col">
                         </div>
                     </form>
@@ -42,5 +38,18 @@ function template() {
 }
 
 export async function dashboardPage(ctx) {
-    ctx.render(template());
+    let data = [], total = 0, receipts = [];
+
+    try {
+        const res = await get("/jsonstore/receipts?sortBy=_createdOn%20desc");
+        Object.keys(res).forEach(k => {
+            data.push(res[k]);
+            total += res[k].total;            
+        });
+    } catch (err) {
+        alert(err);
+        if (err.message) alert(err.message);
+        else alert(err);
+    }
+    ctx.render(template({ data, total }));
 }
