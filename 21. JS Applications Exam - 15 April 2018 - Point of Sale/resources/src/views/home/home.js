@@ -181,8 +181,8 @@ export async function homePage(ctx) {
         const formData = new FormData(e.target);
         const item = {
             productName: formData.get('type').trim(),
-            quantity: formData.get('qty').trim(),
-            price: formData.get('price').trim()
+            quantity: Number(formData.get('qty').trim()),
+            price: Number(formData.get('price').trim())
         }
 
         if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
@@ -202,7 +202,11 @@ export async function homePage(ctx) {
 
         if (data.length === 0) return;
 
-        data.forEach(pr => items += pr.quantity);
+        data.forEach(pr => {
+            items += pr.quantity;
+            console.log(pr);
+
+        });
         try {
             await post("/jsonstore/receipts", { data, total, items, creationDate: getCurrentFormattedDate() });
             alert("Receipt checked out");
