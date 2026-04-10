@@ -1,6 +1,7 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from '../../utils/api.js';
 
-function template() {
+function template({ data }) {
     return html`        
         <section id="receipt-details-view">
             <h1>Receipt Details</h1>
@@ -11,22 +12,27 @@ function template() {
                     <div class="col wide">Price per Unit</div>
                     <div class="col">Sub-total</div>
                 </div>
-                <div class="row">
-                    <div class="col wide">Apple</div>
-                    <div class="col wide">10</div>
-                    <div class="col wide">4.50</div>
-                    <div class="col">45.00</div>
-                </div>
-                <div class="row">
-                    <div class="col wide">Banana</div>
-                    <div class="col wide">9</div>
-                    <div class="col wide">3.50</div>
-                    <div class="col">31.50</div>
-                </div>
+                ${0 < data.length
+            ? data.map(el => html`<div class="row">
+                    <div class="col wide">${el.productName}</div>
+                    <div class="col wide">${el.quantity}</div>
+                    <div class="col wide">${el.price.toFixed(2)}</div>
+                    <div class="col">${(el.price * el.quantity).toFixed(2)}</div>
+                </div>`)
+            : null
+        }
             </div>
         </section>`;
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const { id } = ctx.params
+    let data = [];
+
+    try {
+        data = await get(`/jsonstore/receipts/${id}`);
+    } catch (error) {
+        alert(error.message);
+    }
+    ctx.render(template({ data: data.data }));
 }

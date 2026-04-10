@@ -18,7 +18,7 @@ function template({ data, total }) {
                     <div class="col wide">${el.items}</div>
                     <div class="col">${el.total.toFixed(2)}</div>
                     <div class="col">
-                        <a href="#">Details</a>
+                        <a href="/details/${el._id}">Details</a>
                     </div>
                 </div>`)
             : null
