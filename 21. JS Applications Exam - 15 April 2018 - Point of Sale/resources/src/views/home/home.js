@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, post, del } from "../../utils/api.js";
-import { saveUserData } from "../../utils/utils.js";
+import { saveUserData, showMessage } from "../../utils/utils.js";
 
 function main({ onRegister, onLogin }) {
     return html`
@@ -119,21 +119,23 @@ export async function homePage(ctx) {
             const password = formData.get('password-register');
             const repass = formData.get('password-register-check');
 
-            if (username === '' || password === '') return alert('All fields are required');
-            if (password !== repass) return alert("Passwords don't match");
+            if (username === '' || password === '') return showMessage('errorBox', 'All fields are required');
+            if (password !== repass) return showMessage('errorBox', "Passwords don't match");
 
             try {
+                showMessage('loadingBox', 'Loading...');
                 const user = await post("/users/register", { username, password });
 
                 if (399 < user.status) throw user.statusText;
 
                 saveUserData(user);
+                await showMessage('infoBox', 'User registration successful');
                 e.target.reset();
                 ctx.setNavigation();
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showMessage('errorBox', err.message);
+                else showMessage('errorBox', err);
             }
         }
 
@@ -143,20 +145,22 @@ export async function homePage(ctx) {
             const username = formData.get('username-login');
             const password = formData.get('password-login');
 
-            if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
+            if (username.trim() === '' || password.trim() === '') return showMessage('errorBox', 'All fields are required!');
 
             try {
+                showMessage('loadingBox', 'Loading...');
                 const user = await post("/users/login", { username, password });
 
                 if (399 < user.status) throw user.statusText;
 
                 saveUserData(user);
+                await showMessage('infoBox', 'Login successful');
                 e.target.reset();
                 ctx.setNavigation();
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showMessage('errorBox', err.message);
+                else showMessage('errorBox', err);
             }
         }
 
@@ -185,14 +189,16 @@ export async function homePage(ctx) {
             price: Number(formData.get('price').trim())
         }
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        if (Object.values(item).some((x) => !x)) return showMessage('errorBox', "All fields are required!");
 
         try {
+            showMessage('loadingBox', 'Loading...');
             await post("/jsonstore/products", item);
+            await showMessage('infoBox', 'Entry added');
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
-            alert(err.message);
+            showMessage('errorBox', err.message);
         }
     }
 
@@ -204,14 +210,15 @@ export async function homePage(ctx) {
 
         data.forEach(pr => items += pr.quantity);
         try {
+            showMessage('loadingBox', 'Loading...');
             await post("/jsonstore/receipts", { data, total, items, creationDate: getCurrentFormattedDate() });
-            alert("Receipt checked out");
+            await showMessage('infoBox', "Receipt checked out");
             for (let i = 0; i < data.length; i++) await del(`/jsonstore/products/${data[i]._id}`);
 
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
-            alert(err.message);
+            showMessage('errorBox', err.message);
         }
     }
 
@@ -220,22 +227,26 @@ export async function homePage(ctx) {
 
         if (choice) {
             try {
+                showMessage('loadingBox', 'Loading...');
                 await del(`/jsonstore/products/${id}`);
+                await showMessage('infoBox', 'Entry removed');
                 ctx.page.redirect('/');
             } catch (err) {
-                alert(err.message);
+                showMessage('errorBox', err.message);
             }
         }
     }
 
     try {
+        showMessage('loadingBox', 'Loading...');
         const res = await get("/jsonstore/products?sortBy=_createdOn%20desc");
+        showMessage('', 'Loading...');
         Object.keys(res).forEach(k => data.push(res[k]));
 
         data.forEach(el => total += (el.quantity * el.price));
     } catch (err) {
-        if (err.message) alert(err.message);
-        else alert(err);
+        if (err.message) showMessage(err.message);
+        else showMessage('errorBox', err);
     }
 
     return ctx.render(dashboard({ onCheckout, data, onCreate, total, onDelete }));

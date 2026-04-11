@@ -1,5 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get } from '../../utils/api.js';
+import { showMessage } from "../../utils/utils.js";
 
 function template({ data }) {
     return html`        
@@ -30,9 +31,13 @@ export async function detailsPage(ctx) {
     let data = [];
 
     try {
+        showMessage('loadingBox', 'Loading...');
         data = await get(`/jsonstore/receipts/${id}`);
+        showMessage('', 'Loading...');
     } catch (error) {
-        alert(error.message);
+        // alert(error.message);
+        if (err.message) showMessage('errorBox', err.message);
+        else showMessage('errorBox', err);
     }
     ctx.render(template({ data: data.data }));
 }

@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get } from "../../utils/api.js";
+import { showMessage } from "../../utils/utils.js";
 
 function template({ data, total }) {
     return html`
@@ -41,15 +42,18 @@ export async function dashboardPage(ctx) {
     let data = [], total = 0, receipts = [];
 
     try {
+        showMessage('loadingBox', 'Loading...');
         const res = await get("/jsonstore/receipts?sortBy=_createdOn%20desc");
         Object.keys(res).forEach(k => {
             data.push(res[k]);
-            total += res[k].total;            
+            total += res[k].total;
         });
+        showMessage('', 'Loading...');
     } catch (err) {
-        alert(err);
-        if (err.message) alert(err.message);
-        else alert(err);
+        if (err.message) showMessage('errorBox', err.message);
+        else showMessage('errorBox', err);
+        // if (err.message) alert(err.message);
+        // else alert(err);
     }
     ctx.render(template({ data, total }));
 }

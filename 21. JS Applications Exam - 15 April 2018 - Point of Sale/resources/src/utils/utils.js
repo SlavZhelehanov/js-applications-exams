@@ -25,15 +25,15 @@ export function setNavigation() {
             header.style.display = 'block',
             header.innerHTML = `<div id="cashier">
                 <span>Cashier: </span>
-                <a href="/profile">${username}}</a>
+                <a href="/">${username}</a>
             </div>
             <nav id="nav">
                 <ul>
                     <li>
-                        <a href="#">Editor</a>
+                        <a href="/">Editor</a>
                     </li>
                     <li>
-                        <a href="#">Overview</a>
+                        <a href="/dashboard">Overview</a>
                     </li>
                     <li>
                         <a href="/logout" class="logout">Logout</a>
