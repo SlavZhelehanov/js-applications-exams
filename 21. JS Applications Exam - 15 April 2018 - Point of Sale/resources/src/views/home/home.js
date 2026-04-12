@@ -120,7 +120,8 @@ export async function homePage(ctx) {
             const repass = formData.get('password-register-check');
 
             if (username === '' || password === '') return showMessage('errorBox', 'All fields are required');
-            if (password !== repass) return showMessage('errorBox', "Passwords don't match");
+            if (typeof username !== 'string' || username.length < 5) return showMessage('errorBox', 'A username should be a string with at least 5 characters long.');
+            if (password !== repass) return showMessage('errorBox', "Both passwords should match.");
 
             try {
                 showMessage('loadingBox', 'Loading...');
@@ -146,6 +147,7 @@ export async function homePage(ctx) {
             const password = formData.get('password-login');
 
             if (username.trim() === '' || password.trim() === '') return showMessage('errorBox', 'All fields are required!');
+            if (typeof username !== 'string' || username.length < 5) return showMessage('errorBox', 'A username should be a string with at least 5 characters long.');
 
             try {
                 showMessage('loadingBox', 'Loading...');
