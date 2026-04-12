@@ -187,11 +187,16 @@ export async function homePage(ctx) {
         const formData = new FormData(e.target);
         const item = {
             productName: formData.get('type').trim(),
-            quantity: Number(formData.get('qty').trim()),
-            price: Number(formData.get('price').trim())
+            quantity: formData.get('qty').trim(),
+            price: formData.get('price').trim()
         }
 
         if (Object.values(item).some((x) => !x)) return showMessage('errorBox', "All fields are required!");
+        if (isNaN(item.quantity)) return showMessage('errorBox', 'Quantity must be a number');
+        if (isNaN(item.price)) return showMessage('errorBox', 'Price must be a number');
+
+        item.quantity = +item.quantity;
+        item.price = +item.price;
 
         try {
             showMessage('loadingBox', 'Loading...');
