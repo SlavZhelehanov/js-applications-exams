@@ -1,17 +1,18 @@
 import { html } from "../../lib/lit-html.min.js";
-import { getisLogin, setIsLogin } from "../../utils/utils.js";
+import { post } from "../../utils/api.js";
+import { getisLogin, setIsLogin, saveUserData } from "../../utils/utils.js";
 
-function register({ redirectTo }) {
+function register({ redirectTo, onRegister }) {
     return html`
         <section id="viewRegister">
         <div class="content">
-            <form class="form" id="formRegister">
+            <form class="form" id="formRegister" method='post' @submit=${onRegister}>
                 <label>Username</label>
-                <input name="username" type="text">
+                <input name="username-register" type="text">
                 <label>Password</label>
-                <input name="password" type="password">
+                <input name="password-register" type="password">
                 <label>Repeat Password</label>
-                <input name="repeatPass" type="password">
+                <input name="password-register-check" type="password">
                 <input id="btnRegister" value="Register" type="submit">
                 <a @click=${() => redirectTo('login')} href="javascript:void(0)">Log in</a>
             </form>
@@ -35,7 +36,7 @@ function login({ redirectTo }) {
     </section>`;
 }
 export async function homePage(ctx) {
-    const isAuth = !!ctx.userData, isLogin = getisLogin();    
+    const isAuth = !!ctx.userData, isLogin = getisLogin();
 
     function redirectTo(param) {
         if (param === 'login') setIsLogin(true);
@@ -44,7 +45,34 @@ export async function homePage(ctx) {
     }
 
     if (!isAuth && !isLogin) {
-        return ctx.render(register({ redirectTo }));
+        async function onRegister(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const username = formData.get('username-register');
+            const password = formData.get('password-register');
+            const repass = formData.get('password-register-check');
+
+            if (username === '' || password === '') return alert('All fields are required');
+            if (typeof username !== 'string' || username.length < 5) return alert('A username should be a string with at least 5 characters long.');
+            if (password !== repass) return alert("Both passwords should match.");
+
+            try {
+                const user = await post("/users/register", { username, password });
+
+                if (399 < user.status) throw user.statusText;
+
+                saveUserData(user);
+                await alert('User registration successful');
+                e.target.reset();
+                ctx.setNavigation();
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+
+        return ctx.render(register({ redirectTo, onRegister }));
     } else if (!isAuth && isLogin) {
         return ctx.render(login({ redirectTo }));
     }
