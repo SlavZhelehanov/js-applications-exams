@@ -14,6 +14,18 @@ export function getUserData() {
 export function clearUserData() {
     sessionStorage.removeItem(item);
 }
+
+export function setNavigation() {
+    const isLoggedIn = Boolean(getUserData());
+    // const header = document.getElementsByTagName('header')[0];
+    const header = document.getElementsByClassName('menu')[0];
+    // const username = getUserData() ? getUserData().username : null;
+
+    isLoggedIn
+        ? header.style.display = 'block'
+        : header.style.display = 'none';
+}
+
 export function setIsLogin(data) {
     sessionStorage.setItem('isLogin', JSON.stringify(data));
 }
