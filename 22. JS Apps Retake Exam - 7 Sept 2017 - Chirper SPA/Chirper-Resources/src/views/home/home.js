@@ -35,6 +35,38 @@ function login({ redirectTo, onLogin }) {
         </div>
     </section>`;
 }
+
+function dashboard({ data, onDelete, onCreate, onCheckout, total }) {
+    return html`
+        <section id="viewFeed">
+        <div class="content">
+            <div class="chirper">
+
+                <h2 class="titlebar">Pesho</h2>
+
+                <form id="formSubmitChirp" class="chirp-form">
+                    <textarea name="text" class="chirp-input"></textarea>
+                    <input class="chirp-submit" id="btnSubmitChirp" value="Chirp" type="submit">
+                </form>
+
+                <div id="userStats" class="user-details">
+                    <span>0 chirps</span> | <span>1 following</span> | <span>0 followers</span>
+                </div>
+            </div>
+            <div id="chirps" class="chirps"><h2 class="titlebar">Chirps</h2>
+                <article class="chirp">
+                    <div class="titlebar">
+                        <a href="#" class="chirp-author">vako</a>
+                        <span class="chirp-time">1 day</span>
+                    </div>
+                    <p>yohooo</p>
+                </article>
+                <!-- TODO Load more articles -->
+            </div>
+        </div>
+    </section>`;
+}
+
 export async function homePage(ctx) {
     const isAuth = !!ctx.userData, isLogin = getisLogin();
 
@@ -101,6 +133,8 @@ export async function homePage(ctx) {
 
         return ctx.render(login({ redirectTo, onLogin }));
     }
+    } else {
 
+        return ctx.render(dashboard());
     }
 }
