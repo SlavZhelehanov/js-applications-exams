@@ -1,6 +1,7 @@
 import page from "./lib/page.js";
 
-import {decorateCTX, guardRoute, setNavigation} from "./utils/utils.js";
+import { decorateCTX, guardRoute, setNavigation } from "./utils/utils.js";
+import { discoverPage } from "./views/auth/discover.js";
 import { logoutAction } from "./views/auth/logout.js";
 import { homePage } from "./views/home/home.js";
 
@@ -10,5 +11,6 @@ page(decorateCTX);
 page("/skeleton.html", "/");
 page("/", homePage);
 page("/logout", guardRoute('user'), logoutAction);
+page("/discover", guardRoute('user'), discoverPage);
 
 page.start();
