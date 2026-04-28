@@ -36,15 +36,14 @@ function login({ redirectTo, onLogin }) {
     </section>`;
 }
 
-function dashboard({ data, onDelete, onCreate, onCheckout, total }) {
+function dashboard({ onCreate }) {
     return html`
         <section id="viewFeed">
         <div class="content">
             <div class="chirper">
-
                 <h2 class="titlebar">Pesho</h2>
 
-                <form id="formSubmitChirp" class="chirp-form">
+                <form id="formSubmitChirp" class="chirp-form" method="post" @submit=${onCreate}>
                     <textarea name="text" class="chirp-input"></textarea>
                     <input class="chirp-submit" id="btnSubmitChirp" value="Chirp" type="submit">
                 </form>
@@ -90,6 +89,7 @@ export async function homePage(ctx) {
 
             try {
                 const user = await post("/users/register", { username, password });
+                const userSeed = await post("/jsonstore/users", { username, followers: [], following: [] });
 
                 if (399 < user.status) throw user.statusText;
 
@@ -132,9 +132,46 @@ export async function homePage(ctx) {
         }
 
         return ctx.render(login({ redirectTo, onLogin }));
-    }
     } else {
+        const userData = ctx.userData;
+        let data = [], total = 0;
 
-        return ctx.render(dashboard());
+        async function onCreate(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const text = formData.get('text').trim();
+
+            if (!text) return alert("All fields are required!");
+
+            try {
+                const users = await get("/jsonstore/users");
+                let user = {};
+
+                Object.keys(users).forEach(u => {
+                    if (users[u].username === userData.username) user = users[u];
+                });
+
+                await post("/jsonstore/chirps", { text, author: user.username, createdAt: Date.now() });
+                e.target.reset();
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+
+        try {
+
+            const res = await get("/jsonstore/products?sortBy=_createdOn%20desc");
+            Object.keys(res).forEach(k => data.push(res[k]));
+
+            data.forEach(el => total += (el.quantity * el.price));
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+
+        return ctx.render(dashboard({ onCreate }));
     }
 }
