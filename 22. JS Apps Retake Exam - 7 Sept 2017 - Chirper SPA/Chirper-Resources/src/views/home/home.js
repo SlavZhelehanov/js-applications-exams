@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, post } from "../../utils/api.js";
-import { getisLogin, setIsLogin, saveUserData } from "../../utils/utils.js";
+import { getisLogin, setIsLogin, saveUserData, calcTime } from "../../utils/utils.js";
 
 function register({ redirectTo, onRegister }) {
     return html`
@@ -36,7 +36,7 @@ function login({ redirectTo, onLogin }) {
     </section>`;
 }
 
-function dashboard({ onCreate }) {
+function dashboard({ onCreate, data }) {
     return html`
         <section id="viewFeed">
         <div class="content">
@@ -53,13 +53,17 @@ function dashboard({ onCreate }) {
                 </div>
             </div>
             <div id="chirps" class="chirps"><h2 class="titlebar">Chirps</h2>
-                <article class="chirp">
+                ${0 < data.length
+            ? data.map(ch => html`<article class="chirp">
                     <div class="titlebar">
-                        <a href="#" class="chirp-author">vako</a>
-                        <span class="chirp-time">1 day</span>
+                        <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
+                        <span class="chirp-time">${calcTime(ch.createdAt)}</span>
                     </div>
                     <p>yohooo</p>
-                </article>
+                </article>`)
+            : null
+        }
+                
                 <!-- TODO Load more articles -->
             </div>
         </div>
@@ -167,11 +171,15 @@ export async function homePage(ctx) {
             Object.keys(res).forEach(k => data.push(res[k]));
 
             data.forEach(el => total += (el.quantity * el.price));
+        try {
+            const res = await get("/jsonstore/chirps?sortBy=_createdOn%20desc");
+            const usr = await get("/jsonstore/users");
+            Object.keys(res).forEach(k => data.push(res[k]));
         } catch (err) {
             if (err.message) alert(err.message);
             else alert(err);
         }
 
-        return ctx.render(dashboard({ onCreate }));
+        return ctx.render(dashboard({ onCreate, data }));
     }
 }
