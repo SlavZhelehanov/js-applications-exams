@@ -1,5 +1,5 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get, post } from "../../utils/api.js";
+import { get, post, put } from "../../utils/api.js";
 import { getisLogin, setIsLogin, saveUserData, calcTime } from "../../utils/utils.js";
 
 function register({ redirectTo, onRegister }) {
@@ -36,7 +36,7 @@ function login({ redirectTo, onLogin }) {
     </section>`;
 }
 
-function dashboard({ onCreate, data }) {
+function dashboard({ onCreate, data, chirps, following, followers }) {
     return html`
         <section id="viewFeed">
         <div class="content">
@@ -49,7 +49,7 @@ function dashboard({ onCreate, data }) {
                 </form>
 
                 <div id="userStats" class="user-details">
-                    <span>0 chirps</span> | <span>1 following</span> | <span>0 followers</span>
+                    <span>${chirps.length} chirps</span> | <span>${following.length} following</span> | <span>${followers.length} followers</span>
                 </div>
             </div>
             <div id="chirps" class="chirps"><h2 class="titlebar">Chirps</h2>
@@ -93,7 +93,7 @@ export async function homePage(ctx) {
 
             try {
                 const user = await post("/users/register", { username, password });
-                const userSeed = await post("/jsonstore/users", { username, followers: [], following: [] });
+                const userSeed = await post("/jsonstore/users", { username, followers: [], following: [], chirps: [] });
 
                 if (399 < user.status) throw user.statusText;
 
@@ -138,7 +138,7 @@ export async function homePage(ctx) {
         return ctx.render(login({ redirectTo, onLogin }));
     } else {
         const userData = ctx.userData;
-        let data = [], total = 0;
+        let data = [], chirps = 0, following = 0, followers = 0;
 
         async function onCreate(e) {
             e.preventDefault();
@@ -156,7 +156,10 @@ export async function homePage(ctx) {
                     if (users[u].username === userData.username) user = users[u];
                 });
 
-                await post("/jsonstore/chirps", { text, author: user.username, createdAt: Date.now() });
+                const chrp = await post("/jsonstore/chirps", { text, author: user.username, createdAt: Date.now() });
+
+                user.chirps.push(chrp);
+                await put(`/jsonstore/users/${user._id}`, user);
                 e.target.reset();
                 ctx.page.redirect('/');
             } catch (err) {
@@ -164,22 +167,22 @@ export async function homePage(ctx) {
             }
         }
 
-
-        try {
-
-            const res = await get("/jsonstore/products?sortBy=_createdOn%20desc");
-            Object.keys(res).forEach(k => data.push(res[k]));
-
-            data.forEach(el => total += (el.quantity * el.price));
         try {
             const res = await get("/jsonstore/chirps?sortBy=_createdOn%20desc");
-            const usr = await get("/jsonstore/users");
+            const usrs = await get("/jsonstore/users");
             Object.keys(res).forEach(k => data.push(res[k]));
+            Object.keys(usrs).forEach(async (k) => {
+                if (usrs[k].username === userData.username) {
+                    followers = usrs[k].followers;
+                    following = usrs[k].following;
+                    chirps = usrs[k].chirps;
+                }
+            });
         } catch (err) {
             if (err.message) alert(err.message);
             else alert(err);
         }
 
-        return ctx.render(dashboard({ onCreate, data }));
+        return ctx.render(dashboard({ onCreate, data, chirps, following, followers }));
     }
 }
