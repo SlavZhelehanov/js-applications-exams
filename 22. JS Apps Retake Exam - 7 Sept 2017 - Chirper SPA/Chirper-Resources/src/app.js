@@ -15,6 +15,6 @@ page("/", homePage);
 page("/discover", guardRoute('user'), discoverPage);
 page("/logout", guardRoute('user'), logoutAction);
 page("/my", guardRoute('user'), myPage);
-page("/profile/:id", guardRoute('user'), profilePage);
+page("/profile/:username", guardRoute('user'), profilePage);
 
 page.start();

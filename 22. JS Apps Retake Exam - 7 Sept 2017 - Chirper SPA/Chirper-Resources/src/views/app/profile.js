@@ -1,11 +1,12 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
+import { calcTime } from "../../utils/utils.js";
 
-function template() {
+function template({ user }) {
     return html`
     <section id="viewProfile">
         <div class="content">
             <div class="chirper">
-
                 <h2 class="titlebar">SoftUni</h2>
 
                 <a id="btnFollow" class="chirp-author" href="#">Follow</a>
@@ -15,19 +16,33 @@ function template() {
                 </div>
             </div>
             <div id="profileChirps" class="chirps"><h2 class="titlebar">Chirps</h2>
-                <article class="chirp">
+                ${0 < user.chirps.length
+            ? user.chirps.map(ch => html`<article class="chirp">
                     <div class="titlebar">
-                        <a href="#" class="chirp-author">SoftUni</a>
-                        <span class="chirp-time">1 day</span>
+                        <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
+                        <span class="chirp-time">${calcTime(ch.createdAt)}</span>
                     </div>
-                    <p>First place at OIB startup weekend!</p>
-                </article>
+                    <p>${ch.text}</p>
+                </article>`)
+            : null
+        }                
             </div>
         </div>
     </section>`;
 }
 
 export async function profilePage(ctx) {
-    const isAuth = !!ctx.userData;
-    return ctx.render(template());
+    const isAuth = ctx.userData, { username } = ctx.params;
+    let user = {};
+
+    try {
+        const users = await get(`/jsonstore/users/`);
+        Object.keys(users).forEach(u => {
+            if (users[u].username === username) user = users[u];
+        });
+    } catch (error) {
+
+    }
+
+    return ctx.render(template({ user }));
 }
