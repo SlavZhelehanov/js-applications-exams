@@ -41,7 +41,8 @@ export async function profilePage(ctx) {
             if (users[u].username === username) user = users[u];
         });        
     } catch (error) {
-
+        if (err.message) alert(err.message);
+        else alert(err);
     }
 
     return ctx.render(template({ user }));

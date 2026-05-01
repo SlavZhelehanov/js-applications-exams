@@ -163,7 +163,8 @@ export async function homePage(ctx) {
                 e.target.reset();
                 ctx.page.redirect('/');
             } catch (err) {
-                alert(err.message);
+                if (err.message) alert(err.message);
+                else alert(err);
             }
         }
 
