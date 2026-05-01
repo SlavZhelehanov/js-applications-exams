@@ -7,12 +7,12 @@ function template({ user }) {
     <section id="viewProfile">
         <div class="content">
             <div class="chirper">
-                <h2 class="titlebar">SoftUni</h2>
+                <h2 class="titlebar">${user.username}</h2>
 
                 <a id="btnFollow" class="chirp-author" href="#">Follow</a>
 
                 <div id="userProfileStats" class="user-details">
-                    <span>1 chirps</span> | <span>0 following</span> | <span>2 followers</span>
+                    <span>${user.chirps.length} chirps</span> | <span>${user.following.length} following</span> | <span>${user.followers.length} followers</span>
                 </div>
             </div>
             <div id="profileChirps" class="chirps"><h2 class="titlebar">Chirps</h2>
@@ -39,7 +39,7 @@ export async function profilePage(ctx) {
         const users = await get(`/jsonstore/users/`);
         Object.keys(users).forEach(u => {
             if (users[u].username === username) user = users[u];
-        });
+        });        
     } catch (error) {
 
     }
