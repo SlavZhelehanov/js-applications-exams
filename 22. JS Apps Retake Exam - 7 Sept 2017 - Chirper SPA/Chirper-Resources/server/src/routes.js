@@ -1,8 +1,13 @@
-import {Router} from 'express';
-import homeRouter from './routes/homeRouter.js';
+import {Router} from "express";
 
-export const routes = Router();
+import homeController from "./controllers/homeController.js";
 
-routes.use('/', homeRouter);
+const routes = Router();
+
+routes.use("/", homeController);
+
+routes.all(/\*/, (req, res) => {
+    return res.status(404).json({message: "Page Not Found"});
+});
 
 export default routes;
