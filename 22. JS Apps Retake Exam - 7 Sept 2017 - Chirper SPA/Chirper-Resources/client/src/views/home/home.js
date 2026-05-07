@@ -18,6 +18,21 @@ function register() {
     </section>`;
 }
 
+function login() {
+    return html`<section id="viewLogin">
+        <div class="content">
+            <form id="formLogin" class="form">
+                <label>Username</label>
+                <input name="username" type="text">
+                <label>Password</label>
+                <input name="password" type="password">
+                <input id="btnLogin" value="Sign In" type="submit">
+                <a href="#">Register</a>
+            </form>
+        </div>
+    </section>`;
+}
+
 export async function homePage(ctx) {
     ctx.render(register());
 }
