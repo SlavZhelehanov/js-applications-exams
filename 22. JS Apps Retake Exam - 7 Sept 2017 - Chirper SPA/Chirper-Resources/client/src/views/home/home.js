@@ -20,10 +20,10 @@ function register({ switchPage, onRegister }) {
     </section>`;
 }
 
-function login({ switchPage }) {
+function login({ switchPage, onLogin }) {
     return html`<section id="viewLogin">
         <div class="content">
-            <form id="formLogin" class="form">
+            <form id="formLogin" class="form" method="post" @submit=${onLogin}>
                 <label>Username</label>
                 <input name="username" type="text">
                 <label>Password</label>
@@ -111,6 +111,32 @@ export async function homePage(ctx) {
 
         return ctx.render(register({ switchPage, onRegister }));
     } else {
-        return ctx.render(login({ switchPage }));
+        async function onLogin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            // const email = formData.get('email');
+            const username = formData.get('username');
+            const password = formData.get('password');
+
+            // if (email.trim() === '' || password.trim() === '') return showError('All fields are required!');
+            if (username.trim() === '' || password.trim() === '') return showError('All fields are required!');
+
+            try {
+                // const user = await post("/users/login", { email, password });
+                const user = await post("/auth/login", { username, password });
+
+                if (399 < user.status) throw user.statusText;
+
+                saveUserData(user);
+                e.target.reset();
+                ctx.setNavigation();
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+
+        return ctx.render(login({ switchPage, onLogin }));
     }
 }

@@ -31,24 +31,38 @@ const userSchema = new Schema({
     }
 });
 
-userSchema.pre('save', async function () {
-    if (this.isModified('password')) {
-        if (this.password.length < 4) return new Error('The password should be at least 4 characters long');
+// userSchema.pre('save', async function () {
+//     if (this.isModified('password')) {
+//         if (this.password.length < 4) throw new Error('The password should be at least 4 characters long');
+//
+//         try {
+//             this.password = await bcrypt.hash(this.password, 10);
+//         } catch (error) {
+//             return error;
+//         }
+//     }
+// });
 
-        try {
-            this.password = await bcrypt.hash(this.password, 10);
-        } catch (error) {
-            return error;
-        }
+// userSchema.methods.checkPassword = async function (enteredPassword) {
+//     try {
+//         return await bcrypt.compare(enteredPassword, this.password);
+//     } catch (err) {
+//         throw new Error('Error comparing passwords');
+//     }
+// };
+
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
+
+    if (this.password.length < 4) {
+        throw new Error('The password should be at least 4 characters long');
     }
+
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 userSchema.methods.checkPassword = async function (enteredPassword) {
-    try {
-        return await bcrypt.compare(enteredPassword, this.password);
-    } catch (err) {
-        throw new Error('Error comparing passwords');
-    }
+    return bcrypt.compare(enteredPassword, this.password);
 };
 
 export default model("User", userSchema);
