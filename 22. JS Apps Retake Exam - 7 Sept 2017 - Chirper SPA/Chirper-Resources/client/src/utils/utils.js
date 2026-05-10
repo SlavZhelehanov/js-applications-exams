@@ -4,12 +4,22 @@ import page from "../lib/page.mjs";
 const item = "userData";
 
 export function saveUserData(data) {
-    sessionStorage.setItem(item, JSON.stringify(data));
+    // sessionStorage.setItem(item, JSON.stringify(data));
+    sessionStorage.setItem(item, JSON.stringify({
+        id: data.user.id,
+        username: data.user.username,
+        token: data.token
+    }));
 }
 
 export function getUserData() {
     return JSON.parse(sessionStorage.getItem(item));
 }
+
+export function clearUserData() {
+    sessionStorage.removeItem(item);
+}
+
 export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
     const menu = document.getElementsByClassName('menu')[0];

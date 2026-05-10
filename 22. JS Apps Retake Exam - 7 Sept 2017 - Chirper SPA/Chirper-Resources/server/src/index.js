@@ -12,6 +12,7 @@ import routes from "./routes.js";
 // Define __dirname
 import {dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import logger from "./middlewares/logger.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -26,6 +27,7 @@ const app = express();
 
 // Add middlewares
 // app.set('trust proxy', 1); // важно при Nginx/HTTPS
+app.use(logger);
 app.use(cors(
     {
         origin: ["http://localhost:5500", "http://127.0.0.1:5500"],

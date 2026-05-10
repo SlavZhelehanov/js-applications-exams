@@ -9,8 +9,8 @@ async function request(method, url, data) {
     const userData = getUserData();
 
     if (userData) {
-        // options.headers['x-authorization'] = userData['accessToken'];
-        options.headers['x-authorization'] = userData['id'];
+        options.headers['x-authorization'] = userData.token;
+        // options.headers['x-authorization'] = userData['id'];
     }
 
     if (data !== undefined) {
@@ -18,21 +18,6 @@ async function request(method, url, data) {
         options.body = JSON.stringify(data);
     }
 
-    // try {
-    //     const response = await fetch(URL + url, options);
-
-    //     if (response.ok === false) {
-    //         throw await response.json();
-    //     }
-    //     try {
-    //         return await response.json();
-    //     } catch (err) {
-    //         return response;
-    //     }
-    // } catch (error) {
-    //     alert(error.message);
-    //     throw error;
-    // }
     const response = await fetch(URL + url, options);
 
     if (response.ok === false) {
