@@ -35,14 +35,14 @@ function login({ switchPage, onLogin }) {
     </section>`;
 }
 
-function dashboard({ data }) {
+function dashboard({ data, onCreate }) {
     return html`<section id="viewFeed">
         <div class="content">
             <div class="chirper">
 
                 <h2 class="titlebar">Pesho</h2>
 
-                <form id="formSubmitChirp" class="chirp-form">
+                <form id="formSubmitChirp" class="chirp-form" method="post" @submit=${onCreate}>
                     <textarea name="text" class="chirp-input"></textarea>
                     <input class="chirp-submit" id="btnSubmitChirp" value="Chirp" type="submit">
                 </form>
@@ -83,13 +83,40 @@ export async function homePage(ctx) {
     if (isAuth) {
         let data = [];
 
+        async function onCreate(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            // const item = {
+            //     name: formData.get('name').trim(),
+            //     imgUrl: formData.get('imgUrl').trim(),
+            //     price: formData.get('price').trim(),
+            //     releaseDate: formData.get('releaseDate').trim(),
+            //     artist: formData.get('artist').trim(),
+            //     genre: formData.get('genre').trim(),
+            //     description: formData.get('description').trim()
+            // }
+            const text = formData.get('text').trim();
+
+            // if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+            if (!text || text.length === 0) return alert("All fields are required!");
+
+            try {
+                await post("/chirps", {text});
+                e.target.reset();
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
         try {
             data = await get("/chirps");
         } catch (error) {
             if (error.message) alert(error.message);
             else alert(error);
         }
-        return ctx.render(dashboard({ data }));
+        return ctx.render(dashboard({ data, onCreate }));
     } else if (ctx.isRegister) {
         async function onRegister(e) {
             e.preventDefault();

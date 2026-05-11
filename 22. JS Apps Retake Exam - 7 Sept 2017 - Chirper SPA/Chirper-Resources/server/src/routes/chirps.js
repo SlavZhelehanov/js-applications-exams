@@ -15,4 +15,15 @@ chirpsRouter.get('/', isAuth, async (req, res) => {
     }
 });
 
+chirpsRouter.post('/', isAuth, async (req, res) => {
+    try {
+        const {text} = req.body;
+
+        await Chirp.create({text, author: req.user.username, creator: req.user.id});
+        return res.status(200).json({message: 'Chirp created'})
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
 export default chirpsRouter;
