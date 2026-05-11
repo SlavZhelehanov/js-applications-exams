@@ -6,7 +6,7 @@ const URL = 'http://localhost:5050';
 async function request(method, url, data) {
     // const options = { method, credentials: "include", headers: {} };
     const options = { method, headers: {} };
-    const userData = getUserData();
+    const userData = getUserData();    
 
     if (userData) {
         options.headers['x-authorization'] = userData.token;

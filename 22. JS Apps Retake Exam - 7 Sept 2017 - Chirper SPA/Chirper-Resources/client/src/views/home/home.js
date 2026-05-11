@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
-import { post } from "../../utils/api.js";
-import { getUserData, setIsRegister, saveUserData } from "../../utils/utils.js";
+import { post, get } from "../../utils/api.js";
+import { getUserData, setIsRegister, saveUserData, calcTime } from "../../utils/utils.js";
 
 function register({ switchPage, onRegister }) {
     return html`
@@ -35,7 +35,7 @@ function login({ switchPage, onLogin }) {
     </section>`;
 }
 
-function dashboard() {
+function dashboard({ data }) {
     return html`<section id="viewFeed">
         <div class="content">
             <div class="chirper">
@@ -52,14 +52,17 @@ function dashboard() {
                 </div>
             </div>
             <div id="chirps" class="chirps"><h2 class="titlebar">Chirps</h2>
-                <article class="chirp">
+                ${0 < data.length
+            ? data.map(ch => html`
+                        <article class="chirp">
                     <div class="titlebar">
-                        <a href="#" class="chirp-author">vako</a>
-                        <span class="chirp-time">1 day</span>
+                        <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
+                        <span class="chirp-time">${calcTime(ch.createdAt)}</span>
                     </div>
                     <p>yohooo</p>
-                </article>
-                <!-- TODO Load more articles -->
+                </article>`)
+            : null
+        }
             </div>
         </div>
     </section>`;
@@ -78,7 +81,15 @@ export async function homePage(ctx) {
     }
 
     if (isAuth) {
-        return ctx.render(dashboard());
+        let data = [];
+
+        try {
+            data = await get("/chirps");
+        } catch (error) {
+            if (error.message) alert(error.message);
+            else alert(error);
+        }
+        return ctx.render(dashboard({ data }));
     } else if (ctx.isRegister) {
         async function onRegister(e) {
             e.preventDefault();
@@ -94,8 +105,6 @@ export async function homePage(ctx) {
 
             try {
                 const res = await post("/auth/register", { username, password });
-                console.log(res);
-
 
                 if (399 < res.status) throw res.statusText;
 
