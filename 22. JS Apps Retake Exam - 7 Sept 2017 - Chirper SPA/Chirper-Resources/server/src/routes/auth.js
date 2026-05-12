@@ -52,8 +52,13 @@ authRouter.get("/logout", isAuth, (req, res) => {
 });
 
 // CURRENT USER
-authRouter.get("/me", (req, res) => {
-    return res.json(req.user || null);
+authRouter.get("/me", isAuth, async (req, res) => {
+    try {
+        const me = await User.findOne({userId: req.user.id}, 'followers, following -_id').lean();
+        return res.status(200).json(me);
+    } catch (error) {
+        return res.status(500).json({message: "Failed to get current user"});
+    }
 });
 
 export default authRouter;

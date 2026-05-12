@@ -35,7 +35,7 @@ function login({ switchPage, onLogin }) {
     </section>`;
 }
 
-function dashboard({ data, onCreate }) {
+function dashboard({ data, user, chirps, onCreate }) {
     return html`<section id="viewFeed">
         <div class="content">
             <div class="chirper">
@@ -48,7 +48,7 @@ function dashboard({ data, onCreate }) {
                 </form>
 
                 <div id="userStats" class="user-details">
-                    <span>0 chirps</span> | <span>1 following</span> | <span>0 followers</span>
+                    <span>${chirps.length} chirps</span> | <span>${user?.following?.length || 0} following</span> | <span>${user?.followers?.length || 0} followers</span>
                 </div>
             </div>
             <div id="chirps" class="chirps"><h2 class="titlebar">Chirps</h2>
@@ -81,7 +81,7 @@ export async function homePage(ctx) {
     }
 
     if (isAuth) {
-        let data = [];
+        let data = [], user = {}, chirps = [];
 
         async function onCreate(e) {
             e.preventDefault();
@@ -102,7 +102,7 @@ export async function homePage(ctx) {
             if (!text || text.length === 0) return alert("All fields are required!");
 
             try {
-                await post("/chirps", {text});
+                await post("/chirps", { text });
                 e.target.reset();
                 ctx.page.redirect('/');
             } catch (err) {
@@ -112,11 +112,13 @@ export async function homePage(ctx) {
 
         try {
             data = await get("/chirps");
+            user = await get('/auth/me');
+            chirps = await get('/chirps/me');
         } catch (error) {
             if (error.message) alert(error.message);
             else alert(error);
         }
-        return ctx.render(dashboard({ data, onCreate }));
+        return ctx.render(dashboard({ chirps, data, onCreate, user }));
     } else if (ctx.isRegister) {
         async function onRegister(e) {
             e.preventDefault();
