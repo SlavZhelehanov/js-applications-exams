@@ -1,6 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
+import { calcTime } from "../../utils/utils.js";
 
-function template() {
+function template({ data }) {
     return html`<section id="viewMe">
         <div class="content">
             <div class="chirper">
@@ -18,12 +20,31 @@ function template() {
             </div>
             <div id="myChirps" class="chirps">
                 <h2 class="titlebar">Chirps</h2>
-                <div class="chirp"><span class="loading">No chirps in database</span></div>
+                ${0 < data.length
+            ? data.map(ch => html`
+                                        <article class="chirp">
+                                    <div class="titlebar">
+                                        <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
+                                        <a href="#">delete</a>
+                                        <span class="chirp-time">${calcTime(ch.createdAt)}</span>
+                                    </div>
+                                    <p>yohooo</p>
+                                </article>`)
+            : html`<div class="chirp"><span class="loading">No chirps in database</span></div>`
+        }                
             </div>
         </div>
     </section>`;
 }
 
 export async function myChirps(ctx) {
-    return ctx.render(template());
+    let data = [];
+
+    try {
+        data = await get('/chirps/me');
+    } catch (error) {
+        if (error.message) alert(error.message);
+        else alert(error);
+    }
+    return ctx.render(template({ data }));
 }
