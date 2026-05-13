@@ -59,7 +59,7 @@ function dashboard({ data, user, chirps, onCreate }) {
                         <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
                         <span class="chirp-time">${calcTime(ch.createdAt)}</span>
                     </div>
-                    <p>yohooo</p>
+                    <p>${ch.text}</p>
                 </article>`)
             : null
         }

@@ -29,7 +29,8 @@ chirpsRouter.post('/', isAuth, async (req, res) => {
 chirpsRouter.get('/me', isAuth, async (req, res) => {
     try {
         const chirps = await Chirp.find({creator: req.user.id}, '-_id author text createdAt');
-        return res.status(200).json(chirps);
+        const userData = await User.findOne({userId: req.user.id}, '-_id chirps following followers').lean();
+        return res.status(200).json({chirps, userData});
     } catch (error) {
         return res.status(500).json(error);
     }
