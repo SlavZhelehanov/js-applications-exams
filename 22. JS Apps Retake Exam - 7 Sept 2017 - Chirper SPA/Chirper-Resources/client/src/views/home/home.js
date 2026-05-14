@@ -35,12 +35,12 @@ function login({ switchPage, onLogin }) {
     </section>`;
 }
 
-function dashboard({ data, user, chirps, onCreate }) {
+function dashboard({ data, user, username, chirps, onCreate }) {
     return html`<section id="viewFeed">
         <div class="content">
             <div class="chirper">
 
-                <h2 class="titlebar">Pesho</h2>
+                <h2 class="titlebar">${username}</h2>
 
                 <form id="formSubmitChirp" class="chirp-form" method="post" @submit=${onCreate}>
                     <textarea name="text" class="chirp-input"></textarea>
@@ -118,7 +118,7 @@ export async function homePage(ctx) {
             if (error.message) alert(error.message);
             else alert(error);
         }
-        return ctx.render(dashboard({ chirps, data, onCreate, user }));
+        return ctx.render(dashboard({ chirps, data, onCreate, user, username: isAuth.username }));
     } else if (ctx.isRegister) {
         async function onRegister(e) {
             e.preventDefault();

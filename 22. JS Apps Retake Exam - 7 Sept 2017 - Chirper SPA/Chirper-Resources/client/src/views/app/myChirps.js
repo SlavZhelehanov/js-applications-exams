@@ -1,13 +1,13 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, post, del } from "../../utils/api.js";
-import { calcTime } from "../../utils/utils.js";
+import { calcTime, getUserData } from "../../utils/utils.js";
 
-function template({ data, chirps, onDelete, onCreate, followers, following }) {
+function template({ data, chirps, onDelete, username, onCreate, followers, following }) {
     return html`<section id="viewMe">
         <div class="content">
             <div class="chirper">
 
-                <h2 class="titlebar">Pesho</h2>
+                <h2 class="titlebar">${username}</h2>
 
                 <form id="formSubmitChirpMy" class="chirp-form" method="post" @submit=${onCreate}>
                     <textarea name="text" class="chirp-input"></textarea>
@@ -38,6 +38,7 @@ function template({ data, chirps, onDelete, onCreate, followers, following }) {
 }
 
 export async function myChirps(ctx) {
+    const { username } = getUserData();
     let res = {};
 
     async function onCreate(e) {
@@ -89,6 +90,7 @@ export async function myChirps(ctx) {
     return ctx.render(template({
         data: res.chirps,
         onDelete,
+        username,
         chirps: res.userData.chirps,
         following: res.userData.following,
         followers: res.userData.followers,
