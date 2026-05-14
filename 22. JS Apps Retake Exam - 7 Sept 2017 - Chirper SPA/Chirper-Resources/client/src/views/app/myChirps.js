@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get, post } from "../../utils/api.js";
+import { get, post, del } from "../../utils/api.js";
 import { calcTime } from "../../utils/utils.js";
 
-function template({ data, chirps, onCreate, followers, following }) {
+function template({ data, chirps, onDelete, onCreate, followers, following }) {
     return html`<section id="viewMe">
         <div class="content">
             <div class="chirper">
@@ -25,7 +25,7 @@ function template({ data, chirps, onCreate, followers, following }) {
                                         <article class="chirp">
                                     <div class="titlebar">
                                         <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
-                                        <a href="#">delete</a>
+                                        <a @click=${() => onDelete(ch._id)} href="#">delete</a>
                                         <span class="chirp-time">${calcTime(ch.createdAt)}</span>
                                     </div>
                                     <p>${ch.text}</p>
@@ -62,8 +62,21 @@ export async function myChirps(ctx) {
             await post("/chirps", { text });
             e.target.reset();
             ctx.page.redirect('/chirps/me');
-        } catch (err) {
-            alert(err.message);
+        } catch (error) {
+            if (error.message) alert(error.message);
+            else alert(error);
+        }
+    }
+
+    async function onDelete(id) {
+        if (!id) return;
+
+        try {
+            await del(`/chirps/${id}`);
+            ctx.page.redirect('/chirps/me');
+        } catch (error) {
+            if (error.message) alert(error.message);
+            else alert(error);
         }
     }
 
@@ -75,6 +88,7 @@ export async function myChirps(ctx) {
     }
     return ctx.render(template({
         data: res.chirps,
+        onDelete,
         chirps: res.userData.chirps,
         following: res.userData.following,
         followers: res.userData.followers,
