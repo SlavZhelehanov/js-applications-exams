@@ -6,6 +6,16 @@ import {parseErrorMessage} from "../util/parseErrorMessage.js";
 
 const authRouter = Router();
 
+// ALL USERS WITHOUT CURRENT ONE
+authRouter.get('/', isAuth, async (req, res) => {
+    try {
+        const users = await User.find({userId: {$ne: req.user.id}}, '-_id userId username followers');
+        return res.status(200).json(users);
+    } catch (error) {
+        return res.status(500).json({message: "Failed to get users"});
+    }
+});
+
 // REGISTER
 authRouter.post("/register", isNotAuth, async (req, res) => {
     const {username, password} = req.body;
