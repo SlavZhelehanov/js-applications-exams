@@ -20,7 +20,7 @@ function template(data) {
                 </div>
             </div>
         </div>
-    </section> `;
+    </section>`;
 }
 
 export async function dashboardPage(ctx) {
