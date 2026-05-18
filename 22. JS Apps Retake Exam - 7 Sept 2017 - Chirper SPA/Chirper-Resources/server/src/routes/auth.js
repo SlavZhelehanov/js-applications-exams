@@ -3,6 +3,7 @@ import {v4 as uuidv4} from "uuid";
 import User from "../models/User.js";
 import {isAuth, isNotAuth, createToken} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
+import {isValidObjectId} from "mongoose";
 
 const authRouter = Router();
 
@@ -68,6 +69,20 @@ authRouter.get("/me", isAuth, async (req, res) => {
         return res.status(200).json(me);
     } catch (error) {
         return res.status(500).json({message: "Failed to get current user"});
+    }
+});
+
+// USER DATA
+authRouter.get('/:id', isAuth, async (req, res) => {
+    const {id} = req.params;
+
+    if (!isValidObjectId(id)) return res.status(400).json({message: 'Wrong ID'});
+
+    try {
+        const user = await User.findOne({userId: id}, '-_id').lean();
+        return res.status(200).json(user);
+    } catch (error) {
+        return res.status(500).json({message: "Failed to get user data"});
     }
 });
 

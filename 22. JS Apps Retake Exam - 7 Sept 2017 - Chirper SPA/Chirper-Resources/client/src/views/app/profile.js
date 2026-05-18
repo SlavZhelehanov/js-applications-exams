@@ -1,17 +1,18 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get } from "../../utils/api.js";
+import { calcTime } from "../../utils/utils.js";
 
-function template({ username, data }) {
+function template({ user, data }) {
     return html`<section id="viewProfile">
         <div class="content">
             <div class="chirper">
 
-                <h2 class="titlebar">Softuni</h2>
+                <h2 class="titlebar">${user.username}</h2>
 
                 <a id="btnFollow" class="chirp-author" href="#">Follow</a>
 
                 <div id="userProfileStats" class="user-details">
-                    <span>1 chirps</span> | <span>0 following</span> | <span>2 followers</span>
+                    <span>${user?.chirps?.length || 0} chirps</span> | <span>${user?.following?.length || 0} following</span> | <span>${user?.followers?.length || 0} followers</span>
                 </div>
             </div>
             <div id="profileChirps" class="chirps"><h2 class="titlebar">Chirps</h2>
@@ -19,7 +20,7 @@ function template({ username, data }) {
             ? data.map(ch => html`<article class="chirp">
                     <div class="titlebar">
                         <a href="#" class="chirp-author">${ch.author}</a>
-                        <span class="chirp-time">1 day</span>
+                        <span class="chirp-time">${calcTime(ch.createdAt)} day</span>
                     </div>
                     <p>${ch.text}</p>
                 </article>`)
@@ -37,11 +38,12 @@ export async function profiePage(ctx) {
     try {
         data = await get(`/chirps/${id}/users-chirps`);
         user = await get(`/auth/${id}`);
-        console.log(data);
+        // console.log(data);
+        // console.log(user);
     } catch (error) {
         if (error.message) alert(error.message);
         else alert(error);
     }
 
-    return ctx.render(template({ username: user.username, data }));
+    return ctx.render(template({ user, data }));
 }
