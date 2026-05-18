@@ -1,11 +1,12 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
 
-function template() {
+function template({ username, data }) {
     return html`<section id="viewProfile">
         <div class="content">
             <div class="chirper">
 
-                <h2 class="titlebar">SoftUni</h2>
+                <h2 class="titlebar">Softuni</h2>
 
                 <a id="btnFollow" class="chirp-author" href="#">Follow</a>
 
@@ -14,18 +15,33 @@ function template() {
                 </div>
             </div>
             <div id="profileChirps" class="chirps"><h2 class="titlebar">Chirps</h2>
-                <article class="chirp">
+            ${0 < data.length
+            ? data.map(ch => html`<article class="chirp">
                     <div class="titlebar">
-                        <a href="#" class="chirp-author">SoftUni</a>
+                        <a href="#" class="chirp-author">${ch.author}</a>
                         <span class="chirp-time">1 day</span>
                     </div>
-                    <p>First place at OIB startup weekend!</p>
-                </article>
+                    <p>${ch.text}</p>
+                </article>`)
+            : null
+        }                
             </div>
         </div>
     </section>`;
 }
 
 export async function profiePage(ctx) {
-    return ctx.render(template());
+    const { id } = ctx.params;
+    let data = [], user = '';
+
+    try {
+        data = await get(`/chirps/${id}/users-chirps`);
+        user = await get(`/auth/${id}`);
+        console.log(data);
+    } catch (error) {
+        if (error.message) alert(error.message);
+        else alert(error);
+    }
+
+    return ctx.render(template({ username: user.username, data }));
 }

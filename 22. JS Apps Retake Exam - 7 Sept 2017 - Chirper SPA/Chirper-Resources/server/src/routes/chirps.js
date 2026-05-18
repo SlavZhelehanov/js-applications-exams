@@ -46,11 +46,24 @@ chirpsRouter.delete('/:id', isAuth, async (req, res) => {
         const chirp = await Chirp.findOneAndDelete({_id: id, creator: req.user.id});
 
         if (!chirp) return res.status(404).json({message: 'Chirp not found'});
-        
+
         return res.status(200).json({message: 'Chirp deleted'});
     } catch (error) {
         return res.status(500).json(error);
     }
 });
+
+chirpsRouter.get('/:id/users-chirps', isAuth, async (req, res) => {
+    const {id} = req.params;
+
+    // if (!isValidObjectId(id)) return res.status(400).json({message: 'Wrong ID'});
+
+    try {
+        const chirps = await Chirp.find({creator: id}, '-_id text author createdAt');
+        return res.status(200).json(chirps);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+})
 
 export default chirpsRouter;
