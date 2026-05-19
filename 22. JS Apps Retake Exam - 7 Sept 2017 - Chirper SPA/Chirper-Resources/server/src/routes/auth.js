@@ -76,13 +76,38 @@ authRouter.get("/me", isAuth, async (req, res) => {
 authRouter.get('/:id', isAuth, async (req, res) => {
     const {id} = req.params;
 
-    if (!isValidObjectId(id)) return res.status(400).json({message: 'Wrong ID'});
+    // if (!isValidObjectId(id)) return res.status(400).json({message: 'Wrong ID'});
 
     try {
         const user = await User.findOne({userId: id}, '-_id').lean();
         return res.status(200).json(user);
     } catch (error) {
         return res.status(500).json({message: "Failed to get user data"});
+    }
+});
+
+// CHANGE OPININION
+authRouter.post('/:id/opinion', isAuth, async (req, res) => {
+    const {id} = req.params, {op} = req.body;
+
+    if (typeof op !== 'boolean') return res.status(400).json({message: 'Wrong opinion type'});
+    // if (!isValidObjectId(id)) return res.status(400).json({message: 'Wrong ID'});
+
+    try {
+        const [host, guest] = await Promise.all([
+            User.findOne({userId: id}),
+            User.findOne({userId: req.user.id})
+        ]);
+
+        host.followers.push(guest.username);
+        guest.following.push(host.username);
+
+        await Promise.all([host.save(), guest.save()]);
+        // const user = await User.findOne({userId: id}, '-_id').lean();
+        // return res.status(200).json(user);
+        return res.status(200).json({message: "Changed opinion"});
+    } catch (error) {
+        return res.status(500).json({message: "Failed to change opinion"});
     }
 });
 
