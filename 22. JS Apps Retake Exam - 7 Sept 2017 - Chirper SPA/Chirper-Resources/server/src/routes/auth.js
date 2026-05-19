@@ -99,8 +99,13 @@ authRouter.post('/:id/opinion', isAuth, async (req, res) => {
             User.findOne({userId: req.user.id})
         ]);
 
-        host.followers.push(guest.username);
-        guest.following.push(host.username);
+        if (op) {
+            host.followers.push(guest.username);
+            guest.following.push(host.username);
+        } else {
+            host.followers = host.followers.filter(name => name !== guest.username);
+            guest.following = guest.following.filter(name => name !== host.username);
+        }
 
         await Promise.all([host.save(), guest.save()]);
         // const user = await User.findOne({userId: id}, '-_id').lean();
