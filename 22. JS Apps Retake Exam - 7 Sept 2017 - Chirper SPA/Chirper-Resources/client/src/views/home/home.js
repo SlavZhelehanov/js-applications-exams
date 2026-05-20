@@ -163,21 +163,23 @@ export async function homePage(ctx) {
             const password = formData.get('password');
 
             // if (email.trim() === '' || password.trim() === '') return showError('All fields are required!');
-            if (username.trim() === '' || password.trim() === '') return showError('All fields are required!');
+            if (username.trim() === '' || password.trim() === '') return showNotification('error', 'All fields are required!');
 
             try {
+                showNotification('loading', 'Loading...')
                 // const user = await post("/users/login", { email, password });
                 const user = await post("/auth/login", { username, password });
 
                 if (399 < user.status) throw user.statusText;
 
                 saveUserData(user);
+                showNotification('info', 'Login successful.');
                 e.target.reset();
                 ctx.setNavigation();
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showNotification('error', err.message);
+                else showNotification('error', err);
             }
         }
 
