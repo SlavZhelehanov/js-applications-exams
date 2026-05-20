@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post, get } from "../../utils/api.js";
-import { getUserData, setIsRegister, saveUserData, calcTime } from "../../utils/utils.js";
+import { getUserData, setIsRegister, saveUserData, calcTime, showNotification } from "../../utils/utils.js";
 
 function register({ switchPage, onRegister }) {
     return html`
@@ -48,7 +48,7 @@ function dashboard({ data, user, username, chirps, onCreate }) {
                 </form>
 
                 <div id="userStats" class="user-details">
-                    <span>${chirps.length} chirps</span> | <span>${user?.following?.length || 0} following</span> | <span>${user?.followers?.length || 0} followers</span>
+                    <span>${chirps?.length || 0} chirps</span> | <span>${user?.following?.length || 0} following</span> | <span>${user?.followers?.length || 0} followers</span>
                 </div>
             </div>
             <div id="chirps" class="chirps"><h2 class="titlebar">Chirps</h2>
@@ -113,7 +113,8 @@ export async function homePage(ctx) {
         try {
             data = await get("/chirps");
             user = await get('/auth/me');
-            chirps = await get('/chirps/me');
+            const chrpUsrData = await get('/chirps/me');
+            chirps = chrpUsrData.chirps;
         } catch (error) {
             if (error.message) alert(error.message);
             else alert(error);
@@ -129,21 +130,26 @@ export async function homePage(ctx) {
             const password = formData.get('password').trim();
             const repass = formData.get('repeatPass').trim();
 
-            if (username === '' || password === '') return alert('All fields are required');
-            if (password !== repass) return alert("Passwords don't match");
+            // if (username === '' || password === '') return alert('All fields are required');
+            if (username.length < 5) return showNotification('error', 'A username should be a string with at least 5 characters long');
+            if (password !== repass || password === '') return showNotification('error', "Passwords input fields shouldn’t be empty and both passwords should match.");
 
             try {
+                showNotification('loading', 'Loading...')
                 const res = await post("/auth/register", { username, password });
+                console.log(res);
+
 
                 if (399 < res.status) throw res.statusText;
 
-                saveUserData(res.user);
+                saveUserData(res);
+                showNotification('info', 'User registration successful.');
                 e.target.reset();
                 ctx.setNavigation();
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showNotification('error', err.message);
+                else showNotification('error', err);
             }
         }
 
