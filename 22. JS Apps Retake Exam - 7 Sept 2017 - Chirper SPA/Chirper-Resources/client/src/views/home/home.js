@@ -81,7 +81,7 @@ export async function homePage(ctx) {
     }
 
     if (isAuth) {
-        let data = [], user = {}, chirps = [];
+        let data = [], user = {}, chirps = [], chrpUsrData = [];
 
         async function onCreate(e) {
             e.preventDefault();
@@ -102,22 +102,23 @@ export async function homePage(ctx) {
             if (!text || text.length === 0) return alert("All fields are required!");
 
             try {
+                showNotification('loading', 'Loading...');
                 await post("/chirps", { text });
+                showNotification('info', 'Chirp published.');
                 e.target.reset();
                 ctx.page.redirect('/');
             } catch (err) {
-                alert(err.message);
+                if (err.message) showNotification('error', err.message);
+                else showNotification('error', err);
             }
         }
 
         try {
-            data = await get("/chirps");
-            user = await get('/auth/me');
-            const chrpUsrData = await get('/chirps/me');
+            [data, user, chrpUsrData] = await Promise.all([get("/chirps"), get('/auth/me'), get('/chirps/me')]);
             chirps = chrpUsrData.chirps;
-        } catch (error) {
-            if (error.message) alert(error.message);
-            else alert(error);
+        } catch (err) {
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
         return ctx.render(dashboard({ chirps, data, onCreate, user, username: isAuth.username }));
     } else if (ctx.isRegister) {

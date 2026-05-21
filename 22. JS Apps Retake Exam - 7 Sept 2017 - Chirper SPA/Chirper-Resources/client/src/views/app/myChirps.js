@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, post, del } from "../../utils/api.js";
-import { calcTime, getUserData } from "../../utils/utils.js";
+import { calcTime, getUserData, showNotification } from "../../utils/utils.js";
 
 function template({ data, chirps, onDelete, username, onCreate, followers, following }) {
     return html`<section id="viewMe">
@@ -60,12 +60,14 @@ export async function myChirps(ctx) {
         if (!text || text.length === 0) return alert("All fields are required!");
 
         try {
+            showNotification('loading', 'Loading...');
             await post("/chirps", { text });
+            showNotification('info', 'Chirp published.');
             e.target.reset();
             ctx.page.redirect('/chirps/me');
-        } catch (error) {
-            if (error.message) alert(error.message);
-            else alert(error);
+        } catch (err) {
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
     }
 
@@ -83,9 +85,9 @@ export async function myChirps(ctx) {
 
     try {
         res = await get('/chirps/me');
-    } catch (error) {
-        if (error.message) alert(error.message);
-        else alert(error);
+    } catch (err) {
+        if (err.message) showNotification('error', err.message);
+        else showNotification('error', err);
     }
     return ctx.render(template({
         data: res.chirps,
