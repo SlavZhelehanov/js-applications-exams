@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, post } from "../../utils/api.js";
-import { calcTime, getUserData } from "../../utils/utils.js";
+import { calcTime, getUserData, showNotification } from "../../utils/utils.js";
 
 function template({ user, data, isFollowing, changeOpinion }) {
     return html`<section id="viewProfile">
@@ -41,7 +41,9 @@ export async function profiePage(ctx) {
 
     async function changeOpinion(op) {
         try {
+            showNotification('loading', 'Loading...');
             await post(`/auth/${id}/opinion`, { op });
+            showNotification('info', op ? `Subscribed to ${user.username}` : `Unsubscribed to ${user.username}`);
             return ctx.page.redirect(`/profile/${id}`);
         } catch (error) {
             alert(error);
@@ -49,8 +51,7 @@ export async function profiePage(ctx) {
     }
 
     try {
-        data = await get(`/chirps/${id}/users-chirps`);
-        user = await get(`/auth/${id}`);
+        [data, user] = await Promise.all([get(`/chirps/${id}/users-chirps`), get(`/auth/${id}`)]);
         isFollowing = user?.followers.includes(username);
         // console.log(data);
         // console.log(username);
