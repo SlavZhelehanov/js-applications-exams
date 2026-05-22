@@ -75,11 +75,13 @@ export async function myChirps(ctx) {
         if (!id) return;
 
         try {
+            showNotification('loading', 'Loading...');
             await del(`/chirps/${id}`);
+            showNotification('info', 'Chirp deleted.');
             ctx.page.redirect('/chirps/me');
-        } catch (error) {
-            if (error.message) alert(error.message);
-            else alert(error);
+        } catch (err) {
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
     }
 
