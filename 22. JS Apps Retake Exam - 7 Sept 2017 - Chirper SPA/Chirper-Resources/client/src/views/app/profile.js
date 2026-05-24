@@ -46,7 +46,8 @@ export async function profiePage(ctx) {
             showNotification('info', op ? `Subscribed to ${user.username}` : `Unsubscribed to ${user.username}`);
             return ctx.page.redirect(`/profile/${id}`);
         } catch (error) {
-            alert(error);
+            if (error.message) return showNotification('error', error.message);
+            return showNotification('error', error);
         }
     }
 
@@ -57,8 +58,8 @@ export async function profiePage(ctx) {
         // console.log(username);
         // console.log(user);
     } catch (error) {
-        if (error.message) alert(error.message);
-        else alert(error);
+        if (error.message) return showNotification('error', error.message);
+        return showNotification('error', error);
     }
 
     return ctx.render(template({ user, data, isFollowing, changeOpinion }));
