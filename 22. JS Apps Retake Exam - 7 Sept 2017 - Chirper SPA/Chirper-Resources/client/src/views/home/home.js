@@ -56,7 +56,7 @@ function dashboard({ data, user, username, chirps, onCreate }) {
             ? data.map(ch => html`
                         <article class="chirp">
                     <div class="titlebar">
-                        <a href="/profile/${ch.author}" class="chirp-author">${ch.author}</a>
+                        <a href="/profile/${ch.creator}" class="chirp-author">${ch.author}</a>
                         <span class="chirp-time">${calcTime(ch.createdAt)}</span>
                     </div>
                     <p>${ch.text}</p>

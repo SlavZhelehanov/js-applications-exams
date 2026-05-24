@@ -54,9 +54,6 @@ export async function profiePage(ctx) {
     try {
         [data, user] = await Promise.all([get(`/chirps/${id}/users-chirps`), get(`/auth/${id}`)]);
         isFollowing = user?.followers.includes(username);
-        // console.log(data);
-        // console.log(username);
-        // console.log(user);
     } catch (error) {
         if (error.message) return showNotification('error', error.message);
         return showNotification('error', error);

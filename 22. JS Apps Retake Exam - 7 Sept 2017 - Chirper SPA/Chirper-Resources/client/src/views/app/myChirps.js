@@ -57,7 +57,7 @@ export async function myChirps(ctx) {
         const text = formData.get('text').trim();
 
         // if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
-        if (!text || text.length === 0) return alert("All fields are required!");
+        if (!text || text.length === 0) return showNotification('error', "All fields are required!");
 
         try {
             showNotification('loading', 'Loading...');
