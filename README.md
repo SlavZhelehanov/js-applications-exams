@@ -40,4 +40,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 20. JS Applications Exam - 12 August 2018 - "Car Tube" - Bonus: Notifications
 - [x] 21. JS Applications Exam - 15 April 2018 - "Point of Sale" - Bonus: Notifications
 - [x] 22. JS Apps Retake Exam - 7 Sept 2017 - "Chirper SPA" - Bonus: Notifications
-- [ ] 23. JS Applications Exam - 20 August 2017 - "SeentIt"
+- [ ] 23. JS Applications Exam - 20 August 2017 - "SeentIt" - Bonus:: Notifications
