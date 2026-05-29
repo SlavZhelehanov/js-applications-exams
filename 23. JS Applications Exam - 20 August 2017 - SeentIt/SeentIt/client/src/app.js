@@ -1,6 +1,7 @@
 import page from "./lib/page.mjs";
 
 import { decorateCTX, guardRoute, setNavigation } from "./utils/utils.js";
+import { editPage } from "./views/app/edit.js";
 import { myPostsPage } from "./views/app/myPosts.js";
 import { submitPage } from "./views/app/submit.js";
 import { homePage } from "./views/home/home.js";
@@ -12,5 +13,6 @@ page("/index.html", "/");
 page("/", homePage);
 page("/submit", guardRoute('user'), submitPage);
 page("/my-posts", guardRoute('user'), myPostsPage);
+page("/edit/:id", guardRoute('user'), editPage);
 
 page.start();
