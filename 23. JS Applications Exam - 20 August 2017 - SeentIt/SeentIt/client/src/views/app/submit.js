@@ -2,36 +2,23 @@ import { html } from "../../lib/lit-html.min.js";
 
 function template() {
     return html`
-        <section id="viewWelcome">
-            <div class="welcome">
-                <div class="signup">
-                    <form id="loginForm">
-                        <h2>Sign In</h2>
-                        <label>Username:</label>
-                        <input name="username" type="text">
-                        <label>Password:</label>
-                        <input name="password" type="password">
-                        <input id="btnLogin" value="Sign In" type="submit">
-                    </form>
-                    <form id="registerForm">
-                        <h2>Register</h2>
-                        <label>Username:</label>
-                        <input name="username" type="text">
-                        <label>Password:</label>
-                        <input name="password" type="password">
-                        <label>Repeat Password:</label>
-                        <input name="repeatPass" type="password">
-                        <input id="btnRegister" value="Sign Up" type="submit">
-                    </form>
-                </div>
-
-                <div class="about">
-                    <h1>Welcome to SeenIt</h1>
-                    <p>
-                        Share interesting links and discuss great content. It's what's happening now.
-                    </p>
-                    <p>Sign in or sign up in a second.</p>
-                </div>
+        <section id="viewSubmit">
+            <div class="submitArea">
+                <h1>Submit Link</h1>
+                <p>Please, fill out the form. A thumbnail image is not required.</p>
+            </div>
+            <div class="submitArea formContainer">
+                <form id="submitForm" class="submitForm">
+                    <label>Link URL:</label>
+                    <input name="url" value="" type="text">
+                    <label>Link Title:</label>
+                    <input name="title" value="" type="text">
+                    <label>Link Thumbnail Image (optional):</label>
+                    <input name="image" value="" type="text">
+                    <label>Comment (optional):</label>
+                    <textarea name="comment"></textarea>
+                    <input id="btnSubmitPost" value="Submit" type="submit">
+                </form>
             </div>
         </section>`;
 }
