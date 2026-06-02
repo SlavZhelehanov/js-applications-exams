@@ -40,10 +40,7 @@ export function registerPage(ctx) {
         const email = formData.get('email');
         const password = formData.get('password');
         const repass = formData.get('repeatPass');
-
-        console.log(gender);
-
-
+		
         if (email === '' || password === '') return showError('All fields are required');
         if (password !== repass) return showError("Passwords don't match");
 

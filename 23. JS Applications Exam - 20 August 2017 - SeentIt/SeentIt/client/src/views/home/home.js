@@ -2,7 +2,7 @@ import { html } from "../../lib/lit-html.min.js";
 import { post, get } from "../../utils/api.js";
 import { getUserData, setIsRegister, saveUserData, calcTime, showNotification } from "../../utils/utils.js";
 
-function welcome() {
+function welcome({ onRegister }) {
     return html`
         <section id="viewWelcome">
             <div class="welcome">
@@ -15,12 +15,12 @@ function welcome() {
                         <input name="password" type="password">
                         <input id="btnLogin" value="Sign In" type="submit">
                     </form>
-                    <form id="registerForm">
+                    <form id="registerForm" method="post" @submit=${onRegister}>
                         <h2>Register</h2>
                         <label>Username:</label>
-                        <input name="username" type="text">
+                        <input name="register-username" type="text">
                         <label>Password:</label>
-                        <input name="password" type="password">
+                        <input name="register-password" type="password">
                         <label>Repeat Password:</label>
                         <input name="repeatPass" type="password">
                         <input id="btnRegister" value="Sign Up" type="submit">
@@ -140,19 +140,37 @@ function dashboard() {
 
 export async function homePage(ctx) {
     const isAuth = getUserData();
-
-    function switchPage(params) {
-        if (params === 'login') {
-            setIsRegister(false);
-            return ctx.page.redirect('/');
-        }
-        setIsRegister(true);
-        return ctx.page.redirect('/');
-    }
+    console.log(isAuth);
+    
 
     if (isAuth) {
         return ctx.render(dashboard());
     } else {
-        return ctx.render(welcome());
+        async function onRegister(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const username = formData.get('register-username');
+            const password = formData.get('register-password');
+            const repass = formData.get('repeatPass');
+
+            if (username === '' || password === '') return alert('All fields are required');
+            if (password !== repass) return alert("Passwords don't match");
+
+            try {
+                const user = await post("/auth/register", { username, password });
+
+                if (399 < user.status) throw user.statusText;
+
+                saveUserData(user);
+                e.target.reset();
+                ctx.setNavigation();
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+
+        return ctx.render(welcome({ onRegister }));
     }
 }

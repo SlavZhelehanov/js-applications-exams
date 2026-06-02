@@ -19,7 +19,7 @@ export function getUserData() {
 
 export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
-    const menu = document.getElementsByClassName('menu')[0];
+    const menu = document.getElementById('menu');
     const email = getUserData() ? getUserData().email : null;
 
     isLoggedIn
