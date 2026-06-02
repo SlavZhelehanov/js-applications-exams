@@ -2,17 +2,17 @@ import { html } from "../../lib/lit-html.min.js";
 import { post, get } from "../../utils/api.js";
 import { getUserData, setIsRegister, saveUserData, calcTime, showNotification } from "../../utils/utils.js";
 
-function welcome({ onRegister }) {
+function welcome({ onRegister, onLogin }) {
     return html`
         <section id="viewWelcome">
             <div class="welcome">
                 <div class="signup">
-                    <form id="loginForm">
+                    <form id="loginForm" method="post" @submit=${onLogin}>
                         <h2>Sign In</h2>
                         <label>Username:</label>
-                        <input name="username" type="text">
+                        <input name="login-username" type="text">
                         <label>Password:</label>
-                        <input name="password" type="password">
+                        <input name="login-password" type="password">
                         <input id="btnLogin" value="Sign In" type="submit">
                     </form>
                     <form id="registerForm" method="post" @submit=${onRegister}>
@@ -141,7 +141,7 @@ function dashboard() {
 export async function homePage(ctx) {
     const isAuth = getUserData();
     console.log(isAuth);
-    
+
 
     if (isAuth) {
         return ctx.render(dashboard());
@@ -171,6 +171,29 @@ export async function homePage(ctx) {
             }
         }
 
-        return ctx.render(welcome({ onRegister }));
+        async function onLogin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const username = formData.get('login-username');
+            const password = formData.get('login-password');
+
+            if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
+
+            try {
+                const user = await post("/auth/login", { username, password });
+
+                if (399 < user.status) throw user.statusText;
+
+                saveUserData(user);
+                e.target.reset();
+                ctx.setNavigation();
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+
+        return ctx.render(welcome({ onLogin, onRegister }));
     }
 }

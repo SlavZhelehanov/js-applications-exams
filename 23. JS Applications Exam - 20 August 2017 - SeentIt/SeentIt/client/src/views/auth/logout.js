@@ -5,11 +5,11 @@ export async function logoutAction(ctx) {
     try {
         // await get("/auth/logout");
         clearUserData();
-        alert('info', 'Logout successful.');
+        alert('Logout successful.');
         ctx.setNavigation();
     } catch (err) {
-        if (err.message) alert('error', err.message);
-        else alert('error', err);
+        if (err.message) alert(err.message);
+        else alert(err);
     }
     return ctx.page.redirect('/');
 }
