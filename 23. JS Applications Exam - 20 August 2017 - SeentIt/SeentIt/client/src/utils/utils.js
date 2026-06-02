@@ -16,6 +16,9 @@ export function getUserData() {
     return JSON.parse(sessionStorage.getItem(item));
 }
 
+export function clearUserData() {
+    sessionStorage.removeItem(item);
+}
 
 export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
