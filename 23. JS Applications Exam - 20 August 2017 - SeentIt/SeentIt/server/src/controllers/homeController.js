@@ -1,27 +1,25 @@
 import {Router} from "express";
 
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
-import posts from "../../import-json/posts.js";
+import comments from "../../import-json/comments.js";
 import User from "../models/User.js";
-import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 
 const homeController = Router();
 
 // HOME
 homeController.get("/", async (req, res) => {
     try {
-        for (const post of posts) {
-            const user = await User.findOne({username: post.author}).lean();
+        for (const comment of comments) {
+            const user = await User.findOne({username: comment.author}).lean();
 
-            const newUser = await Post.create({
-                postId: post._id,
-                title: post.title,
-                description: post.description,
-                url: post.url,
-                imageUrl: post.imageUrl,
-                author: post.author,
+            const newUser = await Comment.create({
+                commentId: comment._id,
+                postId: comment.postId,
+                author: comment.author,
+                content: comment.content,
                 creator: user.userId,
-                createdAt: post._kmd.ect,
+                createdAt: comment._kmd.ect,
             })
             console.log(newUser);
         }
