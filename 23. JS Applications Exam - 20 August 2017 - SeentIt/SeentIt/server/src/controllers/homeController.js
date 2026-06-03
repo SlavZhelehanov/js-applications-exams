@@ -1,20 +1,27 @@
 import {Router} from "express";
 
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
-import users from "../../import-json/users.js";
+import posts from "../../import-json/posts.js";
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 
 const homeController = Router();
 
 // HOME
 homeController.get("/", async (req, res) => {
     try {
-        for (const user of users) {
-            const newUser = await User.create({
-                username: user.username,
-                userId: user._id,
-                password: "123456",
-                createdAt: user._kmd.ect,
+        for (const post of posts) {
+            const user = await User.findOne({username: post.author}).lean();
+
+            const newUser = await Post.create({
+                postId: post._id,
+                title: post.title,
+                description: post.description,
+                url: post.url,
+                imageUrl: post.imageUrl,
+                author: post.author,
+                creator: user.userId,
+                createdAt: post._kmd.ect,
             })
             console.log(newUser);
         }
