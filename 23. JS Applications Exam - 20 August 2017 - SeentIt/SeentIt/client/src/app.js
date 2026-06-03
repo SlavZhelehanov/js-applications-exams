@@ -8,7 +8,7 @@ import { submitPage } from "./views/app/submit.js";
 import { logoutAction } from "./views/auth/logout.js";
 import { homePage } from "./views/home/home.js";
 
-// setNavigation();
+setNavigation();
 
 page(decorateCTX);
 page("/index.html", "/");

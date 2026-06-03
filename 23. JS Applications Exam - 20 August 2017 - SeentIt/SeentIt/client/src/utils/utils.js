@@ -23,11 +23,20 @@ export function clearUserData() {
 export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
     const menu = document.getElementById('menu');
-    const email = getUserData() ? getUserData().email : null;
+    const profile = document.getElementById('profile');
+    const profileSpan = profile.getElementsByTagName('span')[0];
+    const username = getUserData() ? getUserData().username : null;
 
     isLoggedIn
-        ? menu.style.display = 'block'
-        : menu.style.display = 'none'
+        ? [
+            menu.style.display = 'block',
+            profile.style.display = 'block',
+            profileSpan.textContent = username
+        ]
+        : [
+            menu.style.display = 'none',
+            profile.style.display = 'none',
+        ]
 }
 
 export function decorateCTX(ctx, next) {
