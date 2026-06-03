@@ -1,6 +1,7 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`
         <section id="viewSubmit">
             <div class="submitArea">
@@ -8,7 +9,7 @@ function template() {
                 <p>Please, fill out the form. A thumbnail image is not required.</p>
             </div>
             <div class="submitArea formContainer">
-                <form id="submitForm" class="submitForm">
+                <form id="submitForm" class="submitForm" @submit=${onCreate}>
                     <label>Link URL:</label>
                     <input name="url" value="" type="text">
                     <label>Link Title:</label>
@@ -24,5 +25,28 @@ function template() {
 }
 
 export async function submitPage(ctx) {
-    return ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            url: formData.get('url').trim(),
+            title: formData.get('title').trim(),
+            description: formData.get('comment').trim(),
+            imageUrl: formData.get('image').trim()
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/app", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    return ctx.render(template(onCreate));
 }
