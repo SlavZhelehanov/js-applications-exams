@@ -3,6 +3,17 @@ import Post from '../models/Post.js';
 import {auth} from "../middlewares/authMiddleware.js";
 
 const postsRouter = Router();
+
+postsRouter.get('/', async (req, res) => {
+    try {
+        const props = '-_id -__v -updatedAt'
+        const posts = await Post.find({}, props).sort({createdAt: -1}).lean();
+        return res.status(200).json(posts);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
 postsRouter.post('/', auth, async (req, res) => {
     const {title, description, url, imageUrl} = req.body;
     const {id, username} = req.user;

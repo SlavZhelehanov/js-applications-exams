@@ -38,113 +38,59 @@ function welcome({ onRegister, onLogin }) {
         </section>`;
 }
 
-function dashboard() {
+function dashboard(data) {
     return html`<section id="viewCatalog">
             <div class="posts">
-                <article class="post">
+                ${0 < data.length
+            ? data.map((pst, idx) => html`<article class="post">
                     <div class="col rank">
-                        <span>1</span>
+                        <span>${idx + 1}</span>
                     </div>
                     <div class="col thumbnail">
-                        <a href="https://softuni.bg/">
-                            <img src="https://media.licdn.com/mpr/mpr/shrink_200_200/AAEAAQAAAAAAAAMDAAAAJGY2Mjg3Y2I4LWU1ZTktNDJlNC1iM2M4LTc2MDlhNmVhNThhNQ.png">
+                        <a href=${pst.url}>
+                            <img src=${pst.imageUrl}>
                         </a>
                     </div>
                     <div class="post-content">
                         <div class="title">
-                            <a href="https://softuni.bg/">
-                                SoftUni
+                            <a href=${pst.url}>
+                                ${pst.title}
                             </a>
                         </div>
                         <div class="details">
                             <div class="info">
-                                submitted 1 day ago by Kiril
+                                submitted ${calcTime(pst.createdAt)} ago by ${pst.author}
                             </div>
                             <div class="controls">
                                 <ul>
-                                    <li class="action"><a class="commentsLink" href="#">comments</a></li>
-                                    <li class="action"><a class="editLink" href="#">edit</a></li>
+                                    <li class="action"><a class="commentsLink" href="/details/${pst.postId}">comments</a></li>
+                                    <li class="action"><a class="editLink" href="/edit/">edit</a></li>
                                     <li class="action"><a class="deleteLink" href="#">delete</a></li>
                                 </ul>
                             </div>
 
                         </div>
                     </div>
-                </article>
-
-                <article class="post">
-                    <div class="col rank">
-                        <span>2</span>
-                    </div>
-                    <div class="col thumbnail">
-                        <a href="https://www.sli.do/">
-                            <img src="https://www.sli.do/assets/images/2-step.png">
-                        </a>
-                    </div>
-                    <div class="post-content">
-                        <div class="title">
-                            <a href="https://www.sli.do/">
-                                Sli.Do
-                            </a>
-                        </div>
-                        <div class="details">
-                            <div class="info">
-                                submitted 3 days ago by Viktor
-                            </div>
-                            <div class="controls">
-                                <ul>
-                                    <li class="action"><a class="commentsLink" href="#">comments</a></li>
-                                    <li class="action"><a class="editLink" href="#">edit</a></li>
-                                    <li class="action"><a class="deleteLink" href="#">delete</a></li>
-                                </ul>
-                            </div>
-
-                        </div>
-                    </div>
-                </article>
-
-                <article class="post">
-                    <div class="col rank">
-                        <span>3</span>
-                    </div>
-                    <div class="col thumbnail">
-                        <a href="https://www.cnbc.com/2017/06/28/progress-buys-mobile-backend-start-up-kinvey-for-49-million.html">
-                            <img src="https://pbs.twimg.com/profile_images/464099715865276417/nXvsGPVO.png">
-                        </a>
-                    </div>
-                    <div class="post-content">
-                        <div class="title">
-                            <a href="https://www.cnbc.com/2017/06/28/progress-buys-mobile-backend-start-up-kinvey-for-49-million.html">
-                                Progress Software buys Kinvey
-                            </a>
-                        </div>
-                        <div class="details">
-                            <div class="info">
-                                submitted 4 hours ago by Nakov
-                            </div>
-                            <div class="controls">
-                                <ul>
-                                    <li class="action"><a class="commentsLink" href="#">comments</a></li>
-                                    <li class="action"><a class="editLink" href="#">edit</a></li>
-                                    <li class="action"><a class="deleteLink" href="#">delete</a></li>
-                                </ul>
-                            </div>
-
-                        </div>
-                    </div>
-                </article>
-                <!-- TODO: more posts will come here -->
-            </div>
-        </section>`;
+                </article>`)
+            : html`<h3>No posts in database</h3>`
+        }`;
 }
 
 export async function homePage(ctx) {
     const isAuth = getUserData();
-    console.log(isAuth);
-
 
     if (isAuth) {
-        return ctx.render(dashboard());
+        let data = [];
+
+        try {
+            data = await get("/app");
+            console.log(data);
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+
+        return ctx.render(dashboard(data));
     } else {
         async function onRegister(e) {
             e.preventDefault();
@@ -192,6 +138,17 @@ export async function homePage(ctx) {
                 if (err.message) alert(err.message);
                 else alert(err);
             }
+        }
+
+        try {
+            const user = await get("/");
+
+            if (399 < user.status) throw user.statusText;
+
+            console.log(user);
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
         }
 
         return ctx.render(welcome({ onLogin, onRegister }));
