@@ -38,7 +38,7 @@ function welcome({ onRegister, onLogin }) {
         </section>`;
 }
 
-function dashboard(data) {
+function dashboard({ data, isAuth }) {
     return html`<section id="viewCatalog">
             <div class="posts">
                 ${0 < data.length
@@ -64,15 +64,19 @@ function dashboard(data) {
                             <div class="controls">
                                 <ul>
                                     <li class="action"><a class="commentsLink" href="/details/${pst.postId}">comments</a></li>
-                                    <li class="action"><a class="editLink" href="/edit/">edit</a></li>
-                                    <li class="action"><a class="deleteLink" href="#">delete</a></li>
-                                </ul>
-                            </div>
+                                    ${isAuth.id === pst.creator
+                    ? html`<li class="action"><a class="editLink" href="/edit/${pst.postId}">edit</a></li>
+                                    <li class="action"><a class="deleteLink" href="#">delete</a></li>`
+                    : null
+                }
+                                    
+                                </ul >
+                            </div >
 
-                        </div>
-                    </div>
-                </article>`)
-            : html`<h3>No posts in database</h3>`
+                        </div >
+                    </div >
+                </article > `)
+            : html`< h3 > No posts in database</h3 > `
         }`;
 }
 
@@ -84,13 +88,12 @@ export async function homePage(ctx) {
 
         try {
             data = await get("/app");
-            console.log(data);
         } catch (err) {
             if (err.message) alert(err.message);
             else alert(err);
         }
 
-        return ctx.render(dashboard(data));
+        return ctx.render(dashboard({ data, isAuth }));
     } else {
         async function onRegister(e) {
             e.preventDefault();
