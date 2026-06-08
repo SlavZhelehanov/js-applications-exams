@@ -43,4 +43,20 @@ postsRouter.get('/post/:id', auth, async (req, res) => {
     }
 });
 
+postsRouter.put('/post/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findOne({postId: req.params.id}).lean();
+        const options = req.body;
+
+        if (!post) return res.status(404).json({message: "Post not found"});
+        if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to update this post"});
+
+        await Post.findOneAndUpdate({postId: req.params.id}, options, {runValidators: true, returnDocument: 'after'});
+
+        return res.status(200).json({message: "Updated"});
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
 export default postsRouter;
