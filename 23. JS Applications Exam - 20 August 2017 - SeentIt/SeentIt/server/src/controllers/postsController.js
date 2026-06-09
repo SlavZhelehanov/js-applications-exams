@@ -59,4 +59,20 @@ postsRouter.put('/post/:id', auth, async (req, res) => {
     }
 });
 
+postsRouter.delete('/post/:postId', auth, async (req, res) => {
+    try {
+        const {postId} = req.params;
+        const post = await Post.findOne({postId}).lean();
+
+        if (!post) return res.status(404).json({message: "Post not found"});
+        if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to delete this post"});
+
+        await Post.findOneAndDelete({postId});
+
+        return res.status(200).json({message: "Deleted"});
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
 export default postsRouter;

@@ -1,5 +1,5 @@
 import { html } from "../../lib/lit-html.min.js";
-import { post, get } from "../../utils/api.js";
+import { post, get, del } from "../../utils/api.js";
 import { getUserData, setIsRegister, saveUserData, calcTime, showNotification } from "../../utils/utils.js";
 
 function welcome({ onRegister, onLogin }) {
@@ -38,7 +38,7 @@ function welcome({ onRegister, onLogin }) {
         </section>`;
 }
 
-function dashboard({ data, isAuth }) {
+function dashboard({ data, onDelete, isAuth }) {
     return html`<section id="viewCatalog">
             <div class="posts">
                 ${0 < data.length
@@ -66,7 +66,7 @@ function dashboard({ data, isAuth }) {
                                     <li class="action"><a class="commentsLink" href="/details/${pst.postId}">comments</a></li>
                                     ${isAuth.id === pst.creator
                     ? html`<li class="action"><a class="editLink" href="/edit/${pst.postId}">edit</a></li>
-                                    <li class="action"><a class="deleteLink" href="#">delete</a></li>`
+                                    <li class="action"><a @click=${() => onDelete(pst.postId)} class="deleteLink" href="#">delete</a></li>`
                     : null
                 }
                                     
@@ -86,6 +86,20 @@ export async function homePage(ctx) {
     if (isAuth) {
         let data = [];
 
+        async function onDelete(id) {
+            const choice = confirm('Are you sure?');
+
+            if (choice) {
+                try {
+                    await del(`/app/post/${id}`);
+                    ctx.page.redirect('/');
+                } catch (err) {
+                    if (err.message) alert(err.message);
+                    else alert(err);
+                }
+            }
+        }
+
         try {
             data = await get("/app");
         } catch (err) {
@@ -93,7 +107,7 @@ export async function homePage(ctx) {
             else alert(err);
         }
 
-        return ctx.render(dashboard({ data, isAuth }));
+        return ctx.render(dashboard({ onDelete, data, isAuth }));
     } else {
         async function onRegister(e) {
             e.preventDefault();
