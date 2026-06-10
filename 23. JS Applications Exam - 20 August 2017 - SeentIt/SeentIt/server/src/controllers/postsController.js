@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import Post from '../models/Post.js';
 import {auth} from "../middlewares/authMiddleware.js";
+import Comment from "../models/Comment.js";
 
 const postsRouter = Router();
 
@@ -38,6 +39,18 @@ postsRouter.get('/post/:id', auth, async (req, res) => {
         // if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to view this post"});
 
         return res.status(200).json(post);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
+postsRouter.get('/post/:postId/comments', auth, async (req, res) => {
+    const {postId} = req.params;
+
+    try {
+        const props = '-_id -__v -updatedAt'
+        const comments = await Comment.find({postId}, props).lean();
+        return res.status(200).json(comments);
     } catch (error) {
         return res.status(500).json(error);
     }

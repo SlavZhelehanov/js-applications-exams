@@ -2,7 +2,7 @@ import { html } from "../../lib/lit-html.min.js";
 import { get } from "../../utils/api.js";
 import { calcTime } from "../../utils/utils.js";
 
-function template(post) {
+function template({ post, comments }) {
     return html`
         <section id="viewComments">
             <div class="post">
@@ -40,38 +40,29 @@ function template(post) {
                     <input type="submit" value="Add Comment" id="btnPostComment">
                 </form>
             </div>
-            <article class="post post-content">
-                <p>Thanks, just what I needed.</p>
+            ${0 < comments.length
+            ? comments.map(cm => html`<article class="post post-content">
+                <p>${cm.content}</p>
                 <div class="info">
-                    submitted 5 days ago by Gosho | <a href="#" class="deleteLink">delete</a>
+                    submitted ${calcTime(cm.createdAt)} ago by ${cm.author} | <a href="#" class="deleteLink">delete</a>
                 </div>
-            </article>
-            <article class="post post-content">
-                <p>Tutorial is kinda outdated, but it works.</p>
-                <div class="info">
-                    submitted 4 days ago by Kiril | <a href="#" class="deleteLink">delete</a>
-                </div>
-            </article>
-            <article class="post post-content">
-                <p>Beats React any day! So must easier and less boilerplate.</p>
-                <div class="info">
-                    submitted 3 days ago by Nakov | <a href="#" class="deleteLink">delete</a>
-                </div>
-            </article>
+            </article>`)
+            : html`<h3>There are no comments yet</h3>`
+        }
         </section>`;
 }
 
 export async function detailsPage(ctx) {
-    const {id} = ctx.params;
-    let post = {};
+    const { id } = ctx.params;
+    let post = {}, comments = [];
 
     try {
         post = await get(`/app/post/${id}`);
-        // console.log(post);        
+        comments = await get(`/app/post/${id}/comments`);
     } catch (err) {
         if (err.message) alert(err.message);
         else alert(err);
     }
 
-    return ctx.render(template(post));
+    return ctx.render(template({ post, comments }));
 }
