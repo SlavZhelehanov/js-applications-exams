@@ -1,28 +1,30 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
+import { calcTime } from "../../utils/utils.js";
 
-function template() {
+function template(post) {
     return html`
         <section id="viewComments">
             <div class="post">
                 <div class="col thumbnail">
-                    <a href="http://sammyjs.org/docs/api/0.7.4/all#Sammy.RenderContext-load">
-                        <img src="src/RuditoFreshStep.jpg">
+                    <a href=${post?.url}>
+                        <img src=${post?.imageUrl}>
                     </a>
                 </div>
                 <div class="post-content">
                     <div class="title">
-                        <a href="http://sammyjs.org/docs/api/0.7.4/all#Sammy.RenderContext-load">
-                            Sammy Docs
+                        <a href=${post?.url}>
+                            ${post?.title}
                         </a>
                     </div>
                     <div class="details">
-                        <p>Very helpful and complete info. Even includes a detailed tutorial.</p>
+                        <p>${post?.description}</p>
                         <div class="info">
-                            submitted 5 days ago by pesho
+                            submitted ${calcTime(post?.createdAt)} ago by ${post?.author}
                         </div>
                         <div class="controls">
                             <ul>
-                                <li class="action"><a class="editLink" href="#">edit</a></li>
+                                <li class="action"><a class="editLink" href="/edit/${post?.postId}">edit</a></li>
                                 <li class="action"><a class="deleteLink" href="#">delete</a></li>
                             </ul>
                         </div>
@@ -60,5 +62,16 @@ function template() {
 }
 
 export async function detailsPage(ctx) {
-    return ctx.render(template());
+    const {id} = ctx.params;
+    let post = {};
+
+    try {
+        post = await get(`/app/post/${id}`);
+        // console.log(post);        
+    } catch (err) {
+        if (err.message) alert(err.message);
+        else alert(err);
+    }
+
+    return ctx.render(template(post));
 }

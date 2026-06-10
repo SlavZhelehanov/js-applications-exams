@@ -35,7 +35,7 @@ postsRouter.get('/post/:id', auth, async (req, res) => {
         const post = await Post.findOne({postId: req.params.id}, props).lean();
 
         if (!post) return res.status(404).json({message: "Post not found"});
-        if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to view this post"});
+        // if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to view this post"});
 
         return res.status(200).json(post);
     } catch (error) {
