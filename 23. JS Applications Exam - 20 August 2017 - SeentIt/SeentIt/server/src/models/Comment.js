@@ -1,9 +1,10 @@
 import {Schema, model} from "mongoose";
+import {v4 as uuid} from "uuid";
 
 const commentSchema = new Schema({
     commentId: {
         type: String,
-        required: [true, "Post ID field can't be empty"],
+        default: uuid,
     },
     postId: {
         type: String,

@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get, del } from "../../utils/api.js";
+import { get, del, post as pst } from "../../utils/api.js";
 import { calcTime } from "../../utils/utils.js";
 
-function template({ post, onPostDelete, comments }) {
+function template({ onComment, post, onPostDelete, comments }) {
     return html`
         <section id="viewComments">
             <div class="post">
@@ -34,7 +34,7 @@ function template({ post, onPostDelete, comments }) {
                 <div class="clear"></div>
             </div>
             <div class="post post-content">
-                <form id="commentForm">
+                <form id="commentForm" method='post' @submit=${onComment}>
                     <label>Comment</label>
                     <textarea name="content" type="text"></textarea>
                     <input type="submit" value="Add Comment" id="btnPostComment">
@@ -60,18 +60,38 @@ export async function detailsPage(ctx) {
         const choice = confirm('Are you sure?');
 
         if (choice) {
-            await del(`/app/post/${id}`);
-            ctx.page.redirect('/');
+            try {
+                await del(`/app/post/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+    }
+
+    async function onComment(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const comment = formData.get('content');
+
+        try {
+            await pst(`/app/post/${id}/comments`, { comment: comment });
+            e.target.reset();
+            ctx.page.redirect(`/details/${id}`);
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
         }
     }
 
     try {
-        post = await get(`/app/post/${id}`);
-        comments = await get(`/app/post/${id}/comments`);
+        [post, comments] = await Promise.all([get(`/app/post/${id}`), get(`/app/post/${id}/comments`)]);
     } catch (err) {
         if (err.message) alert(err.message);
         else alert(err);
     }
 
-    return ctx.render(template({ post, comments, onPostDelete }));
+    return ctx.render(template({ post, comments, onComment, onPostDelete }));
 }

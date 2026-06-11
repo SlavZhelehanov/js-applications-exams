@@ -56,6 +56,26 @@ postsRouter.get('/post/:postId/comments', auth, async (req, res) => {
     }
 });
 
+postsRouter.post('/post/:postId/comments', auth, async (req, res) => {
+    const {postId} = req.params;
+    const content = req.body.comment;
+
+    try {
+        const props = '-_id -__v -updatedAt'
+
+        await Comment.create({
+            postId,
+            content,
+            author: req.user.username,
+            creator: req.user.id,
+        })
+
+        return res.status(200).json("comments");
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
 postsRouter.put('/post/:id', auth, async (req, res) => {
     try {
         const post = await Post.findOne({postId: req.params.id}).lean();
