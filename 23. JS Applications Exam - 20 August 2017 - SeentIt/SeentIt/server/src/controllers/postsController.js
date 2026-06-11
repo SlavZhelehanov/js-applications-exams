@@ -80,7 +80,7 @@ postsRouter.delete('/post/:postId', auth, async (req, res) => {
         if (!post) return res.status(404).json({message: "Post not found"});
         if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to delete this post"});
 
-        await Post.findOneAndDelete({postId});
+        await Promise.all([ Post.findOneAndDelete({postId}), Comment.deleteMany({postId})]);
 
         return res.status(200).json({message: "Deleted"});
     } catch (error) {

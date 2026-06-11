@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, del } from "../../utils/api.js";
 import { calcTime } from "../../utils/utils.js";
 
-function template({ post, comments }) {
+function template({ post, onPostDelete, comments }) {
     return html`
         <section id="viewComments">
             <div class="post">
@@ -25,7 +25,7 @@ function template({ post, comments }) {
                         <div class="controls">
                             <ul>
                                 <li class="action"><a class="editLink" href="/edit/${post?.postId}">edit</a></li>
-                                <li class="action"><a class="deleteLink" href="#">delete</a></li>
+                                <li class="action"><a class="deleteLink" @click=${() => onPostDelete(post?.postId)} href="#">delete</a></li>
                             </ul>
                         </div>
 
@@ -56,6 +56,15 @@ export async function detailsPage(ctx) {
     const { id } = ctx.params;
     let post = {}, comments = [];
 
+    async function onPostDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            await del(`/app/post/${id}`);
+            ctx.page.redirect('/');
+        }
+    }
+
     try {
         post = await get(`/app/post/${id}`);
         comments = await get(`/app/post/${id}/comments`);
@@ -64,5 +73,5 @@ export async function detailsPage(ctx) {
         else alert(err);
     }
 
-    return ctx.render(template({ post, comments }));
+    return ctx.render(template({ post, comments, onPostDelete }));
 }

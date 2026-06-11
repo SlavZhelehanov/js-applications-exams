@@ -161,8 +161,6 @@ export async function homePage(ctx) {
             const user = await get("/");
 
             if (399 < user.status) throw user.statusText;
-
-            console.log(user);
         } catch (err) {
             if (err.message) alert(err.message);
             else alert(err);
