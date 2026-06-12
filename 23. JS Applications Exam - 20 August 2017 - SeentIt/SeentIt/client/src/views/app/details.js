@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, del, post as pst } from "../../utils/api.js";
-import { calcTime } from "../../utils/utils.js";
+import { calcTime, getUserData } from "../../utils/utils.js";
 
-function template({ onComment, post, onPostDelete, comments }) {
+function template({ onComment, post, onPostDelete, comments, onCommentDelete, userId }) {
     return html`
         <section id="viewComments">
             <div class="post">
@@ -25,7 +25,7 @@ function template({ onComment, post, onPostDelete, comments }) {
                         <div class="controls">
                             <ul>
                                 <li class="action"><a class="editLink" href="/edit/${post?.postId}">edit</a></li>
-                                <li class="action"><a class="deleteLink" @click=${() => onPostDelete(post?.postId)} href="#">delete</a></li>
+                                <li class="action"><a class="deleteLink" @click=${onPostDelete} href="#">delete</a></li>
                             </ul>
                         </div>
 
@@ -44,7 +44,11 @@ function template({ onComment, post, onPostDelete, comments }) {
             ? comments.map(cm => html`<article class="post post-content">
                 <p>${cm.content}</p>
                 <div class="info">
-                    submitted ${calcTime(cm.createdAt)} ago by ${cm.author} | <a href="#" class="deleteLink">delete</a>
+                    submitted ${calcTime(cm.createdAt)} ago by ${cm.author} 
+                    ${userId === cm.creator
+                    ? html`| <a @click=${() => onCommentDelete(cm?.commentId)} href="#" class="deleteLink">delete</a>`
+                    : null
+                }                    
                 </div>
             </article>`)
             : html`<h3>There are no comments yet</h3>`
@@ -53,7 +57,7 @@ function template({ onComment, post, onPostDelete, comments }) {
 }
 
 export async function detailsPage(ctx) {
-    const { id } = ctx.params;
+    const { id } = ctx.params, { id: userId } = getUserData();
     let post = {}, comments = [];
 
     async function onPostDelete() {
@@ -63,6 +67,20 @@ export async function detailsPage(ctx) {
             try {
                 await del(`/app/post/${id}`);
                 ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+    }
+
+    async function onCommentDelete(commentId) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/app/post/${id}/${commentId}`);
+                ctx.page.redirect(`/details/${id}`);
             } catch (err) {
                 if (err.message) alert(err.message);
                 else alert(err);
@@ -93,5 +111,5 @@ export async function detailsPage(ctx) {
         else alert(err);
     }
 
-    return ctx.render(template({ post, comments, onComment, onPostDelete }));
+    return ctx.render(template({ post, comments, onCommentDelete, onComment, onPostDelete, userId }));
 }

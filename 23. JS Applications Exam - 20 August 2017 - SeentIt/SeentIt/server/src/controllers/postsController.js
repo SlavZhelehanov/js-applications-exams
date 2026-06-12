@@ -102,7 +102,25 @@ postsRouter.delete('/post/:postId', auth, async (req, res) => {
 
         await Promise.all([ Post.findOneAndDelete({postId}), Comment.deleteMany({postId})]);
 
-        return res.status(200).json({message: "Deleted"});
+        return res.status(200).json({message: "Post deleted"});
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
+postsRouter.delete('/post/:postId/:commentId', auth, async (req, res) => {
+    try {
+        const {postId, commentId} = req.params;
+        const post = await Post.findOne({postId}).lean();
+        const comment = await Comment.findOne({commentId}).lean();
+
+        if (!post) return res.status(404).json({message: "Post not found"});
+        if (!comment) return res.status(404).json({message: "Comment not found"});
+        if (req.user.id !== comment.creator) return res.status(403).json({message: "You are not authorized to delete this comment"});
+
+        await Comment.findOneAndDelete({postId, commentId});
+
+        return res.status(200).json({message: "Comment deleted"});
     } catch (error) {
         return res.status(500).json(error);
     }
