@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, del } from "../../utils/api.js";
 import { calcTime } from "../../utils/utils.js";
 
-function template(data) {
+function template({ data, onDelete }) {
     return html`
         <section id="viewMyPosts">
             <div class="post post-content">
@@ -34,7 +34,7 @@ function template(data) {
                                 <ul>
                                     <li class="action"><a class="commentsLink" href="/details/${el.postId}">comments</a></li>
                                     <li class="action"><a class="editLink" href="/edit/${el.postId}">edit</a></li>
-                                    <li class="action"><a class="deleteLink" href="#">delete</a></li>
+                                    <li class="action"><a @click=${() => onDelete(el.postId)} class="deleteLink" href="#">delete</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -50,6 +50,20 @@ function template(data) {
 export async function myPostsPage(ctx) {
     let data = [];
 
+    async function onDelete(id) {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/app/post/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                if (err.message) alert(err.message);
+                else alert(err);
+            }
+        }
+    }
+
     try {
         data = await get('/app/my');
     } catch (err) {
@@ -57,5 +71,5 @@ export async function myPostsPage(ctx) {
         else alert(err);
     }
 
-    return ctx.render(template(data));
+    return ctx.render(template({ data, onDelete }));
 }
