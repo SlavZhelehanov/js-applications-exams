@@ -30,6 +30,18 @@ postsRouter.post('/', auth, async (req, res) => {
     }
 });
 
+postsRouter.get('/my', auth, async (req, res) => {
+    const {id} = req.user;
+
+    try {
+        const props = '-_id -__v -updatedAt'
+        const posts = await Post.find({creator: id}, props).sort({createdAt: -1}).lean();
+        return res.status(200).json(posts);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+});
+
 postsRouter.get('/post/:id', auth, async (req, res) => {
     try {
         const props = '-_id -__v -updatedAt'
@@ -100,7 +112,7 @@ postsRouter.delete('/post/:postId', auth, async (req, res) => {
         if (!post) return res.status(404).json({message: "Post not found"});
         if (req.user.id !== post.creator) return res.status(403).json({message: "You are not authorized to delete this post"});
 
-        await Promise.all([ Post.findOneAndDelete({postId}), Comment.deleteMany({postId})]);
+        await Promise.all([Post.findOneAndDelete({postId}), Comment.deleteMany({postId})]);
 
         return res.status(200).json({message: "Post deleted"});
     } catch (error) {
