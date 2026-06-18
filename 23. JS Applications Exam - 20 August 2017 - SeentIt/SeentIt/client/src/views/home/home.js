@@ -101,10 +101,12 @@ export async function homePage(ctx) {
         }
 
         try {
+            showNotification("loading", "Loading...");
             data = await get("/app");
+            showNotification();
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
 
         return ctx.render(dashboard({ onDelete, data, isAuth }));
@@ -116,21 +118,23 @@ export async function homePage(ctx) {
             const password = formData.get('register-password');
             const repass = formData.get('repeatPass');
 
-            if (username === '' || password === '') return alert('All fields are required');
-            if (password !== repass) return alert("Passwords don't match");
+            if (username === '' || password === '') return showNotification('error', 'All fields are required');
+            if (password !== repass) return showNotification('error', "Passwords don't match");
 
             try {
+                showNotification("loading", "Registration on progress...");
                 const user = await post("/auth/register", { username, password });
 
                 if (399 < user.status) throw user.statusText;
 
                 saveUserData(user);
+                showNotification("info", "User registration successful.");
                 e.target.reset();
                 ctx.setNavigation();
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showNotification('error', err.message);
+                else showNotification('error', err);
             }
         }
 
@@ -140,20 +144,22 @@ export async function homePage(ctx) {
             const username = formData.get('login-username');
             const password = formData.get('login-password');
 
-            if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
+            if (username.trim() === '' || password.trim() === '') return showNotification('error', 'All fields are required!');
 
             try {
+                showNotification("loading", "Login in...");
                 const user = await post("/auth/login", { username, password });
 
                 if (399 < user.status) throw user.statusText;
 
                 saveUserData(user);
+                showNotification("info", "Login successful.");
                 e.target.reset();
                 ctx.setNavigation();
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showNotification('error', err.message);
+                else showNotification('error', err);
             }
         }
 
@@ -162,8 +168,8 @@ export async function homePage(ctx) {
 
             if (399 < user.status) throw user.statusText;
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
 
         return ctx.render(welcome({ onLogin, onRegister }));

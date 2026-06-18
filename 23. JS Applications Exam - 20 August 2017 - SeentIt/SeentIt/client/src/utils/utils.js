@@ -62,6 +62,22 @@ export function guardRoute(status) {
     };
 }
 
+function hideAllNotifications() {
+    document.querySelectorAll('#notifications .notification')
+        .forEach(n => n.style.display = 'none');
+}
+
+export function showNotification(type, message) {
+    hideAllNotifications();
+
+    const box = document.querySelector(`#${type}Box`);
+    if (!box) return;
+
+    box.querySelector('span').textContent = message;
+    box.style.display = 'block';
+
+    setTimeout(() => hideAllNotifications(), 3000);
+}
 
 export function setIsRegister(value) {
     sessionStorage.setItem('isRegister', value ? 'true' : 'false');
