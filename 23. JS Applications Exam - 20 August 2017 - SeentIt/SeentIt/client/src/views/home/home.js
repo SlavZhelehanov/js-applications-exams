@@ -91,19 +91,19 @@ export async function homePage(ctx) {
 
             if (choice) {
                 try {
+                    showNotification("loading", "Deleting...");
                     await del(`/app/post/${id}`);
+                    showNotification("info", "Post deleted");
                     ctx.page.redirect('/');
                 } catch (err) {
-                    if (err.message) alert(err.message);
-                    else alert(err);
+                    if (err.message) showNotification('error', err.message);
+                    else showNotification('error', err);
                 }
             }
         }
 
         try {
-            showNotification("loading", "Loading...");
             data = await get("/app");
-            showNotification();
         } catch (err) {
             if (err.message) showNotification('error', err.message);
             else showNotification('error', err);

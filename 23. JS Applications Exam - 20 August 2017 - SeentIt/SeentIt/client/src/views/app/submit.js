@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
+import { showNotification } from "../../utils/utils.js";
 
 function template(onCreate) {
     return html`
@@ -36,15 +37,16 @@ export async function submitPage(ctx) {
             imageUrl: formData.get('image').trim()
         }
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        if (Object.values(item).some((x) => !x)) return showNotification('error', "All fields are required!");
 
         try {
             await post("/app", item);
+            showNotification('info', "Post created.");
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
     }
 

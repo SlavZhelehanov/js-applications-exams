@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, put } from "../../utils/api.js";
+import { showNotification } from "../../utils/utils.js";
 
 function template({ data, onEdit }) {
     return html`
@@ -39,23 +40,24 @@ export async function editPage(ctx) {
             imageUrl: formData.get('image').trim()
         }
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        if (Object.values(item).some((x) => !x)) return showNotification("error", "All fields are required!");
 
         try {
             await put(`/app/post/${id}`, item);
+            showNotification('info', `Post ${item.title} updated.`)
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showNotification("error", err.message);
+            else showNotification("error", err);
         }
     }
 
     try {
         data = await get(`/app/post/${id}`);
     } catch (err) {
-        if (err.message) alert(err.message);
-        else alert(err);
+        if (err.message) showNotification("error", err.message);
+        else showNotification("error", err);
     }
 
     return ctx.render(template({ data, onEdit }));

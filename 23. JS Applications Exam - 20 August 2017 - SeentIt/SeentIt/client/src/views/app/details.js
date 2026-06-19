@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, del, post as pst } from "../../utils/api.js";
-import { calcTime, getUserData } from "../../utils/utils.js";
+import { calcTime, getUserData, showNotification } from "../../utils/utils.js";
 
 function template({ onComment, post, onPostDelete, comments, onCommentDelete, userId }) {
     return html`
@@ -66,10 +66,11 @@ export async function detailsPage(ctx) {
         if (choice) {
             try {
                 await del(`/app/post/${id}`);
+                showNotification('info', 'Post deleted.');
                 ctx.page.redirect('/');
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showNotification("error", err.message);
+                else showNotification("error", err);
             }
         }
     }
@@ -80,10 +81,11 @@ export async function detailsPage(ctx) {
         if (choice) {
             try {
                 await del(`/app/post/${id}/${commentId}`);
+                showNotification('info', 'Comment deleted.');
                 ctx.page.redirect(`/details/${id}`);
             } catch (err) {
-                if (err.message) alert(err.message);
-                else alert(err);
+                if (err.message) showNotification("error", err.message);
+                else showNotification("error", err);
             }
         }
     }
@@ -96,19 +98,20 @@ export async function detailsPage(ctx) {
 
         try {
             await pst(`/app/post/${id}/comments`, { comment: comment });
+            showNotification('info', 'Comment created.');
             e.target.reset();
             ctx.page.redirect(`/details/${id}`);
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showNotification("error", err.message);
+            else showNotification("error", err);
         }
     }
 
     try {
         [post, comments] = await Promise.all([get(`/app/post/${id}`), get(`/app/post/${id}/comments`)]);
     } catch (err) {
-        if (err.message) alert(err.message);
-        else alert(err);
+        if (err.message) showNotification("error", err.message);
+        else showNotification("error", err);
     }
 
     return ctx.render(template({ post, comments, onCommentDelete, onComment, onPostDelete, userId }));
