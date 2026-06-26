@@ -32,3 +32,14 @@ export function decorateCTX(ctx, next) {
     ctx.isRegister = getIsRegister();
     next();
 }
+
+export function guardRoute(status) {
+    return function (ctx, next) {
+        const user = getUserData();
+        const isUser = Boolean(user);
+
+        if ((status === 'user' && isUser) || (status === 'guest' && !isUser)) next();
+        else if (status === 'guest' && isUser) page.redirect('/');
+        else page.redirect('/');
+    };
+}
