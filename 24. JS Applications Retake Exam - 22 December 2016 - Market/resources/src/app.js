@@ -1,6 +1,7 @@
 import page from "./lib/page.mjs";
 
 import { decorateCTX, guardRoute, setNavigation } from "./utils/utils.js";
+import { cartPage } from "./views/app/cart.js";
 import { shopPage } from "./views/app/shop.js";
 import { loginPage } from "./views/auth/login.js";
 import { registerPage } from "./views/auth/register.js";
@@ -12,5 +13,6 @@ page("/", homePage);
 page("/login", guardRoute('guest'), loginPage);
 page("/register", guardRoute('guest'), registerPage);
 page("/shop", guardRoute('user'), shopPage);
+page("/cart", guardRoute('user'), cartPage);
 
 page.start();
