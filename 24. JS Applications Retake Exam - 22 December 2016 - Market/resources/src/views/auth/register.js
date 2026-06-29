@@ -41,6 +41,7 @@ export async function registerPage(ctx) {
             const user = await post('/auth/register', { username, password, name });
             saveUserData(user);
             e.target.reset();
+            ctx.setNavigation();
             ctx.page.redirect('/');
         } catch (err) {
             if (err.message) alert(err.message);
