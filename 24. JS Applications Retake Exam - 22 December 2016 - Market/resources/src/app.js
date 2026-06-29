@@ -4,6 +4,7 @@ import { decorateCTX, guardRoute, setNavigation } from "./utils/utils.js";
 import { cartPage } from "./views/app/cart.js";
 import { shopPage } from "./views/app/shop.js";
 import { loginPage } from "./views/auth/login.js";
+import { logoutAction } from "./views/auth/logout.js";
 import { registerPage } from "./views/auth/register.js";
 import { homePage } from "./views/home/home.js";
 setNavigation();
@@ -12,6 +13,7 @@ page("/index.html", "/");
 page("/", homePage);
 page("/login", guardRoute('guest'), loginPage);
 page("/register", guardRoute('guest'), registerPage);
+page("/logout", guardRoute('user'), logoutAction);
 page("/shop", guardRoute('user'), shopPage);
 page("/cart", guardRoute('user'), cartPage);
 
