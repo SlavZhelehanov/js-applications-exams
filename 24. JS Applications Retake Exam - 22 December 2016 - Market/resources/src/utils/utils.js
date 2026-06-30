@@ -52,3 +52,9 @@ export function guardRoute(status) {
         else page.redirect('/');
     };
 }
+
+export function formatPrice(price) {
+    let num = Number(price);
+    if (isNaN(num)) return "0.00";
+    return num.toFixed(2);
+}
