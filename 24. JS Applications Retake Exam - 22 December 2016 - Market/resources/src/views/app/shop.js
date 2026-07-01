@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, put } from "../../utils/api.js";
 import { formatPrice } from "../../utils/utils.js";
 
-function template(data) {
+function template({ data, onSubmit }) {
     return html`
         <section id="viewShop">
             <h1>Products</h1>
@@ -23,7 +23,7 @@ function template(data) {
                                 <td>${product.description}</td>
                                 <td>$${formatPrice(product.price)}</td>
                                 <td>
-                                    <a href="/${product.productId}/details">Details</a>
+                                    <a @click=${() => onSubmit(product.productId, product.productName)} href="#">Purchase</a>
                                 </td>
                             </tr>
                         `)}
@@ -37,6 +37,16 @@ function template(data) {
 export async function shopPage(ctx) {
     let data = [];
 
+    async function onSubmit(productId, productName) {
+        try {
+            await put(`/app/${productId}/purchase`, { productId });
+            alert(`The product ${productName} is added to your cart`);
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
     try {
         data = await get(`/app`);
     } catch (error) {
@@ -44,5 +54,5 @@ export async function shopPage(ctx) {
         return console.log(error);
     }
 
-    return ctx.render(template(data));
+    return ctx.render(template({ data, onSubmit }));
 }

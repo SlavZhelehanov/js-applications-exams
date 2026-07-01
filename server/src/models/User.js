@@ -16,6 +16,7 @@ const userSchema = new Schema({
         minLength: [2, "The name should be at least 2 characters long"],
         maxLength: [32, "The name should be maximum 32 characters long"]
     },
+    cart: [],
     // email: {
     //     type: String,
     //     required: [true, "Email field can't be empty"],
