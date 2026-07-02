@@ -37,22 +37,29 @@ productsRouter.get('/cart', isAuth, async (req, res) => {
 
 productsRouter.put('/:productId/purchase', isAuth, async (req, res) => {
     const {productId} = req.params;
-    const {userId} = req.user;
+    const userId = req.user.id;
 
     try {
-        const product = await Product.findOne({productId}).lean();
+        const [product, user] = await Promise.all([
+            Product.findOne({productId}).lean(),
+            User.findOne({userId})
+        ]);
 
         if (!product) return res.status(404).json({error: "Product not found"});
 
-        await User.findOneAndUpdate({userId}, {
-            $push: {
-                cart: {
-                    productId,
-                    quantity: 1
-                }
-            }
-        });
-        console.log(product)
+        const existing = user.cart.find(item => item.productId === productId);
+
+        if (existing) {
+            await User.updateOne(
+                { userId, "cart.productId": productId },
+                { $inc: { "cart.$.quantity": 1 } }
+            );
+        } else {
+            await User.updateOne(
+                { userId },
+                { $push: { cart: { productId, quantity: 1 } } }
+            );
+        }
         return res.status(200).json({message: "Added to cart"});
     } catch (error) {
         return res.status(500).json(parseErrorMessage(error));
