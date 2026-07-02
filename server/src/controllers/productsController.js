@@ -6,7 +6,7 @@ import User from "../models/User.js";
 
 const productsRouter = Router();
 
-productsRouter.get('/', async (req, res) => {
+productsRouter.get('/', isAuth, async (req, res) => {
     try {
         const props = '-_id -__v -updatedAt'
         const products = await Product.find({}, props).sort({createdAt: -1}).lean();
@@ -16,7 +16,6 @@ productsRouter.get('/', async (req, res) => {
     }
 });
 
-productsRouter.put('/:productId/purchase', auth, async (req, res) => {
 productsRouter.get('/cart', isAuth, async (req, res) => {
     const {id} = req.user;
 
@@ -36,6 +35,7 @@ productsRouter.get('/cart', isAuth, async (req, res) => {
     }
 });
 
+productsRouter.put('/:productId/purchase', isAuth, async (req, res) => {
     const {productId} = req.params;
     const {userId} = req.user;
 
