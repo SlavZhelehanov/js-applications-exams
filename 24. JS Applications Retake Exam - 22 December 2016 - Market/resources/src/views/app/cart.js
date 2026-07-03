@@ -1,7 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, del } from "../../utils/api.js";
+import { formatPrice } from "../../utils/utils.js";
 
-function template(data) {
+function template({data, removeFromCart}) {
     return html`
         <section id="viewCart">
             <h1>My Cart</h1>
@@ -17,31 +18,37 @@ function template(data) {
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.length > 0 
-                            ? data.map(item => html`
+                        ${data.length > 0
+            ? data.map(item => html`
                                 <tr>
                                     <td>${item.productName}</td>
                                     <td>${item.description}</td>
                                     <td>${item.quantity}</td>
-                                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
-                                    <td><button @click=${() => removeFromCart(item.productId)}>Remove</button></td>
+                                    <td>$${formatPrice((item.price * item.quantity))}</td>
+                                    <td><button @click=${() => removeFromCart(item.productId)}>Discard</button></td>
                                 </tr>
                             `)
-                            : html`<tr><td colspan="5">Your cart is empty</td></tr>`
-                        }
+            : html`<tr><td colspan="5">Your cart is empty</td></tr>`
+        }
                     </tbody>
                 </table>
             </div>
         </section>`;
 }
 
-function removeFromCart(productId) {
-    // TODO: Implement remove from cart functionality
-    console.log(`Remove product with ID: ${productId}`);
-}
-
 export async function cartPage(ctx) {
     let data = [];
+
+    async function removeFromCart(productId) {
+        try {
+            await del(`/app/${productId}`);
+            alert('Product deleted successfully');
+            ctx.page.redirect(`/cart`);
+        } catch (error) {
+            if (error.message) return console.log(error.message);
+            return console.log(error);
+        }
+    }
 
     try {
         data = await get(`/app/cart`);
@@ -50,5 +57,5 @@ export async function cartPage(ctx) {
         return console.log(error);
     }
 
-    return ctx.render(template(data));
+    return ctx.render(template({data, removeFromCart}));
 }
