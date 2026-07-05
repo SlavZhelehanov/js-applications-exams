@@ -98,3 +98,7 @@ footer {
     text-align: center;
     border-radius: 3px;
 }
+
+.notification {
+    display: none;
+}

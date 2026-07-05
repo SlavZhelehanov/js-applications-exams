@@ -41,6 +41,7 @@ export async function shopPage(ctx) {
         try {
             await put(`/app/${productId}/purchase`, { productId });
             alert(`The product ${productName} is added to your cart`);
+            ctx.page.redirect('/cart');
         } catch (err) {
             if (err.message) alert(err.message);
             else alert(err);

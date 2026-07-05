@@ -13,6 +13,10 @@ export function getUserData() {
     return JSON.parse(sessionStorage.getItem(item));
 }
 
+export function clearUserData() {
+    sessionStorage.removeItem(item);
+}
+
 export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
     const menu = document.getElementById('menu');
@@ -53,6 +57,22 @@ export function guardRoute(status) {
     };
 }
 
+function hideAllNotifications() {
+    document.querySelectorAll('#notifications .notification')
+        .forEach(n => n.style.display = 'none');
+}
+
+export function showNotification(type, message) {
+    hideAllNotifications();
+
+    const box = document.querySelector(`#${type}Box`);
+    if (!box) return;
+
+    box.querySelector('span').textContent = message;
+    box.style.display = 'block';
+
+    setTimeout(() => hideAllNotifications(), 3000);
+}
 export function formatPrice(price) {
     let num = Number(price);
     if (isNaN(num)) return "0.00";
