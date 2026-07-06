@@ -1,3 +1,6 @@
+import { render } from "../lib/lit-html.min.js";
+import page from "../lib/page.mjs";
+
 const item = "userData";
 
 export function saveUserData(data) {
@@ -26,7 +29,7 @@ export function setNavigation() {
         ? menu.innerHTML = `<a href="/" class="anonymous" id="linkMenuAppHome">Home</a>
             <a href="/login" class="anonymous" id="linkMenuLogin">Login</a>
             <a href="/register" class="anonymous" id="linkMenuRegister">Register</a>`
-        : menu.innerHTML = `<a href="#" class="useronly" id="linkMenuUserHome">Home</a>
+        : menu.innerHTML = `<a href="/" class="useronly" id="linkMenuUserHome">Home</a>
             <a href="/shop" class="useronly" id="linkMenuShop">Shop</a>
             <a href="/cart" class="useronly" id="linkMenuCart">Cart</a>
             <a href="/logout" class="useronly" id="linkMenuLogout">Logout</a>
