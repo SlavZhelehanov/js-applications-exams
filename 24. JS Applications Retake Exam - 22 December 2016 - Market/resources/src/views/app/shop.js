@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, put } from "../../utils/api.js";
-import { formatPrice } from "../../utils/utils.js";
+import { formatPrice, showNotification } from "../../utils/utils.js";
 
 function template({ data, onSubmit }) {
     return html`
@@ -40,19 +40,19 @@ export async function shopPage(ctx) {
     async function onSubmit(productId, productName) {
         try {
             await put(`/app/${productId}/purchase`, { productId });
-            alert(`The product ${productName} is added to your cart`);
+            showNotification('info', `Product purchased.`);
             ctx.page.redirect('/cart');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
     }
 
     try {
         data = await get(`/app`);
-    } catch (error) {
-        if (error.message) return console.log(error.message);
-        return console.log(error);
+    } catch (err) {
+        if (err.message) showNotification('error', err.message);
+        else showNotification('error', err);
     }
 
     return ctx.render(template({ data, onSubmit }));
