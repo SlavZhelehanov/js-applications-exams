@@ -2,7 +2,7 @@ import { html } from "../../lib/lit-html.min.js";
 import { get, del } from "../../utils/api.js";
 import { formatPrice } from "../../utils/utils.js";
 
-function template({data, removeFromCart}) {
+function template({ data, removeFromCart }) {
     return html`
         <section id="viewCart">
             <h1>My Cart</h1>
@@ -41,21 +41,24 @@ export async function cartPage(ctx) {
 
     async function removeFromCart(productId) {
         try {
+            showNotification('loading', "Discarding...");
             await del(`/app/${productId}`);
-            alert('Product deleted successfully');
+            showNotification('info', "Product discarded.");
             ctx.page.redirect(`/cart`);
-        } catch (error) {
-            if (error.message) return console.log(error.message);
-            return console.log(error);
+        } catch (err) {
+            if (err.message) showNotification('error', err.message);
+            else showNotification('error', err);
         }
     }
 
     try {
+        showNotification('loading', "Loading...");
         data = await get(`/app/cart`);
-    } catch (error) {
-        if (error.message) return console.log(error.message);
-        return console.log(error);
+        showNotification();
+    } catch (err) {
+        if (err.message) showNotification('error', err.message);
+        else showNotification('error', err);
     }
 
-    return ctx.render(template({data, removeFromCart}));
+    return ctx.render(template({ data, removeFromCart }));
 }
