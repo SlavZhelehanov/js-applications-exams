@@ -1,8 +1,10 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
+import { saveUserData } from "../../utils/utils.js";
 
 function template(onRegister) {
     return html`
-        <section id="viewRegister">
+        <section id="viewRegister" @submit=${onRegister}>
             <h1>Please register here</h1>
             <form id="formRegister">
                 <label>
@@ -25,5 +27,30 @@ function template(onRegister) {
 }
 
 export function registerPage(ctx) {
-    ctx.render(template());
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const password = formData.get('password');
+        const name = formData.get('name');
+
+        if (username === '' || password === '' || name === '') return alert('All fields are required');
+        // if (password !== repass) return alert("Passwords don't match");
+
+        try {
+            const user = await post("/auth/register", { username, password, name });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onRegister));
 }
