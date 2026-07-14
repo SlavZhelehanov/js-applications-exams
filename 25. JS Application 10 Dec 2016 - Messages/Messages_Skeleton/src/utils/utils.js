@@ -10,7 +10,7 @@ export function getUserData() {
 export function setNavigation() {
     const isLoggedIn = Boolean(getUserData());
     const header = document.getElementById('menu');
-    const username = getUserData() ? getUserData().username : null;
+    const username = getUserData() ? getUserData().user.username : null;
 
     !isLoggedIn
         ? header.innerHTML = `
