@@ -1,10 +1,12 @@
 import { html } from '../../lib/lit-html.min.js';
+import { post } from "../../utils/api.js";
+import { saveUserData } from "../../utils/utils.js";
 
 function template(onLogin) {
     return html`
         <section id="viewLogin">
             <h1>Please login</h1>
-            <form id="formLogin">
+            <form id="formLogin" @submit=${onLogin}>
                 <label>
                     <div>Username:</div>
                     <input type="text" name="username" id="loginUsername" required />
@@ -21,5 +23,27 @@ function template(onLogin) {
 }
 
 export function loginPage(ctx) {
-    ctx.render(template());
+    async function onLogin(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const password = formData.get('password');
+
+        if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
+
+        try {
+            const user = await post("/auth/login", { username, password });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/app');
+        } catch (err) {
+            alert(err);
+        }
+    }
+
+    ctx.render(template(onLogin));
 }
