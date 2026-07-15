@@ -39,7 +39,7 @@ export function loginPage(ctx) {
             saveUserData(user);
             e.target.reset();
             ctx.setNavigation();
-            ctx.page.redirect('/app');
+            ctx.page.redirect('/');
         } catch (err) {
             alert(err);
         }
