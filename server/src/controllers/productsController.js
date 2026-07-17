@@ -1,9 +1,23 @@
 import {Router} from 'express';
+import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
 import Message from "../models/Message.js";
 
 const productsRouter = Router();
-const props = '-_id -__v -updatedAt'
+const props = '-_id -__v -updatedAt';
+
+productsRouter.post("/", isAuth, async (req, res) => {
+    const senderId = req.user.id;
+    const senderUsername = req.user.username;
+
+    try {
+        await Message.create({...req.body, senderId, senderUsername});
+        return res.status(200).json({message: 'Successfully created'});
+    } catch (error) {
+        console.log(parseErrorMessage(error))
+        return res.status(400).json(parseErrorMessage(error));
+    }
+});
 
 productsRouter.get('/my-messages', isAuth, async (req, res) => {
     const receiverId = req.user.id;
