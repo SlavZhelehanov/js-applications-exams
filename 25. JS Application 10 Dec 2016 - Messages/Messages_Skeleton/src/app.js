@@ -7,6 +7,7 @@ import { registerPage } from "./views/auth/register.js";
 import { createPage } from "./views/app/create.js";
 import { logoutAction } from "./views/auth/logout.js";
 import { myMessagesPage } from "./views/app/my-messages.js";
+import { archiveSentPage } from "./views/app/archiveSent.js";
 
 setNavigation();
 
@@ -19,5 +20,6 @@ page("/register", guardRoute("guest"), registerPage);
 page("/logout", guardRoute("user"), logoutAction);
 page("/send", guardRoute("user"), createPage);
 page("/my-messages", guardRoute("user"), myMessagesPage);
+page("/archive", guardRoute("user"), archiveSentPage);
 
 page.start();
