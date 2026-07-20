@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, del } from "../../utils/api.js";
 import { formatDate } from "../../utils/utils.js";
 
-function template(data) {
+function template(data, onDelete) {
     return html`<section id="viewArchiveSent">
         <h1>Archive (Sent Messages)</h1>
         ${data.length === 0
@@ -23,7 +23,7 @@ function template(data) {
                                 <td>${msg.receiverUsername}</td>
                                 <td>${msg.message}</td>
                                 <td>${formatDate(msg.createdAt)}</td>
-                                <td><button>Delete</button></td>
+                                <td><button @click=${() => onDelete(msg.messageId)}>Delete</button></td>
                             </tr>
                         `)}
                     </tbody>
@@ -36,10 +36,19 @@ function template(data) {
 export async function archiveSentPage(ctx) {
     let data = [];
 
+    async function onDelete(id) {
+        try {
+            await del(`/app/${id}`);
+            ctx.page.redirect('/archive');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     try {
         data = await get('/app/archive');
     } catch (error) {
         alert(error.message);
     }
-    return ctx.render(template(data));
+    return ctx.render(template(data, onDelete));
 }

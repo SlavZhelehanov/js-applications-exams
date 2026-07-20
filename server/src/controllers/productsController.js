@@ -40,3 +40,20 @@ productsRouter.get('/archive', isAuth, async (req, res) => {
         return res.status(500).json(parseErrorMessage(error));
     }
 });
+
+productsRouter.delete('/:messageId', isAuth, async (req, res) => {
+    const {messageId} = req.params;
+    const senderId = req.user.id;
+
+    try {
+        const message =  await Message.findOneAndDelete({messageId, senderId});
+
+        if (!message) return res.status(404).json({message: 'No message found.'});
+
+        return res.status(200).json({message: "Message deleted"});
+    } catch (error) {
+        return res.status(500).json(parseErrorMessage(error));
+    }
+});
+
+export default productsRouter;
