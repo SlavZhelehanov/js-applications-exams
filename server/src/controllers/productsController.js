@@ -29,3 +29,14 @@ productsRouter.get('/my-messages', isAuth, async (req, res) => {
         return res.status(500).json(parseErrorMessage(error));
     }
 });
+
+productsRouter.get('/archive', isAuth, async (req, res) => {
+    const senderId = req.user.id;
+
+    try {
+        const messages = await Message.find({senderId}, props).sort({createdAt: -1}).lean();
+        return res.status(200).json(messages);
+    } catch (error) {
+        return res.status(500).json(parseErrorMessage(error));
+    }
+});

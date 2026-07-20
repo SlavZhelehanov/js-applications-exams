@@ -1,9 +1,13 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
+import { formatDate } from "../../utils/utils.js";
 
-function template() {
+function template(data) {
     return html`<section id="viewArchiveSent">
-            <h1>Archive (Sent Messages)</h1>
-            <div class="messages" id="sentMessages">
+        <h1>Archive (Sent Messages)</h1>
+        ${data.length === 0
+            ? html`<p class="no-messages">Няма архивирани изпратени съобщения.</p>`
+            : html`<div class="messages" id="sentMessages">
                 <table>
                     <thead>
                     <tr>
@@ -14,31 +18,28 @@ function template() {
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>peter</td>
-                        <td>Hi, Peter</td>
-                        <td>29.11.2016 9:43:18</td>
-                        <td><button>Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td>todor</td>
-                        <td>Todor, how are you?</td>
-                        <td>3.07.2016 8:06:03</td>
-                        <td><button>Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td>maria</td>
-                        <td>Party this evening?</td>
-                        <td>9.06.2016 19:55:59</td>
-                        <td><button>Delete</button></td>
-                    </tr>
-                    <!-- TODO: more messages will come here -->
+                        ${data.map(msg => html`
+                            <tr>
+                                <td>${msg.receiverUsername}</td>
+                                <td>${msg.message}</td>
+                                <td>${formatDate(msg.createdAt)}</td>
+                                <td><button>Delete</button></td>
+                            </tr>
+                        `)}
                     </tbody>
                 </table>
-            </div>
-        </section>`;
+            </div>`
+        }
+    </section>`;
 }
 
 export async function archiveSentPage(ctx) {
-    return ctx.render(template());
+    let data = [];
+
+    try {
+        data = await get('/app/archive');
+    } catch (error) {
+        alert(error.message);
+    }
+    return ctx.render(template(data));
 }
