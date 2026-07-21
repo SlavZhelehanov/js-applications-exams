@@ -68,3 +68,36 @@ export function formatDate(dateString) {
 
     return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 }
+
+export function hideAllNotifications() {
+    document.querySelectorAll('#notifications > div')
+        .forEach(box => box.style.display = 'none');
+}
+
+export function showNotification(type, message, autoHide = true) {
+    hideAllNotifications();
+
+    const box = document.getElementById(type + 'Box');
+    if (!box) return;
+
+    box.textContent = message;
+    box.style.display = 'block';
+
+    if (autoHide && type !== 'loading') {
+        setTimeout(() => {
+            box.style.display = 'none';
+        }, 3000);
+    }
+}
+
+export function showLoading(message = 'Loading...') {
+    showNotification('loading', message, false);
+}
+
+export function showInfo(message) {
+    showNotification('info', message);
+}
+
+export function showError(message) {
+    showNotification('error', message);
+}
