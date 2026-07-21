@@ -9,21 +9,22 @@ function template() {
         </section>`;
 }
 
-function dashboard() {
+function dashboard({ username }) {
     return html`
         <section id="viewUserHome">
-            <h1 id="viewUserHomeHeading">Welcome, {user}!</h1>
-            <a href="/me-messages" id="linkUserHomeMyMessages">My Messages</a>
+            <h1 id="viewUserHomeHeading">Welcome, ${username}!</h1>
+            <a href="/my-messages" id="linkUserHomeMyMessages">My Messages</a>
             <a href="/send" id="linkUserHomeSendMessage">Send Message</a>
             <a href="/archive" id="linkUserHomeArchiveSent">Archive (Sent)</a>
-        </section>`;
+        </section>
+        `;
 }
 
 export async function homePage(ctx) {
     const isAuth = getUserData();
 
     if (isAuth) {
-        ctx.render(dashboard());
+        ctx.render(dashboard({ username: isAuth.user.username }));
     } else {
         ctx.render(template());
     }
