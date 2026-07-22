@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
-import { saveUserData } from "../../utils/utils.js";
+import { saveUserData, showError, showInfo, showLoading } from "../../utils/utils.js";
 
 function template(onRegister) {
     return html`
@@ -34,21 +34,23 @@ export function registerPage(ctx) {
         const password = formData.get('password');
         const name = formData.get('name');
 
-        if (username === '' || password === '' || name === '') return alert('All fields are required');
+        if (username === '' || password === '' || name === '') return showError('All fields are required');
         // if (password !== repass) return alert("Passwords don't match");
 
         try {
+            showLoading();
             const user = await post("/auth/register", { username, password, name });
 
             if (399 < user.status) throw user.statusText;
 
             saveUserData(user);
+            showInfo("User registration successful.");
             e.target.reset();
             ctx.setNavigation();
             ctx.page.redirect('/');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showError(err.message);
+            else showError(err);
         }
     }
 
