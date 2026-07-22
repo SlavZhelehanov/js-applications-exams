@@ -14,7 +14,6 @@ setNavigation();
 page(decorateCTX);
 page("/index.html", "/");
 page("/", homePage);
-page("/app", dashboardPage);
 page("/login", guardRoute("guest"), loginPage);
 page("/register", guardRoute("guest"), registerPage);
 page("/logout", guardRoute("user"), logoutAction);

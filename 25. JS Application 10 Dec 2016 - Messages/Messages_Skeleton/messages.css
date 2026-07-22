@@ -99,6 +99,14 @@ footer {
     border-radius: 3px;
 }
 
-#notifications {
+#loadingBox {
+    display: none;
+}
+
+#infoBox {
+    display: none;
+}
+
+#errorBox {
     display: none;
 }
