@@ -1,6 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get } from "../../utils/api.js";
-import { formatDate } from '../../utils/utils.js';
+import { formatDate, showError } from '../../utils/utils.js';
 
 function template(data) {
     return html`
@@ -39,7 +39,8 @@ export async function myMessagesPage(ctx) {
     try {
         data = await get(`/app/my-messages`);
     } catch (err) {
-        alert(err.message);
+        if (err.message) showError(err.message);
+        else showError(err);
     }
 
     ctx.render(template(data));
