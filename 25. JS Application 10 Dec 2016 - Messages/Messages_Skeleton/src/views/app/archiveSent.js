@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, del } from "../../utils/api.js";
-import { formatDate } from "../../utils/utils.js";
+import { formatDate, showError } from "../../utils/utils.js";
 
 function template(data, onDelete) {
     return html`<section id="viewArchiveSent">
@@ -48,7 +48,8 @@ export async function archiveSentPage(ctx) {
     try {
         data = await get('/app/archive');
     } catch (error) {
-        alert(error.message);
+        if (err.message) showError(err.message);
+        else showError(err);
     }
     return ctx.render(template(data, onDelete));
 }
