@@ -42,3 +42,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 22. JS Apps Retake Exam - 7 Sept 2017 - "Chirper SPA" - Bonus: Notifications
 - [x] 23. JS Applications Exam - 20 August 2017 - "SeentIt" - Bonus: Notifications
 - [x] 24. JS Applications Retake Exam - 22 December 2016 - "Market" - Bonus: Notifications
+- [x] 25. JS Application 10 Dec 2016 - "Messages" - Bonus: Notifications
