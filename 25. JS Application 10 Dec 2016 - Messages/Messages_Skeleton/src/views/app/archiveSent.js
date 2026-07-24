@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, del } from "../../utils/api.js";
-import { formatDate, showError } from "../../utils/utils.js";
+import { formatDate, showError, showInfo, showLoading } from "../../utils/utils.js";
 
 function template(data, onDelete) {
     return html`<section id="viewArchiveSent">
@@ -37,11 +37,18 @@ export async function archiveSentPage(ctx) {
     let data = [];
 
     async function onDelete(id) {
+        const confirm = window.confirm("Are you sure you want to delete the message?");
+
+        if (!confirm) return;
+
         try {
+            showLoading();
             await del(`/app/${id}`);
+            showInfo("Message deleted.");
             ctx.page.redirect('/archive');
         } catch (err) {
-            alert(err.message);
+            if (err.message) showError(err.message);
+            else showError(err);
         }
     }
 
