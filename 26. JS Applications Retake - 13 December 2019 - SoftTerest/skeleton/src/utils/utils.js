@@ -14,7 +14,7 @@ export function setNavigation() {
 
     isLoggedIn
         ? header.innerHTML = `
-        <li class="nav-item active"><a class="nav-link" href="/app">Dashboard</a></li>
+        <li class="nav-item active"><a class="nav-link" href="/">Dashboard</a></li>
         <li class="nav-item active"><a class="nav-link" href="/create">Create</a></li>
         <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
         ` : header.innerHTML = `
