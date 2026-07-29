@@ -29,20 +29,24 @@ authRouter.get('/recipients', isAuth, async (req, res) => {
 
 // REGISTER
 authRouter.post("/register", isNotAuth, async (req, res) => {
-    const {username, password, name} = req.body;
+    const {username, password, repass} = req.body;
+
+    if (password.trim() !== repass) return res.status(400).json({message: "Passwords did not match"});
 
     try {
         const existing = await User.findOne({username});
+
         if (existing) return res.status(400).json({message: "User already exists"});
 
-        const user = await User.create({username, password, name, userId: uuidv4()});
+        const user = await User.create({username: username.trim(), password: password.trim(), userId: uuidv4()});
 
         return res.status(200).json({
             message: "Registered",
             token: createToken(user),
-            user: {id: user.userId, username: user.username, name: user.name}
+            user: {id: user.userId, username: user.username}
         });
     } catch (error) {
+        console.error(error.message);
         return res.status(500).json({message: "Registration failed"});
     }
 });

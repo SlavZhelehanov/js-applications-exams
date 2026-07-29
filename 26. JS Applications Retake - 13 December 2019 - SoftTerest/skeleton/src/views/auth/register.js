@@ -1,13 +1,15 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
+import { saveUserData } from "../../utils/utils.js";
 
-function template() {
+function template(onRegister) {
     return html`
         <div class="container home wrapper  my-md-5 pl-md-5">
             <div class="row-form d-md-flex flex-mb-equal ">
                 <div class="col-md-4">
                     <img class="responsive" src="./images/idea.png" alt="">
                 </div>
-                <form class="form-user col-md-7" method="post">
+                <form class="form-user col-md-7" method="post" @submit=${onRegister}>
                     <div class="text-center mb-4">
                         <h1 class="h3 mb-3 font-weight-normal">Register</h1>
                     </div>
@@ -39,5 +41,30 @@ function template() {
 }
 
 export function registerPage(ctx) {
-    ctx.render(template());
+    async function onRegister(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const password = formData.get('password');
+        const repass = formData.get('repeatPassword');
+
+        if (username === '' || password === '' || repass === '') return alert('All fields are required');
+        if (password !== repass) return alert("Passwords don't match");
+
+        try {
+            const user = await post("/auth/register", { username, password, repass });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onRegister));
 }
