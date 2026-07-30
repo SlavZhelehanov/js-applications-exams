@@ -149,6 +149,16 @@
             </div>
         </footer>
     </main>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"
+        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+    <script>
+        const toggler = document.querySelector('.navbar-toggler');
+        const menu = document.getElementById('navbarResponsive');
+
+        toggler.addEventListener('click', () => {
+            menu.classList.toggle('show');
+        });
+    </script>
 </body>
 
 </html>
