@@ -31,7 +31,7 @@ function template(onRegister) {
                     <button class="btn btn-lg btn-dark btn-block" type="submit">Sign Up</button>
                     <div class="text-center mb-4">
                         <p class="alreadyUser"> Don't have account? Then just
-                            <a href="">Sign-Up</a>!
+                            <a href="/login">Sign-Up</a>!
                         </p>
                     </div>
                     <p class="mt-5 mb-3 text-muted text-center">© SoftTerest - 2019.</p>
