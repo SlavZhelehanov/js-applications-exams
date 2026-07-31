@@ -3,6 +3,10 @@ import page from "../lib/page.mjs";
 
 const item = "userData";
 
+export function saveUserData(data) {
+    sessionStorage.setItem(item, JSON.stringify(data));
+}
+
 export function getUserData() {
     return JSON.parse(sessionStorage.getItem(item));
 }

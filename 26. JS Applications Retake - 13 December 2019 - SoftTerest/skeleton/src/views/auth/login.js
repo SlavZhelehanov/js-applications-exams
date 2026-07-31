@@ -1,15 +1,15 @@
 import { html } from '../../lib/lit-html.min.js';
 import { post } from "../../utils/api.js";
-import { saveUserData, showError, showInfo, showLoading } from "../../utils/utils.js";
+import { saveUserData } from "../../utils/utils.js";
 
-function template() {
+function template(onLogin) {
     return html`
         <div class="container home wrapper  my-md-5 pl-md-5">
             <div class="row-form d-md-flex flex-mb-equal ">
                 <div class="col-md-4">
                     <img class="responsive" src="./images/idea.png" alt="">
                 </div>
-                <form class="form-user col-md-7" method="post">
+                <form class="form-user col-md-7" method="post" @submit=${onLogin}>
                     <div class="text-center mb-4">
                         <h1 class="h3 mb-3 font-weight-normal">Login</h1>
                     </div>
@@ -36,5 +36,28 @@ function template() {
 }
 
 export function loginPage(ctx) {
-    ctx.render(template());
+    async function onLogin(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const password = formData.get('password');
+
+        if (username.trim() === '' || password.trim() === '') return alert('All fields are required!');
+
+        try {
+            const user = await post("/auth/login", { username, password });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onLogin));
 }
