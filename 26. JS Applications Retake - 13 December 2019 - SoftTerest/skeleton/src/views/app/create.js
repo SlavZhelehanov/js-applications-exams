@@ -1,12 +1,13 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
 
-function template() {
+function template({ onCreate }) {
     return html`<div class="container home wrapper  my-md-5 pl-md-5">
             <div class=" d-md-flex flex-mb-equal ">
                 <div class="col-md-6">
                     <img class="responsive-ideas create" src="./images/creativity_painted_face.jpg" alt="">
                 </div>
-                <form class="form-idea col-md-5" action="#/create" method="post">
+                <form class="form-idea col-md-5" @submit=${onCreate} method="post">
                     <div class="text-center mb-4">
                         <h1 class="h3 mb-3 font-weight-normal">Share Your Idea</h1>
                     </div>
@@ -35,5 +36,28 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    return ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const item = {
+            title: formData.get('title').trim(),
+            description: formData.get('description').trim(),
+            imageURL: formData.get('imageURL')?.trim()
+        };
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/app", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    return ctx.render(template({ onCreate }));
 }
