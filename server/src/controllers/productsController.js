@@ -2,9 +2,20 @@ import {Router} from 'express';
 import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
 import Product from "../models/Product.js";
+import Dish from "../models/Dish.js";
 
 const productsRouter = Router();
 const props = '-_id -__v -updatedAt';
+
+productsRouter.get("/", isAuth, async (req, res) => {
+    try {
+        const products = await Dish.find({}, props).sort({createdAt: -1}).lean();
+        return res.status(200).json(products);
+    } catch (error) {
+        console.log(parseErrorMessage(error))
+        return res.status(400).json(parseErrorMessage(error));
+    }
+});
 
 productsRouter.post("/", isAuth, async (req, res) => {
     const creator = req.user.id;

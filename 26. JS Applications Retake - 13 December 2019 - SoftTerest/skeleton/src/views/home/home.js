@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { getUserData } from "../../utils/utils.js";
+import { get } from "../../utils/api.js";
 
 function template() {
     return html`
@@ -22,41 +23,36 @@ function template() {
         </div>`;
 }
 
-function dashboard() {
+function dashboard(data) {
     return html`
         <div id="dashboard-holder">
-            <div class="card overflow-hidden current-card details" style="width: 20rem; height: 18rem;">
+        ${0 < data.length
+            ? data.map(dish => html`<div class="card overflow-hidden current-card details" style="width: 20rem; height: 18rem;">
                 <div class="card-body">
-                    <p class="card-text">Dinner Recipe</p>
+                    <p class="card-text">${dish.title}</p>
                 </div>
-                <img class="card-image" src="./images/dinner.jpg" alt="Card image cap">
-                <a class="btn" href="">Details</a>
-            </div>
-            <div class="card overflow-hidden current-card details" style="width: 20rem; height: 18rem;">
-                <div class="card-body">
-                    <p class="card-text">4 easy DIY ideas to try!</p>
-                </div>
-                <img class="card-image" src="./images/brightideacropped.jpg" alt="Card image cap">
-                <a class="btn" href="">Details</a>
-            </div>
-            <div class="card overflow-hidden current-card details" style="width: 20rem; height: 18rem;">
-                <div class="card-body">
-                    <p class="card-text">Best Pilates Workouts to Do at Home</p>
-                </div>
-                <img class="card-image" src="./images/best-pilates-youtube-workouts-2__medium_4x3.jpg"
-                    alt="Card image cap">
-                <a class="btn" href="">Details</a>
-            </div>
-            <h1>No ideas yet! Be the first one :)</h1>
+                <img class="card-image" src=${dish.imageURL} alt="Card image cap">
+                <a class="btn" href="/${dish.dishId}/details">Details</a>
+            </div>`)
+            : html`<h1>No ideas yet! Be the first one :)</h1>`
+        }
         </div>
         `;
 }
 
 export async function homePage(ctx) {
     const isAuth = getUserData();
+    let data = [];
 
     if (isAuth) {
-        ctx.render(dashboard({ username: isAuth.user.username }));
+        try {
+            data = await get("/app");
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+
+        ctx.render(dashboard(data));
     } else {
         ctx.render(template());
     }
