@@ -51,8 +51,20 @@ productsRouter.get('/archive', isAuth, async (req, res) => {
     }
 });
 
-productsRouter.delete('/:messageId', isAuth, async (req, res) => {
-    const {messageId} = req.params;
+productsRouter.get('/:dishId', isAuth, async (req, res) => {
+    const {dishId} = req.params;
+
+    try {
+        const dish = await Dish.findOne({dishId}, props).lean();
+
+        if (!dish) return res.status(404).json({dish: 'No dish found.'});
+
+        return res.status(200).json(dish);
+    } catch (error) {
+        return res.status(500).json(parseErrorMessage(error));
+    }
+});
+
     const creator = req.user.id;
 
     try {

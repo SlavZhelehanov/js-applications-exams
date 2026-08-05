@@ -1,29 +1,25 @@
 import { html } from "../../lib/lit-html.min.js";
+import { get } from "../../utils/api.js";
 
-function template(data, onDelete) {
+function template(data) {
     return html`<div class="container home some">
-            <img class="det-img" src="./images/dinner.jpg" />
+            <img class="det-img" src=${data.imageURL} />
             <div class="desc">
-                <h2 class="display-5">Dinner Recipe</h2>
+                <h2 class="display-5">${data.title}</h2>
                 <p class="infoType">Description:</p>
-                <p class="idea-description">There are few things as comforting as heaping bowl of pasta at the end of a
-                    long
-                    day. With so many easy pasta recipes out there, there's something for every palate to love. That's
-                    why
-                    pasta
-                    makes such a quick, easy dinner for your family—it's likely to satisfy everyone's cravings, due to
-                    its
-                    versatility.</p>
-                <p class="infoType">Likes: <large>2</large>
+                <p class="idea-description">${data.description}</p>
+                <p class="infoType">Likes: <large>${data.likes}</large>
                 </p>
                 <p class="infoType">Comments:</p>
                 <ul>
-                    <li class="comment">Jonh: I really like this idea :)</li>
-                    <li class="comment">No comments yet :(</li>
+                    ${data.comments.length === 0
+            ? html`<li class="comment">No comments yet :(</li>`
+            : data.comments.map(cmnt => html`<li class="comment">${cmnt}</li>`)
+        }
                 </ul>
             </div>
             <div class="text-center">
-                <a class="btn detb" href="">Delete</a>
+                <a class="btn detb" href="#">Delete</a>
             </div>
             <form class="text-center" method="" action="">
                 <textarea class="textarea-det" name="newComment" id=""></textarea>
@@ -34,5 +30,14 @@ function template(data, onDelete) {
 }
 
 export async function detailsPage(ctx) {
-    return ctx.render(template());
+    const { id } = ctx.params;
+    let data = {};
+
+    try {
+        data = await get(`/app/${id}`);
+    } catch (error) {
+        if (err.message) alert(err.message);
+        else alert(err);
+    }
+    return ctx.render(template(data));
 }
