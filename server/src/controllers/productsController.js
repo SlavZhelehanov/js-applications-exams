@@ -21,8 +21,8 @@ productsRouter.post("/", isAuth, async (req, res) => {
     const creator = req.user.id;
 
     try {
-        await Product.create({...req.body, creator});
-        return res.status(200).json({message: 'Successfully created'});
+        await Dish.create({...req.body, creator});
+        return res.status(200).json({dish: 'Successfully created'});
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(400).json(parseErrorMessage(error));
@@ -65,14 +65,16 @@ productsRouter.get('/:dishId', isAuth, async (req, res) => {
     }
 });
 
+productsRouter.delete('/:dishId', isAuth, async (req, res) => {
+    const {dishId} = req.params;
     const creator = req.user.id;
 
     try {
-        const message =  await Product.findOneAndDelete({messageId, creator});
+        const dish = await Dish.findOneAndDelete({dishId, creator});
 
-        if (!message) return res.status(404).json({message: 'No message found.'});
+        if (!dish) return res.status(404).json({dish: 'No dish found.'});
 
-        return res.status(200).json({message: "Product deleted"});
+        return res.status(200).json({dish: "Dish deleted"});
     } catch (error) {
         return res.status(500).json(parseErrorMessage(error));
     }
