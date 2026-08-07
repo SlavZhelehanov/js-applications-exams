@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get, del } from "../../utils/api.js";
+import { get, put, del } from "../../utils/api.js";
 import { getUserData } from "../../utils/utils.js";
 
-function template({ data, user, onDelete }) {
+function template({ data, user, onDelete, onUpdate }) {
     return html`<div class="container home some">
             <img class="det-img" src=${data.imageURL} />
             <div class="desc">
@@ -20,12 +20,12 @@ function template({ data, user, onDelete }) {
                 </ul>
             </div>
             ${user && user.id === data.creator
-            ? html`<div class="text-center"><a class="btn detb" @click=${onDelete} href="#">Delete</a></div>`
+            ? html`<div class="text-center"><a class="btn detb" @click=${onDelete} href="javascript:void(0)">Delete</a></div>`
             : user && user.id !== data.creator
                 ? html`<form class="text-center" method="" action="">
                 <textarea class="textarea-det" name="newComment" id=""></textarea>
                 <button type="submit" class="btn detb">Comment</button>
-                <a class="btn detb" href="">Like</a>
+                <a @click=${() => onUpdate({ like: true })} class="btn detb" href="javascript:void(0)">Like</a>
             </form>`
                 : null
         }            
@@ -50,11 +50,27 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function onUpdate({
+        like = false,
+    }) {
+        try {
+            const payload = {};
+
+            if (like) payload.like = true;
+
+            await put(`/app/${id}`, payload);
+
+            ctx.page.redirect(`/${id}/details`);
+        } catch (err) {
+            alert(err.message || err);
+        }
+    }
+
     try {
         data = await get(`/app/${id}`);
     } catch (err) {
         return alert(err.message || err);
     }
 
-    return ctx.render(template({ data, user, onDelete }));
+    return ctx.render(template({ data, user, onDelete, onUpdate }));
 }
