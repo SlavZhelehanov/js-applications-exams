@@ -22,7 +22,7 @@ function template({ data, user, onDelete, onUpdate }) {
             ${user && user.id === data.creator
             ? html`<div class="text-center"><a class="btn detb" @click=${onDelete} href="javascript:void(0)">Delete</a></div>`
             : user && user.id !== data.creator
-                ? html`<form class="text-center" method="" action="">
+                ? html`<form class="text-center" method="post" @submit=${(e) => onUpdate({ comment: true, e })}>
                 <textarea class="textarea-det" name="newComment" id=""></textarea>
                 <button type="submit" class="btn detb">Comment</button>
                 <a @click=${() => onUpdate({ like: true })} class="btn detb" href="javascript:void(0)">Like</a>
@@ -52,13 +52,28 @@ export async function detailsPage(ctx) {
 
     async function onUpdate({
         like = false,
+        comment = null,
+        e = null
     }) {
         try {
             const payload = {};
 
             if (like) payload.like = true;
+            if (comment) {
+                e.preventDefault();
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const newComment = formData.get('newComment').trim();
+
+                if (!newComment) return;
+
+                payload.comment = newComment;
+            }
 
             await put(`/app/${id}`, payload);
+
+            if (comment) e.target.reset();
 
             ctx.page.redirect(`/${id}/details`);
         } catch (err) {
