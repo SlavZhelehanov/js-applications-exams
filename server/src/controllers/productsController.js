@@ -3,6 +3,7 @@ import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
 import Product from "../models/Product.js";
 import Dish from "../models/Dish.js";
+import User from "../models/User.js";
 
 const productsRouter = Router();
 const props = '-_id -__v -updatedAt';
@@ -46,6 +47,29 @@ productsRouter.get('/archive', isAuth, async (req, res) => {
     try {
         const messages = await Product.find({creator}, props).sort({createdAt: -1}).lean();
         return res.status(200).json(messages);
+
+productsRouter.get('/profile', isAuth, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const user = await User.findOne({ userId }, props + "-password");
+        const userIdeas = await Dish.find({ creator: userId });
+        const ideasCount = userIdeas.length;
+        const ideaTitles = userIdeas.map(dish => dish.title);
+        const profileData = {
+            user: {
+                username: user.username,
+                userId: user.userId,
+                profilePicture: user.profilePicture || "default-profile-picture-url", // Add default if no picture
+                createdAt: user.createdAt
+            },
+            ideasInfo: {
+                count: ideasCount,
+                message: `Has ${ideasCount} ideas`,
+                ideaNames: ideaTitles
+            }
+        };
+        return res.status(200).json(profileData);
     } catch (error) {
         return res.status(500).json(parseErrorMessage(error));
     }
