@@ -1,7 +1,6 @@
 import {Router} from 'express';
 import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
-import Product from "../models/Product.js";
 import Dish from "../models/Dish.js";
 import User from "../models/User.js";
 
@@ -10,7 +9,7 @@ const props = '-_id -__v -updatedAt';
 
 productsRouter.get("/", isAuth, async (req, res) => {
     try {
-        const products = await Dish.find({}, props).sort({createdAt: -1}).lean();
+        const products = await Dish.find({}, props).sort({likes: -1, createdAt: -1}).lean();
         return res.status(200).json(products);
     } catch (error) {
         console.log(parseErrorMessage(error))
@@ -30,30 +29,12 @@ productsRouter.post("/", isAuth, async (req, res) => {
     }
 });
 
-productsRouter.get('/my-messages', isAuth, async (req, res) => {
-    const receiverId = req.user.id;
-
-    try {
-        const messages = await Product.find({receiverId}, props).sort({createdAt: -1}).lean();
-        return res.status(200).json(messages);
-    } catch (error) {
-        return res.status(500).json(parseErrorMessage(error));
-    }
-});
-
-productsRouter.get('/archive', isAuth, async (req, res) => {
-    const creator = req.user.id;
-
-    try {
-        const messages = await Product.find({creator}, props).sort({createdAt: -1}).lean();
-        return res.status(200).json(messages);
-
 productsRouter.get('/profile', isAuth, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const user = await User.findOne({ userId }, props + "-password");
-        const userIdeas = await Dish.find({ creator: userId });
+        const user = await User.findOne({userId}, props + "-password");
+        const userIdeas = await Dish.find({creator: userId});
         const ideasCount = userIdeas.length;
         const ideaTitles = userIdeas.map(dish => dish.title);
         const profileData = {
@@ -97,7 +78,7 @@ productsRouter.put('/:dishId', isAuth, async (req, res) => {
     try {
         const dish = await Dish.findOne({dishId});
 
-        if (!dish) return res.status(404).json({ message: "Dish not found" });
+        if (!dish) return res.status(404).json({message: "Dish not found"});
 
         const isAuthor = dish.creator === creator;
 
@@ -120,7 +101,9 @@ productsRouter.put('/:dishId', isAuth, async (req, res) => {
 
         const allowedFields = ["title", "description", "imageURL"];
 
-        allowedFields.forEach(field => {if (body[field] !== undefined) dish[field] = body[field];});
+        allowedFields.forEach(field => {
+            if (body[field] !== undefined) dish[field] = body[field];
+        });
 
         if (body.likes || body.comments) return res.status(400).json({message: "Author cannot modify likes or comments"});
 
