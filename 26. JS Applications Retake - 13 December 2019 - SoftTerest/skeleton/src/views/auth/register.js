@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
-import { saveUserData } from "../../utils/utils.js";
+import { saveUserData, showError, showInfo, showLoading } from "../../utils/utils.js";
 
 function template(onRegister) {
     return html`
@@ -44,25 +44,28 @@ export function registerPage(ctx) {
     async function onRegister(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const username = formData.get('username');
-        const password = formData.get('password');
-        const repass = formData.get('repeatPassword');
+        const username = formData.get('username').trim();
+        const password = formData.get('password').trim();
+        const repass = formData.get('repeatPassword').trim();
 
-        if (username === '' || password === '' || repass === '') return alert('All fields are required');
-        if (password !== repass) return alert("Passwords don't match");
+        if (username.length < 3) return showError('The username should be at least 3 characters long');
+        if (password.length < 3) return showError('The password should be at least 3 characters long');
+        if (password !== repass) return showError("The repeat password should be equal to the password");
 
         try {
+            showLoading();
             const user = await post("/auth/register", { username, password, repass });
 
             if (399 < user.status) throw user.statusText;
 
             saveUserData(user);
+            showInfo("User registration successful.")
             e.target.reset();
             ctx.setNavigation();
             ctx.page.redirect('/');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showError(err.message);
+            else showError(err);
         }
     }
 
