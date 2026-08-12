@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
+import { showError, showInfo, showLoading } from "../../utils/utils.js";
 
 function template({ onCreate }) {
     return html`<div class="container home wrapper  my-md-5 pl-md-5">
@@ -47,15 +48,19 @@ export async function createPage(ctx) {
             imageURL: formData.get('imageURL')?.trim()
         };
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        if (item.title.length < 6) return showError('The title should be at least 6 characters long.');
+        if (item.description.length < 10) return showError('The description should be at least 10 characters long.');
+        if (!item.imageURL.startsWith('http://') && !item.imageURL.startsWith('https://')) return showError('The image should start with "http://" or "https://".');
 
         try {
+            showLoading();
             await post("/app", item);
+            showInfo("Idea created successfully.");
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
-            if (err.message) alert(err.message);
-            else alert(err);
+            if (err.message) showError(err.message);
+            else showError(err);
         }
     }
 
