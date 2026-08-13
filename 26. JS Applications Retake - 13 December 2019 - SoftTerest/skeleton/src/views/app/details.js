@@ -1,6 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { get, put, del } from "../../utils/api.js";
-import { getUserData } from "../../utils/utils.js";
+import { getUserData, showError, showInfo, showLoading } from "../../utils/utils.js";
 
 function template({ data, user, onDelete, onUpdate }) {
     return html`<div class="container home some">
@@ -43,10 +43,12 @@ export async function detailsPage(ctx) {
         if (!confirm) return;
 
         try {
+            showLoading();
             await del(`/app/${id}`);
+            showInfo('Idea deleted successfully.');
             ctx.page.redirect('/');
         } catch (err) {
-            return alert(err.message || err);
+            return showError(err.message || err);
         }
     }
 
@@ -77,14 +79,14 @@ export async function detailsPage(ctx) {
 
             ctx.page.redirect(`/${id}/details`);
         } catch (err) {
-            alert(err.message || err);
+            showError(err.message || err);
         }
     }
 
     try {
         data = await get(`/app/${id}`);
     } catch (err) {
-        return alert(err.message || err);
+        return showError(err.message || err);
     }
 
     return ctx.render(template({ data, user, onDelete, onUpdate }));
