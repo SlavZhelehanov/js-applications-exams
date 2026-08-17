@@ -1,6 +1,22 @@
 import { render } from "../lib/lit-html.min.js";
 import page from "../lib/page.mjs";
 
+const item = "userData";
+
+export function getUserData() {
+    return JSON.parse(sessionStorage.getItem(item));
+}
+
+export function setNavigation() {
+    const isLoggedIn = Boolean(getUserData());
+    const header = document.getElementById('ul-navbar');
+    const username = getUserData() ? getUserData().user.username : null;
+
+    isLoggedIn
+        ? header.innerHTML = `<a href="/create">Create</a><a href="/logout">Logout</a>` 
+        : header.innerHTML = `<a href="/register">Register</a>`;
+}
+
 export function decorateCTX(ctx, next) {
     const main = document.getElementsByTagName('main')[0];
 
