@@ -17,11 +17,11 @@ const userSchema = new Schema({
     //     maxLength: [32, "The name should be maximum 32 characters long"]
     // },
     cart: [],
-    // email: {
-    //     type: String,
-    //     required: [true, "Email field can't be empty"],
-    //     minLength: [10, "The email should be at least 10 characters long"]
-    // },
+    email: {
+        type: String,
+        required: [true, "Email field can't be empty"],
+        minLength: [10, "The email should be at least 10 characters long"]
+    },
     // followers: [{
     //     type: String
     // }],
