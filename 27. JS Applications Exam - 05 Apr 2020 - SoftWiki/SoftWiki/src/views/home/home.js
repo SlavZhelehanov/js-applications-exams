@@ -1,9 +1,11 @@
 import { html } from "../../lib/lit-html.min.js";
+import { getUserData, saveUserData } from "../../utils/utils.js";
+import { get, post } from "../../utils/api.js";
 
-function template() {
+function template(onLogin) {
     return html`
         <div class="container auth">
-            <form action="#" method="">
+            <form @submit=${onLogin}>
                 <fieldset>
                     <legend>Login</legend>
                     <blockquote>Knowledge is like money: to be of value it must circulate, and in circulating it can
@@ -20,13 +22,127 @@ function template() {
                         <button class="btn submit" type="submit">Log In</button>
                     </p>
                     <p class="field">
-                        <span>If you don't have profile click <a href="#">here</a></span>
+                        <span>If you don't have profile click <a href="/register">here</a></span>
                     </p>
                 </fieldset>
             </form>
         </div>`;
 }
 
-export async function homePage(ctx) {
-    ctx.render(template());
+function dashboard() {
+    return html`
+        <div class="content">
+            <section class="js">
+                <h2>JavaScript</h2>
+                <div class="articles">
+                    <article>
+                        <h3>Arrays</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
+                            quamest fugit ipsa quidem
+                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
+                            voluptas
+                            atque obcaecati?</p>
+                        <a href="#" class="btn details-btn">Details</a>
+                    </article>
+                    <article>
+                        <h3>Objects</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
+                            quamest fugit ipsa quidem
+                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
+                            voluptas
+                            atque obcaecati?</p>
+                        <a href="#" class="btn details-btn">Details</a>
+                    </article>
+                </div>
+            </section>
+            <section class="CSharp">
+                <h2>C#</h2>
+                <div class="articles">
+                    <article>
+                        <h3>Dictionary</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
+                            quamest fugit ipsa quidem
+                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
+                            voluptas
+                            atque obcaecati?</p>
+                        <a href="#" class="btn details-btn">Details</a>
+                    </article>
+                </div>
+            </section>
+            <section class="Java">
+                <h2>Java</h2>
+                <div class="articles">
+                    <article>
+                        <h3>JDK</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
+                            quamest fugit ipsa quidem impedit praesentium tempore placeat numquam blanditiis fuga soluta
+                            beatae perspiciatis voluptas atque obcaecati?</p>
+                        <a href="#" class="btn details-btn">Details</a>
+                    </article>
+                </div>
+            </section>
+            <section class="Pyton">
+                <h2>Pyton</h2>
+                <div class="articles">
+                    <article>
+                        <h3>Gjango</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
+                            quamest fugit ipsa quidem
+                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
+                            voluptas
+                            atque obcaecati?</p>
+                        <a href="#" class="btn details-btn">Details</a>
+                    </article>
+                </div>
+            </section>
+        </div>`;
 }
+
+export async function homePage(ctx) {
+    const isAuth = getUserData();
+
+    if (isAuth) {
+        return ctx.render(dashboard());
+    }
+    
+    async function onLogin(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+
+        if (email.trim() === '' || password.trim() === '') return alert('All fields are required!');
+
+        try {
+            const user = await post("/auth/login", { email, password });
+
+            if (399 < user.status) throw user.statusText;
+
+            saveUserData(user);
+            e.target.reset();
+            ctx.setNavigation();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    ctx.render(template(onLogin));
+}
+
+// const isAuth = getUserData();
+// let data = [];
+
+// if (isAuth) {
+//     try {
+//         data = await get("/app");
+//     } catch (err) {
+//         if (err.message) alert(err.message);
+//         else alert(err);
+//     }
+
+//     ctx.render(dashboard(data));
+// } else {
+//     ctx.render(template());
+// }
