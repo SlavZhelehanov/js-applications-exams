@@ -29,70 +29,59 @@ function template(onLogin) {
         </div>`;
 }
 
-function dashboard() {
+function dashboard({ js, cs, jv, py }) {
     return html`
         <div class="content">
             <section class="js">
                 <h2>JavaScript</h2>
                 <div class="articles">
-                    <article>
-                        <h3>Arrays</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
-                            quamest fugit ipsa quidem
-                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
-                            voluptas
-                            atque obcaecati?</p>
-                        <a href="#" class="btn details-btn">Details</a>
-                    </article>
-                    <article>
-                        <h3>Objects</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
-                            quamest fugit ipsa quidem
-                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
-                            voluptas
-                            atque obcaecati?</p>
-                        <a href="#" class="btn details-btn">Details</a>
-                    </article>
+                    ${0 < js.length
+            ? js.map(artcl => html`<article>
+                        <h3>${artcl.title}</h3>
+                        <p>${artcl.content}</p>
+                        <a href=/${artcl.articleId}/details class="btn details-btn">Details</a>
+                    </article>`)
+            : html`<h3 class="no-articles">No articles yet</h3>`
+        }
                 </div>
             </section>
             <section class="CSharp">
                 <h2>C#</h2>
                 <div class="articles">
-                    <article>
-                        <h3>Dictionary</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
-                            quamest fugit ipsa quidem
-                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
-                            voluptas
-                            atque obcaecati?</p>
-                        <a href="#" class="btn details-btn">Details</a>
-                    </article>
+                    ${0 < cs.length
+            ? cs.map(artcl => html`<article>
+                        <h3>${artcl.title}</h3>
+                        <p>${artcl.content}</p>
+                        <a href=/${artcl.articleId}/details class="btn details-btn">Details</a>
+                    </article>`)
+            : html`<h3 class="no-articles">No articles yet</h3>`
+        }
                 </div>
             </section>
             <section class="Java">
                 <h2>Java</h2>
                 <div class="articles">
-                    <article>
-                        <h3>JDK</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
-                            quamest fugit ipsa quidem impedit praesentium tempore placeat numquam blanditiis fuga soluta
-                            beatae perspiciatis voluptas atque obcaecati?</p>
-                        <a href="#" class="btn details-btn">Details</a>
-                    </article>
+                    ${0 < jv.length
+            ? jv.map(artcl => html`<article>
+                        <h3>${artcl.title}</h3>
+                        <p>${artcl.content}</p>
+                        <a href=/${artcl.articleId}/details class="btn details-btn">Details</a>
+                    </article>`)
+            : html`<h3 class="no-articles">No articles yet</h3>`
+        }
                 </div>
             </section>
             <section class="Pyton">
                 <h2>Pyton</h2>
                 <div class="articles">
-                    <article>
-                        <h3>Gjango</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, excepturi magnam aliquid
-                            quamest fugit ipsa quidem
-                            impedit praesentium tempore placeat numquam blanditiis fuga soluta beatae perspiciatis
-                            voluptas
-                            atque obcaecati?</p>
-                        <a href="#" class="btn details-btn">Details</a>
-                    </article>
+                    ${0 < py.length
+            ? py.map(artcl => html`<article>
+                        <h3>${artcl.title}</h3>
+                        <p>${artcl.content}</p>
+                        <a href=/${artcl.articleId}/details class="btn details-btn">Details</a>
+                    </article>`)
+            : html`<h3 class="no-articles">No articles yet</h3>`
+        }
                 </div>
             </section>
         </div>`;
@@ -102,9 +91,41 @@ export async function homePage(ctx) {
     const isAuth = getUserData();
 
     if (isAuth) {
-        return ctx.render(dashboard());
+        let data = [], js = [], cs = [], jv = [], py = [];
+
+        try {
+            data = await get(`/app`);
+
+            if (data && 0 < data.length) {
+                for (const article of data) {
+                    switch (article.category) {
+                        case "JavaScript": {
+                            js.push(article);
+                            break;
+                        }
+                        case "C#": {
+                            cs.push(article);
+                            break;
+                        }
+                        case "Java": {
+                            jv.push(article);
+                            break;
+                        }
+                        case "Python": {
+                            py.push(article);
+                            break;
+                        }
+                        default: { break; }
+                    }
+                }
+            }
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+        return ctx.render(dashboard({ js, cs, jv, py }));
     }
-    
+
     async function onLogin(e) {
         e.preventDefault();
         const formData = new FormData(e.target);

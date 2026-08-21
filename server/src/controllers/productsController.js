@@ -3,21 +3,22 @@ import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
 import Dish from "../models/Dish.js";
 import User from "../models/User.js";
+import SoftWikiArticle from "../models/SoftWikiArticle.js";
 
-const productsRouter = Router();
+const articlesRouter = Router();
 const props = '-_id -__v -updatedAt';
 
-productsRouter.get("/", isAuth, async (req, res) => {
+articlesRouter.get("/", isAuth, async (req, res) => {
     try {
-        const products = await Dish.find({}, props).sort({likes: -1, createdAt: -1}).lean();
-        return res.status(200).json(products);
+        const articles = await SoftWikiArticle.find({}, props).sort({likes: -1, createdAt: -1}).lean();
+        return res.status(200).json(articles);
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(400).json(parseErrorMessage(error));
     }
 });
 
-productsRouter.post("/", isAuth, async (req, res) => {
+articlesRouter.post("/", isAuth, async (req, res) => {
     const creator = req.user.id;
 
     try {
@@ -29,7 +30,7 @@ productsRouter.post("/", isAuth, async (req, res) => {
     }
 });
 
-productsRouter.get('/profile', isAuth, async (req, res) => {
+articlesRouter.get('/profile', isAuth, async (req, res) => {
     const userId = req.user.id;
 
     try {
@@ -56,7 +57,7 @@ productsRouter.get('/profile', isAuth, async (req, res) => {
     }
 });
 
-productsRouter.get('/:dishId', isAuth, async (req, res) => {
+articlesRouter.get('/:dishId', isAuth, async (req, res) => {
     const {dishId} = req.params;
 
     try {
@@ -70,7 +71,7 @@ productsRouter.get('/:dishId', isAuth, async (req, res) => {
     }
 });
 
-productsRouter.put('/:dishId', isAuth, async (req, res) => {
+articlesRouter.put('/:dishId', isAuth, async (req, res) => {
     const {dishId} = req.params;
     const creator = req.user.id;
     const body = req.body;
@@ -116,7 +117,7 @@ productsRouter.put('/:dishId', isAuth, async (req, res) => {
     }
 });
 
-productsRouter.delete('/:dishId', isAuth, async (req, res) => {
+articlesRouter.delete('/:dishId', isAuth, async (req, res) => {
     const {dishId} = req.params;
     const creator = req.user.id;
 
@@ -131,4 +132,4 @@ productsRouter.delete('/:dishId', isAuth, async (req, res) => {
     }
 });
 
-export default productsRouter;
+export default articlesRouter;
