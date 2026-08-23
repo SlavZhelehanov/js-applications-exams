@@ -15,41 +15,10 @@
         <header>
             <h1><a class="home" href="/">SoftWiki</a></h1>
             <nav class="nav-buttons" id="ul-navbar"></nav>
-        </header>
-
-        <!-- No articles message -->
-        <h3 class="no-articles">No articles yet</h3>
-
-        <!-- Create -->
-        <div class="container">
-            <form action="#" method="">
-                <fieldset>
-                    <legend>Create article</legend>
-                    <p class="field title">
-                        <input type="text" id="title" name="title" placeholder="Arrays">
-                        <label for="title">Title:</label>
-                    </p>
-
-                    <p class="field category">
-                        <input type="text" id="category" name="category" placeholder="JavaScript">
-                        <label for="category">Category:</label>
-                    </p>
-                    <p class="field content">
-                        <textarea name="content" id="content"></textarea>
-                        <label for="content">Content:</label>
-                    </p>
-
-                    <p class="field submit">
-                        <button class="btn submit" type="submit">Create</button>
-                    </p>
-
-                </fieldset>
-            </form>
-        </div>
+        </header>    
 
         <!-- Edit -->
         <div class="container">
-
             <form action="#" method="">
                 <fieldset>
                     <legend>Edit article</legend>
@@ -57,9 +26,14 @@
                         <input type="text" name="title" id="title" placeholder="Arrays">
                         <label for="title">Title:</label>
                     </p>
-
                     <p class="field category">
-                        <input type="text" name="category" id="category" placeholder="JavaScript">
+                        <select id="category" name="category" required>
+                            <option value="">-- Изберете категория --</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="C#">C#</option>
+                            <option value="Java">Java</option>
+                            <option value="Python">Python</option>
+                        </select>
                         <label for="category">Category:</label>
                     </p>
                     <p class="field content">
