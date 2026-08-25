@@ -1,8 +1,9 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
 
-function template() {
+function template(onCreate) {
     return html`<div class="container">
-            <form action="#" method="">
+            <form method="post" @submit=${onCreate}>
                 <fieldset>
                     <legend>Create article</legend>
                     <p class="field title">
@@ -34,5 +35,31 @@ function template() {
 }
 
 export async function createPage(ctx) {
-    return ctx.render(template());
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const item = {
+            title: formData.get('title').trim(),
+            content: formData.get('content').trim(),
+            category: formData.get('category')?.trim()
+        };
+        const availableCategories = ["JavaScript", "C#", "Java", "Python"];
+
+        if (item.title.length < 6) return alert('The title should be at least 6 characters long.');
+        if (item.content.length < 10) return alert('The content should be at least 10 characters long.');
+        if (!availableCategories.some(c => c === item.category)) return alert('The category should be one of "JavaScript" or "C#", or "Java", or "Python"');
+
+        try {
+            await post("/app", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
+    return ctx.render(template(onCreate));
 }

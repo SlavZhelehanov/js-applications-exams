@@ -22,7 +22,7 @@ articlesRouter.post("/", isAuth, async (req, res) => {
     const creator = req.user.id;
 
     try {
-        await Dish.create({...req.body, creator});
+        await SoftWikiArticle.create({...req.body, creator});
         return res.status(200).json({dish: 'Successfully created'});
     } catch (error) {
         console.log(parseErrorMessage(error))
