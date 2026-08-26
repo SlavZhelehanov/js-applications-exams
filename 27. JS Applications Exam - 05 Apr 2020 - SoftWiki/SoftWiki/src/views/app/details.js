@@ -1,0 +1,20 @@
+import { html } from "../../lib/lit-html.min.js";
+function template() {
+    return html`
+        <div class="container details">
+            <div class="details-content">
+                <h2>Title</h2>
+                <strong>Category</strong>
+                <p>Content</p>
+                <div class="buttons">
+                    <a href="#" class="btn delete">Delete</a>
+                    <a href="#" class="btn edit">Edit</a>
+                    <a href="#" class="btn edit">Back</a>
+                </div>
+            </div>
+        </div>`;
+}
+
+export async function detailsPage(ctx) {
+    return ctx.render(template());
+}
