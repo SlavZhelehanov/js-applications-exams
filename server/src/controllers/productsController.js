@@ -57,15 +57,15 @@ articlesRouter.get('/profile', isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.get('/:dishId', isAuth, async (req, res) => {
-    const {dishId} = req.params;
+articlesRouter.get('/:articleId', isAuth, async (req, res) => {
+    const {articleId} = req.params;
 
     try {
-        const dish = await Dish.findOne({dishId}, props).lean();
+        const item = await SoftWikiArticle.findOne({articleId}, props).lean();
 
-        if (!dish) return res.status(404).json({dish: 'No dish found.'});
+        if (!item) return res.status(404).json({article: 'No article found.'});
 
-        return res.status(200).json(dish);
+        return res.status(200).json(item);
     } catch (error) {
         return res.status(500).json(parseErrorMessage(error));
     }
