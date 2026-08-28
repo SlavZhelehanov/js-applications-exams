@@ -10,6 +10,7 @@ function template(data) {
                 <div class="buttons">
                     <a href="#" class="btn delete">Delete</a>
                     <a href="#" class="btn edit">Edit</a>
+                    <a href="/${data.articleId}/edit" class="btn edit">Edit</a>
                     <a href="#" class="btn edit">Back</a>
                 </div>
             </div>
