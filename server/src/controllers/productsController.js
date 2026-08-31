@@ -117,17 +117,18 @@ articlesRouter.put('/:dishId', isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.delete('/:dishId', isAuth, async (req, res) => {
-    const {dishId} = req.params;
+articlesRouter.delete('/:articleId', isAuth, async (req, res) => {
+    const {articleId} = req.params;
     const creator = req.user.id;
 
     try {
-        const dish = await Dish.findOneAndDelete({dishId, creator});
+        const article = await SoftWikiArticle.findOneAndDelete({articleId, creator});
 
-        if (!dish) return res.status(404).json({dish: 'No dish found.'});
+        if (!article) return res.status(404).json({dish: 'No article found.'});
 
-        return res.status(200).json({dish: "Dish deleted"});
+        return res.status(200).json({dish: "Article deleted"});
     } catch (error) {
+        console.log(parseErrorMessage(error))
         return res.status(500).json(parseErrorMessage(error));
     }
 });

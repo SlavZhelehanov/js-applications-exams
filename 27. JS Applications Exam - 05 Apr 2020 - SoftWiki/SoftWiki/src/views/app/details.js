@@ -1,6 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
-function template(data) {
+import { get, del } from "../../utils/api.js";
+import { getUserData } from "../../utils/utils.js";
+
+function template({ data, user, onDelete }) {
     return html`
         <div class="container details">
             <div class="details-content">
@@ -8,10 +10,11 @@ function template(data) {
                 <strong>${data.category}</strong>
                 <p>${data.content}</p>
                 <div class="buttons">
-                    <a href="#" class="btn delete">Delete</a>
-                    <a href="#" class="btn edit">Edit</a>
-                    <a href="/${data.articleId}/edit" class="btn edit">Edit</a>
-                    <a href="#" class="btn edit">Back</a>
+                    ${user && user.id === data.creator
+            ? html`<a @click=${onDelete} href="javascript:void(0)" class="btn delete">Delete</a>
+                    <a href="/${data.articleId}/edit" class="btn edit">Edit</a>`
+            : html`<a href="/" class="btn edit">Back</a>`
+        }
                 </div>
             </div>
         </div>`;
@@ -19,14 +22,28 @@ function template(data) {
 
 export async function detailsPage(ctx) {
     const { id } = ctx.params;
+    const userData = getUserData();
+    const user = userData ? userData.user : null;
     let data = {};
+
+    async function onDelete() {
+        const confirm = window.confirm('Are you sure you want to delete this idea?');
+        if (!confirm) return;
+
+        try {
+            await del(`/app/${id}`);
+            alert('Idea deleted successfully.');
+            ctx.page.redirect('/');
+        } catch (err) {
+            return alert(err.message || err);
+        }
+    }
 
     try {
         data = await get(`/app/${id}`);
-        console.log(data);        
     } catch (err) {
         return alert(err.message || err);
     }
 
-    return ctx.render(template(data));
+    return ctx.render(template({ data, user, onDelete }));
 }
