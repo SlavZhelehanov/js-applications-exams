@@ -1,25 +1,28 @@
 import { html } from "../../lib/lit-html.min.js";
-function template() {
+import { get } from "../../utils/api.js";
+
+function template({ data }) {
+    const categories = ['JavaScript', 'C#', 'Java', 'Python'];
+
     return html`<div class="container">
             <form action="#" method="">
                 <fieldset>
                     <legend>Edit article</legend>
                     <p class="field title">
-                        <input type="text" name="title" id="title" placeholder="Arrays">
+                        <input type="text" name="title" id="title" placeholder="Arrays" value=${data.title}>
                         <label for="title">Title:</label>
                     </p>
                     <p class="field category">
                         <select id="category" name="category" required>
-                            <option value="">-- Изберете категория --</option>
-                            <option value="JavaScript">JavaScript</option>
-                            <option value="C#">C#</option>
-                            <option value="Java">Java</option>
-                            <option value="Python">Python</option>
+                        <option value="">-- Изберете категория --</option>
+                            ${categories.map(cat => 
+                                html`<option value="${cat}" ${data.category === cat ? 'selected' : ''}>${cat}</option>`
+                            )}
                         </select>
                         <label for="category">Category:</label>
                     </p>
                     <p class="field content">
-                        <textarea name="content" id="content"></textarea>
+                        <textarea name="content" id="content">${data.content}</textarea>
                         <label for="content">Content:</label>
                     </p>
 
@@ -33,5 +36,14 @@ function template() {
 }
 
 export async function editPage(ctx) {
-    return ctx.render(template());
+    const { id } = ctx.params;
+    let data = {};
+
+    try {
+        data = await get(`/app/${id}`);
+    } catch (err) {
+        alert(err.message || err);
+    }
+
+    return ctx.render(template({ data }));
 }
