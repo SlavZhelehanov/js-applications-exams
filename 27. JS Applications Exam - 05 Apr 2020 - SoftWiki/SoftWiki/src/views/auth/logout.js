@@ -1,4 +1,5 @@
 import { get } from "../../utils/api.js";
+import { clearUserData } from "../../utils/utils.js";
 
 export async function logoutAction(ctx) {
     try {

@@ -1,11 +1,11 @@
 import { html } from "../../lib/lit-html.min.js";
-import { get } from "../../utils/api.js";
+import { get, put } from "../../utils/api.js";
 
-function template({ data }) {
-    const categories = ['JavaScript', 'C#', 'Java', 'Python'];
+function template({ data, onUpdate }) {
+    const categories = ['-- Изберете категория --', 'JavaScript', 'C#', 'Java', 'Python'];
 
     return html`<div class="container">
-            <form action="#" method="">
+            <form @submit=${onUpdate}>
                 <fieldset>
                     <legend>Edit article</legend>
                     <p class="field title">
@@ -14,10 +14,9 @@ function template({ data }) {
                     </p>
                     <p class="field category">
                         <select id="category" name="category" required>
-                        <option value="">-- Изберете категория --</option>
-                            ${categories.map(cat => 
-                                html`<option value="${cat}" ${data.category === cat ? 'selected' : ''}>${cat}</option>`
-                            )}
+                            ${categories.map(cat =>
+        html`<option value="${cat}" ?selected=${data.category === cat}>${cat}</option>`
+    )}
                         </select>
                         <label for="category">Category:</label>
                     </p>
@@ -39,11 +38,37 @@ export async function editPage(ctx) {
     const { id } = ctx.params;
     let data = {};
 
+    async function onUpdate(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const item = {
+            title: formData.get('title').trim(),
+            content: formData.get('content').trim(),
+            category: formData.get('category')?.trim()
+        };
+        const availableCategories = ["JavaScript", "C#", "Java", "Python"];
+
+        if (item.title.length < 6) return alert('The title should be at least 6 characters long.');
+        if (item.content.length < 10) return alert('The content should be at least 10 characters long.');
+        if (!availableCategories.some(c => c === item.category)) return alert('The category should be one of "JavaScript" or "C#", or "Java", or "Python"');
+
+        try {
+            await put(`/app/${id}`, item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            if (err.message) alert(err.message);
+            else alert(err);
+        }
+    }
+
     try {
         data = await get(`/app/${id}`);
     } catch (err) {
         alert(err.message || err);
     }
 
-    return ctx.render(template({ data }));
+    return ctx.render(template({ data, onUpdate }));
 }

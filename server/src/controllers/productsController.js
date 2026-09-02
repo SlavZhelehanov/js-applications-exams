@@ -71,46 +71,24 @@ articlesRouter.get('/:articleId', isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.put('/:dishId', isAuth, async (req, res) => {
-    const {dishId} = req.params;
+articlesRouter.put('/:articleId', isAuth, async (req, res) => {
+    const {articleId} = req.params;
     const creator = req.user.id;
-    const body = req.body;
+    let options = {};
 
     try {
-        const dish = await Dish.findOne({dishId});
+        const article = await SoftWikiArticle.findOne({articleId, creator}).lean();
 
-        if (!dish) return res.status(404).json({message: "Dish not found"});
+        if (!article) return res.status(404).json({message: "Article not found or you are not the author"});
 
-        const isAuthor = dish.creator === creator;
+        for (const key in req.body) if (article.hasOwnProperty(key) && article[key] !== req.body[key].trim()) options[key] = req.body[key].trim();
 
-        if (!isAuthor) {
-            let updated = false;
-
-            if (body.like === true) {
-                dish.likes += 1;
-                updated = true;
-            }
-            if (body.comment) {
-                dish.comments.push(body.comment);
-                updated = true;
-            }
-            if (!updated) return res.status(400).json({message: "Non-author can only like or comment"});
-
-            await dish.save();
-            return res.status(200).json(dish);
-        }
-
-        const allowedFields = ["title", "description", "imageURL"];
-
-        allowedFields.forEach(field => {
-            if (body[field] !== undefined) dish[field] = body[field];
+        const output = await SoftWikiArticle.findOneAndUpdate({articleId, creator}, options, {
+            runValidators: true,
+            returnDocument: 'after'
         });
-
-        if (body.likes || body.comments) return res.status(400).json({message: "Author cannot modify likes or comments"});
-
-        await dish.save();
-
-        return res.status(200).json(dish);
+        const {_id, updatedAt, __v, ...replay} = output.toObject();
+        return res.status(200).json(replay);
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(500).json(parseErrorMessage(error));
