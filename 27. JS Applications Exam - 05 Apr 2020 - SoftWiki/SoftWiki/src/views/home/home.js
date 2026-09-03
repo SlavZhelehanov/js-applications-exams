@@ -97,6 +97,8 @@ export async function homePage(ctx) {
             data = await get(`/app`);
 
             if (data && 0 < data.length) {
+                data.sort((a, b) => b.title.localeCompare(a.title));
+
                 for (const article of data) {
                     switch (article.category) {
                         case "JavaScript": {
