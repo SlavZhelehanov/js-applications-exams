@@ -4,7 +4,7 @@ function template() {
     return html`
         <h1>Register</h1>
         <p class="form-info">Already registered?
-            <a href="">Login now</a> and have some fun!
+            <a href="/login">Login now</a> and have some fun!
         </p>
 
         <form action="">
