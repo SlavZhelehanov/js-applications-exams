@@ -9,7 +9,7 @@ function template() {
                     <img src="../public/shoes2.jpg" alt="">
                 </div>
                 <p>
-                    <a href="">Register Now</a> and Try it!
+                    <a href="/register">Register Now</a> and Try it!
                 </p>
             </div>
         </div>`;

@@ -3,6 +3,10 @@ import page from "../lib/page.mjs";
 
 const item = "userData";
 
+export function saveUserData(data) {
+    sessionStorage.setItem(item, JSON.stringify(data));
+}
+
 export function getUserData() {
     return JSON.parse(sessionStorage.getItem(item));
 }
@@ -13,7 +17,7 @@ export function setNavigation() {
     const ul = document.getElementsByTagName('ul')[0];
 
     isLoggedIn
-        ? ul.innerHTML = `<li><a href="/create">Create new offer</a></li><li><a href="/"><img src="./public/sneakers.png" alt=""></a></li><li>Welcome, ${user?.email || 'email'} | <a  href="/logout">Logout</a></li>`
+        ? ul.innerHTML = `<li><a href="/create">Create new offer</a></li><li><a href="/"><img src="./public/sneakers.png" alt=""></a></li><li>Welcome, ${user?.user.email || 'email'} | <a  href="/logout">Logout</a></li>`
         : ul.innerHTML = `<li class="site-logo">Shoe</li><li><a href="/"><img src="./public/sneakers.png" alt=""></a></li><li class="site-logo">Shelf</li>`
 }
 
