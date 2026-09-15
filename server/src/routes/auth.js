@@ -69,7 +69,7 @@ authRouter.post("/login", isNotAuth, async (req, res) => {
         return res.status(200).json({
             message: "Logged in",
             token: createToken(user),
-            user: {id: user.userId, username: user.email}
+            user: {id: user.userId, username: user.username, email: user.email}
         });
     } catch (error) {
         return res.status(500).json({message: "Login failed"});
