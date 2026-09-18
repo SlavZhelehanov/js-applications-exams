@@ -3,9 +3,9 @@ import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
 import Dish from "../models/Dish.js";
 import User from "../models/User.js";
-import SoftWikiArticle from "../models/SoftWikiArticle.js";
+import ShoeShelf from "../models/ShoeShelf.js";
 
-const articlesRouter = Router();
+const shoeShelfRouter = Router();
 const props = '-_id -__v -updatedAt';
 
 articlesRouter.get("/", isAuth, async (req, res) => {
@@ -18,11 +18,11 @@ articlesRouter.get("/", isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.post("/", isAuth, async (req, res) => {
+shoeShelfRouter.post("/", isAuth, async (req, res) => {
     const creator = req.user.id;
 
     try {
-        await SoftWikiArticle.create({...req.body, creator});
+        await ShoeShelf.create({...req.body, creator});
         return res.status(200).json({dish: 'Successfully created'});
     } catch (error) {
         console.log(parseErrorMessage(error))
