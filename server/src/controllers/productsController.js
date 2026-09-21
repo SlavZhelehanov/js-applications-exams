@@ -8,9 +8,9 @@ import ShoeShelf from "../models/ShoeShelf.js";
 const shoeShelfRouter = Router();
 const props = '-_id -__v -updatedAt';
 
-articlesRouter.get("/", isAuth, async (req, res) => {
+shoeShelfRouter.get("/", isAuth, async (req, res) => {
     try {
-        const articles = await SoftWikiArticle.find({}, props).sort({likes: -1, createdAt: -1}).lean();
+        const articles = await ShoeShelf.find({}, props).sort({likes: -1, createdAt: -1}).lean();
         return res.status(200).json(articles);
     } catch (error) {
         console.log(parseErrorMessage(error))
@@ -111,4 +111,4 @@ articlesRouter.delete('/:articleId', isAuth, async (req, res) => {
     }
 });
 
-export default articlesRouter;
+export default shoeShelfRouter;
