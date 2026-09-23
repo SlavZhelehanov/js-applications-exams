@@ -57,11 +57,11 @@ articlesRouter.get('/profile', isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.get('/:articleId', isAuth, async (req, res) => {
-    const {articleId} = req.params;
+shoeShelfRouter.get('/:shoeShelfId', isAuth, async (req, res) => {
+    const {shoeShelfId} = req.params;
 
     try {
-        const item = await SoftWikiArticle.findOne({articleId}, props).lean();
+        const item = await ShoeShelf.findOne({shoeShelfId}, props).lean();
 
         if (!item) return res.status(404).json({article: 'No article found.'});
 

@@ -1,21 +1,17 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
 function template() {
+function template({item}) {
     return html`
         <div class="offer-details">
-            <h1>Under Armour HOVR</h1>
+            <h1>${item.brand} ${item.name}</h1>
             <div class="info">
-                <img src="https://i1.t4s.cz/products/3023295-602/under-armour-ua-w-hovr-phantom-se-trek-263676-3023295-603.jpg"
-                    alt="">
-                <div class="description">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facilis explicabo
-                    voluptatibus odio? Deleniti amet qui tenetur ipsa enim blanditiis laboriosam distinctio, dignissimos
-                    cupiditate, delectus autem. Explicabo exercitationem voluptatibus reprehenderit repellat. Lorem
-                    ipsum dolor, sit amet consectetur adipisicing elit. Tempore reiciendis maiores aliquid nobis,
-                    accusantium dolore iste ipsa atque deserunt corrupti maxime, alias neque libero temporibus expedita
-                    magni perferendis aut nostrum.
+                <img src=${item.imageUrl} alt=${item.name}>
+                <div class="description">${item.description}
                     <br>
                     <br>
-                    <p class="price">$149.99</p>
+                    <p class="price">$${item.price.toFixed(2)}</p>
                 </div>
             </div>
             <div class="actions">
@@ -28,5 +24,36 @@ function template() {
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id;
+    let item = {};
+
+    // async function onDonate() {
+    //     try {
+    //         await post(`/data/donation`, { petId: id });
+    //         ctx.page.redirect(`/details/${id}`);
+    //     } catch (error) {
+    //         alert(error.message);
+    //     }
+    // }
+
+    // async function onDelete() {
+    //     const choice = confirm('Are you sure?');
+
+    //     if (choice) {
+    //         try {
+    //             await del(`/data/pets/${id}`);
+    //             ctx.page.redirect('/');
+    //         } catch (err) {
+    //             alert(err.message);
+    //         }
+    //     }
+    // }
+
+    try {
+        item = await get(`/app/${id}`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template({item}));
 }

@@ -24,7 +24,7 @@ function dashboard(data) {
                 : data.map(shoe => html`<div class="shoe">
                 <img src=${shoe.imageUrl}>
                 <h3>${shoe.brand} ${shoe.name}</h3>
-                <a>Buy it for $${shoe.price}</a>
+                <a href="/${shoe.shoeShelfId}/details">Buy it for $${shoe.price}</a>
             </div>`)
             }
         </div>`;
