@@ -1,8 +1,8 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get } from "../../utils/api.js";
+import { getUserData } from '../../utils/utils.js';
 
-function template() {
-function template({item}) {
+function template({ creator, item }) {
     return html`
         <div class="offer-details">
             <h1>${item.brand} ${item.name}</h1>
@@ -15,8 +15,12 @@ function template({item}) {
                 </div>
             </div>
             <div class="actions">
-                <a>Edit</a>
                 <a>Delete</a>
+                ${creator
+            ? html`<a href="/${item.shoeShelfId}/edit">Edit</a>
+            : null
+        }
+                
                 <a>Buy</a>
                 <span>You bought it</span>
             </div>
@@ -24,8 +28,8 @@ function template({item}) {
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id;
-    let item = {};
+    const id = ctx.params.id, authData = getUserData();
+    let item = {}, userId = authData ? authData.user.id : null, creator = false;
 
     // async function onDonate() {
     //     try {
@@ -51,9 +55,10 @@ export async function detailsPage(ctx) {
 
     try {
         item = await get(`/app/${id}`);
+        creator = userId === item.creator;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template({item}));
+    ctx.render(template({ item, creator }));
 }
