@@ -2,7 +2,7 @@ import { html } from '../../lib/lit-html.min.js';
 import { get } from "../../utils/api.js";
 import { getUserData } from '../../utils/utils.js';
 
-function template({ creator, item }) {
+function template({ canBuy, creator, item }) {
     return html`
         <div class="offer-details">
             <h1>${item.brand} ${item.name}</h1>
@@ -15,21 +15,20 @@ function template({ creator, item }) {
                 </div>
             </div>
             <div class="actions">
-                <a>Delete</a>
                 ${creator
             ? html`<a href="/${item.shoeShelfId}/edit">Edit</a>
-            : null
+                <a>Delete</a>`
+            : canBuy
+                ? html`<a>Buy</a>`
+                : html`<span>You bought it</span>`
         }
-                
-                <a>Buy</a>
-                <span>You bought it</span>
             </div>
         </div>`;
 }
 
 export async function detailsPage(ctx) {
     const id = ctx.params.id, authData = getUserData();
-    let item = {}, userId = authData ? authData.user.id : null, creator = false;
+    let item = {}, userId = authData ? authData.user.id : null, creator = false, canBuy = false;
 
     // async function onDonate() {
     //     try {
@@ -56,9 +55,10 @@ export async function detailsPage(ctx) {
     try {
         item = await get(`/app/${id}`);
         creator = userId === item.creator;
+        canBuy = userId && !creator ? !item.peopleBoughtIt.some(usr => usr === userId) : false;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template({ item, creator }));
+    ctx.render(template({ item, creator, canBuy }));
 }
