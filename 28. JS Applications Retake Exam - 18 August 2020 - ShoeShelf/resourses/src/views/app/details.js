@@ -1,8 +1,8 @@
 import { html } from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import { get, put } from "../../utils/api.js";
 import { getUserData } from '../../utils/utils.js';
 
-function template({ canBuy, creator, item }) {
+function template({ onBuy, canBuy, creator, item }) {
     return html`
         <div class="offer-details">
             <h1>${item.brand} ${item.name}</h1>
@@ -19,7 +19,7 @@ function template({ canBuy, creator, item }) {
             ? html`<a href="/${item.shoeShelfId}/edit">Edit</a>
                 <a>Delete</a>`
             : canBuy
-                ? html`<a>Buy</a>`
+                ? html`<a href="#" @click=${onBuy}>Buy</a>`
                 : html`<span>You bought it</span>`
         }
             </div>
@@ -30,14 +30,14 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id, authData = getUserData();
     let item = {}, userId = authData ? authData.user.id : null, creator = false, canBuy = false;
 
-    // async function onDonate() {
-    //     try {
-    //         await post(`/data/donation`, { petId: id });
-    //         ctx.page.redirect(`/details/${id}`);
-    //     } catch (error) {
-    //         alert(error.message);
-    //     }
-    // }
+    async function onBuy() {
+        try {
+            await put(`/app/${id}/buy`, { petId: id });
+            ctx.page.redirect(`/details/${id}`);
+        } catch (error) {
+            alert(error.message || error);
+        }
+    }
 
     // async function onDelete() {
     //     const choice = confirm('Are you sure?');
@@ -60,5 +60,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template({ item, creator, canBuy }));
+    ctx.render(template({ item, creator, canBuy, onBuy }));
 }

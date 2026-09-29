@@ -10,8 +10,8 @@ const props = '-_id -__v -updatedAt';
 
 shoeShelfRouter.get("/", isAuth, async (req, res) => {
     try {
-        const articles = await ShoeShelf.find({}, props).sort({likes: -1, createdAt: -1}).lean();
-        return res.status(200).json(articles);
+        const shoes = await ShoeShelf.find({}, props).sort({likes: -1, createdAt: -1}).lean();
+        return res.status(200).json(shoes);
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(400).json(parseErrorMessage(error));
@@ -95,8 +95,27 @@ articlesRouter.put('/:articleId', isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.delete('/:articleId', isAuth, async (req, res) => {
-    const {articleId} = req.params;
+shoeShelfRouter.put('/:shoeShelfId/buy', isAuth, async (req, res) => {
+    const {shoeShelfId} = req.params;
+    const userId = req.user.id;
+    let options = {};
+
+    try {
+        const shoe = await ShoeShelf.findOne({shoeShelfId});
+
+        if (!shoe) return res.status(404).json({message: "Article not found or you are not the author"});
+        if (shoe.creator === userId) return res.status(409).json({message: "You can't buy your own shoe"});
+        if (shoe.peopleBoughtIt.includes(userId)) return res.status(409).json({message: "User has already bought this shoe"});
+
+        shoe.peopleBoughtIt.push(userId);
+        await shoe.save();
+
+        return res.status(200).json({message: "Purchase successful"});
+    } catch (error) {
+        console.log(parseErrorMessage(error))
+        return res.status(500).json(parseErrorMessage(error));
+    }
+});
     const creator = req.user.id;
 
     try {
