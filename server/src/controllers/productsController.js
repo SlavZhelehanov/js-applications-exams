@@ -71,19 +71,19 @@ shoeShelfRouter.get('/:shoeShelfId', isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.put('/:articleId', isAuth, async (req, res) => {
-    const {articleId} = req.params;
+shoeShelfRouter.put('/:shoeShelfId', isAuth, async (req, res) => {
+    const {shoeShelfId} = req.params;
     const creator = req.user.id;
     let options = {};
 
     try {
-        const article = await SoftWikiArticle.findOne({articleId, creator}).lean();
+        const shoe = await ShoeShelf.findOne({shoeShelfId, creator}).lean();
 
-        if (!article) return res.status(404).json({message: "Article not found or you are not the author"});
+        if (!shoe) return res.status(404).json({message: "Shoe not found or you are not the author"});
 
-        for (const key in req.body) if (article.hasOwnProperty(key) && article[key] !== req.body[key].trim()) options[key] = req.body[key].trim();
+        for (const key in req.body) if (shoe.hasOwnProperty(key) && shoe[key] !== req.body[key].trim()) options[key] = req.body[key].trim();
 
-        const output = await SoftWikiArticle.findOneAndUpdate({articleId, creator}, options, {
+        const output = await ShoeShelf.findOneAndUpdate({shoeShelfId, creator}, options, {
             runValidators: true,
             returnDocument: 'after'
         });
@@ -98,12 +98,11 @@ articlesRouter.put('/:articleId', isAuth, async (req, res) => {
 shoeShelfRouter.put('/:shoeShelfId/buy', isAuth, async (req, res) => {
     const {shoeShelfId} = req.params;
     const userId = req.user.id;
-    let options = {};
 
     try {
         const shoe = await ShoeShelf.findOne({shoeShelfId});
 
-        if (!shoe) return res.status(404).json({message: "Article not found or you are not the author"});
+        if (!shoe) return res.status(404).json({message: "Shoe not found or you are not the author"});
         if (shoe.creator === userId) return res.status(409).json({message: "You can't buy your own shoe"});
         if (shoe.peopleBoughtIt.includes(userId)) return res.status(409).json({message: "User has already bought this shoe"});
 
