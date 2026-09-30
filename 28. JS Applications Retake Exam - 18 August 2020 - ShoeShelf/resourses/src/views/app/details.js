@@ -33,7 +33,7 @@ export async function detailsPage(ctx) {
     async function onBuy() {
         try {
             await put(`/app/${id}/buy`, { petId: id });
-            ctx.page.redirect(`/details/${id}`);
+            ctx.page.redirect(`/${id}/details`);
         } catch (error) {
             alert(error.message || error);
         }
