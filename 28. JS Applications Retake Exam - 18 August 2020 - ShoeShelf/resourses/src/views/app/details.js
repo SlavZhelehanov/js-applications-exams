@@ -1,8 +1,8 @@
 import { html } from '../../lib/lit-html.min.js';
-import { get, put } from "../../utils/api.js";
+import { get, put, del } from "../../utils/api.js";
 import { getUserData } from '../../utils/utils.js';
 
-function template({ onBuy, canBuy, creator, item }) {
+function template({ onDelete, onBuy, canBuy, creator, item }) {
     return html`
         <div class="offer-details">
             <h1>${item.brand} ${item.name}</h1>
@@ -17,9 +17,9 @@ function template({ onBuy, canBuy, creator, item }) {
             <div class="actions">
                 ${creator
             ? html`<a href="/${item.shoeShelfId}/edit">Edit</a>
-                <a>Delete</a>`
+                <a href="javascript:void(0)" @click=${onDelete}>Delete</a>`
             : canBuy
-                ? html`<a href="#" @click=${onBuy}>Buy</a>`
+                ? html`<a href="javascript:void(0)" @click=${onBuy}>Buy</a>`
                 : html`<span>You bought it</span>`
         }
             </div>
@@ -39,18 +39,18 @@ export async function detailsPage(ctx) {
         }
     }
 
-    // async function onDelete() {
-    //     const choice = confirm('Are you sure?');
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
 
-    //     if (choice) {
-    //         try {
-    //             await del(`/data/pets/${id}`);
-    //             ctx.page.redirect('/');
-    //         } catch (err) {
-    //             alert(err.message);
-    //         }
-    //     }
-    // }
+        if (choice) {
+            try {
+                await del(`/app/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message || err);
+            }
+        }
+    }
 
     try {
         item = await get(`/app/${id}`);
@@ -60,5 +60,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template({ item, creator, canBuy, onBuy }));
+    ctx.render(template({ item, creator, canBuy, onBuy, onDelete }));
 }

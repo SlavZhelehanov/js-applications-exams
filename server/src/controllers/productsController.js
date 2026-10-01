@@ -1,8 +1,6 @@
 import {Router} from 'express';
 import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
-import Dish from "../models/Dish.js";
-import User from "../models/User.js";
 import ShoeShelf from "../models/ShoeShelf.js";
 
 const shoeShelfRouter = Router();
@@ -30,40 +28,13 @@ shoeShelfRouter.post("/", isAuth, async (req, res) => {
     }
 });
 
-articlesRouter.get('/profile', isAuth, async (req, res) => {
-    const userId = req.user.id;
-
-    try {
-        const user = await User.findOne({userId}, props + "-password");
-        const userIdeas = await Dish.find({creator: userId});
-        const ideasCount = userIdeas.length;
-        const ideaTitles = userIdeas.map(dish => dish.title);
-        const profileData = {
-            user: {
-                username: user.username,
-                userId: user.userId,
-                profilePicture: user.profilePicture || "default-profile-picture-url", // Add default if no picture
-                createdAt: user.createdAt
-            },
-            ideasInfo: {
-                count: ideasCount,
-                message: `Has ${ideasCount} ideas`,
-                ideaNames: ideaTitles
-            }
-        };
-        return res.status(200).json(profileData);
-    } catch (error) {
-        return res.status(500).json(parseErrorMessage(error));
-    }
-});
-
 shoeShelfRouter.get('/:shoeShelfId', isAuth, async (req, res) => {
     const {shoeShelfId} = req.params;
 
     try {
         const item = await ShoeShelf.findOne({shoeShelfId}, props).lean();
 
-        if (!item) return res.status(404).json({article: 'No article found.'});
+        if (!item) return res.status(404).json({shoe: 'No shoe found.'});
 
         return res.status(200).json(item);
     } catch (error) {
@@ -115,14 +86,17 @@ shoeShelfRouter.put('/:shoeShelfId/buy', isAuth, async (req, res) => {
         return res.status(500).json(parseErrorMessage(error));
     }
 });
+
+shoeShelfRouter.delete('/:shoeShelfId', isAuth, async (req, res) => {
+    const {shoeShelfId} = req.params;
     const creator = req.user.id;
 
     try {
-        const article = await SoftWikiArticle.findOneAndDelete({articleId, creator});
+        const shoe = await ShoeShelf.findOneAndDelete({shoeShelfId, creator});
 
-        if (!article) return res.status(404).json({dish: 'No article found.'});
+        if (!shoe) return res.status(404).json({dish: 'No shoe found.'});
 
-        return res.status(200).json({dish: "Article deleted"});
+        return res.status(200).json({dish: "Shoe deleted"});
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(500).json(parseErrorMessage(error));
