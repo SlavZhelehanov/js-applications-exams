@@ -8,7 +8,16 @@ const props = '-_id -__v -updatedAt';
 
 shoeShelfRouter.get("/", isAuth, async (req, res) => {
     try {
-        const shoes = await ShoeShelf.find({}, props).sort({likes: -1, createdAt: -1}).lean();
+        const shoes = await ShoeShelf.aggregate([
+            {
+                $addFields: {
+                    peopleBoughtItCount: {$size: "$peopleBoughtIt"}
+                }
+            },
+            {
+                $sort: {peopleBoughtItCount: -1}
+            }
+        ]);
         return res.status(200).json(shoes);
     } catch (error) {
         console.log(parseErrorMessage(error))
