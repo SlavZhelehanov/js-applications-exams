@@ -46,3 +46,4 @@ Solutions for SoftUni JS Applications Exams
 - [x] 26. JS Applications Retake - 13 December 2019 - "SoftTerest" - Bonus: Notifications, Profile Page, Ideas sorted in descending order by likes
 - [x] 27. JS Applications Exam - 05 Apr 2020 - "SoftWiki" - Bonus: Sort the articles in the home page
 - [x] 28. JS Applications Retake Exam - 18 August 2020 - "ShoeShelf" - Bonus: Sort the offers in the home page
+- [ ] 29. JS Applications Exam - 8 August 2020 - "Movies" - Bonus: Notifications + Search
