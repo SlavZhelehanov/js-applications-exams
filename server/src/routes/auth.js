@@ -51,7 +51,7 @@ authRouter.post("/register", isNotAuth, async (req, res) => {
             user: {id: user.userId, email: user.email, username: user.username}
         });
     } catch (error) {
-        console.error(error.message);
+        console.error(parseErrorMessage(error));
         return res.status(500).json({message: "Registration failed"});
     }
 });
