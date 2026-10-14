@@ -59,6 +59,7 @@ authRouter.post("/register", isNotAuth, async (req, res) => {
 // LOGIN
 authRouter.post("/login", isNotAuth, async (req, res) => {
     const {email, password} = req.body;
+    console.log(email, password)
 
     try {
         const user = await User.findOne({email});
@@ -72,6 +73,7 @@ authRouter.post("/login", isNotAuth, async (req, res) => {
             user: {id: user.userId, username: user.username, email: user.email}
         });
     } catch (error) {
+        console.log(parseErrorMessage(error));
         return res.status(500).json({message: "Login failed"});
     }
 });
