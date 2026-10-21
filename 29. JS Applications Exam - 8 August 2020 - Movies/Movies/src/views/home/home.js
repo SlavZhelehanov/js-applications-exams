@@ -38,7 +38,7 @@ function template({ data, isAuth }) {
                 </div>
             </div>
         </div>`
-            }
+                }
         `
             : null
         }`;
@@ -48,11 +48,12 @@ export async function homePage(ctx) {
     const isAuth = !!getUserData();
     let data = [];
 
-    console.log(isAuth);
-    try {
-        data = await get(`/app`);
-    } catch (err) {
-        alert(err.message || err);
+    if (isAuth) {
+        try {
+            data = await get(`/app`);
+        } catch (err) {
+            alert(err.message || err);
+        }
     }
 
     ctx.render(template({ isAuth, data }));
