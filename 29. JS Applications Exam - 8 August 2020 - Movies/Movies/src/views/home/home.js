@@ -21,8 +21,8 @@ function template({ data, isAuth }) {
             </form>
         </section>
             ${data.length === 0
-                ? html`<h3>No movies...</h3>`
-                : html`<div class=" mt-3 ">
+                    ? html`<h3>No movies...</h3>`
+                    : html`<div class=" mt-3 ">
             <div class="row d-flex d-wrap">
 
                 <div class="card-deck d-flex justify-content-center">
