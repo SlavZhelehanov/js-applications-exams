@@ -1,35 +1,27 @@
 import {Router} from 'express';
 import {isAuth} from "../middlewares/authMiddleware.js";
 import {parseErrorMessage} from "../util/parseErrorMessage.js";
-import ShoeShelf from "../models/ShoeShelf.js";
+import Movie from "../models/Movie.js";
+import {escapeRegex} from "../util/common.js";
 
-const shoeShelfRouter = Router();
+const moviesRouter = Router();
 const props = '-_id -__v -updatedAt';
 
-shoeShelfRouter.get("/", isAuth, async (req, res) => {
+moviesRouter.get("/", isAuth, async (req, res) => {
     try {
-        const shoes = await ShoeShelf.aggregate([
-            {
-                $addFields: {
-                    peopleBoughtItCount: {$size: "$peopleBoughtIt"}
-                }
-            },
-            {
-                $sort: {peopleBoughtItCount: -1}
-            }
-        ]);
-        return res.status(200).json(shoes);
+        const movies = await Movie.find({}, props).lean();
+        return res.status(200).json(movies);
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(400).json(parseErrorMessage(error));
     }
 });
 
-shoeShelfRouter.post("/", isAuth, async (req, res) => {
+moviesRouter.post("/", isAuth, async (req, res) => {
     const creator = req.user.id;
 
     try {
-        await ShoeShelf.create({...req.body, creator});
+        await Movie.create({...req.body, creator});
         return res.status(200).json({dish: 'Successfully created'});
     } catch (error) {
         console.log(parseErrorMessage(error))
@@ -112,4 +104,4 @@ shoeShelfRouter.delete('/:shoeShelfId', isAuth, async (req, res) => {
     }
 });
 
-export default shoeShelfRouter;
+export default moviesRouter;

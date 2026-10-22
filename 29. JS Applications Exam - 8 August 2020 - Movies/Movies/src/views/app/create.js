@@ -1,7 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
+import { post } from "../../utils/api.js";
 
-function template() {
-    return html`<form class="text-center border border-light p-5" action="#" method="">
+function template(onCreate) {
+    return html`<form class="text-center border border-light p-5" @submit=${onCreate} method="post">
             <h1>Add Movie</h1>
             <div class="form-group">
                 <label for="title">Movie Title</label>
@@ -13,11 +14,33 @@ function template() {
             </div>
             <div class="form-group">
                 <label for="imageUrl">Image url</label>
-                <input type="text" class="form-control" placeholder="Image Url" name="imageUrl" value="">
+                <input type="url" class="form-control" placeholder="Image Url" name="imageUrl" value="">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>`;
 }
 
 export async function createPage(ctx) {
+    async function onCreate(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const item = {
+            title: formData.get('title').trim(),
+            imageUrl: formData.get('imageUrl').trim(),
+            description: formData.get('description').trim(),
+        }
+
+        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+
+        try {
+            await post("/app", item);
+            e.target.reset();
+            ctx.page.redirect('/');
+        } catch (err) {
+            alert(err.message || err);
+        }
+    }
+
+    ctx.render(template(onCreate));
 }
