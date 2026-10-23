@@ -1,28 +1,35 @@
 import { html } from '../../lib/lit-html.min.js';
+import { get } from "../../utils/api.js";
 
-function template() {
+function template({item}) {
     return html`
         <div class="container">
             <div class="row bg-light text-dark">
-                <h1>Movie title: Black Widow</h1>
-
+                <h1>Movie title: ${item.title}</h1>
                 <div class="col-md-8">
-                    <img class="img-thumbnail" src="https://miro.medium.com/max/735/1*akkAa2CcbKqHsvqVusF3-w.jpeg"
-                        alt="Movie">
+                    <img class="img-thumbnail" src=${item.imageUrl} alt=${item.title}>
                 </div>
                 <div class="col-md-4 text-center">
                     <h3 class="my-3 ">Movie Description</h3>
-                    <p>Natasha Romanoff aka Black Widow confronts the darker parts of her ledger when a dangerous
-                        conspiracy with ties to her past arises. Comes on the screens 2020.</p>
+                    <p>${item.description}</p>
                     <a class="btn btn-danger" href="#">Delete</a>
                     <a class="btn btn-warning" href="#">Edit</a>
                     <a class="btn btn-primary" href="#">Like</a>
-                    <span class="enrolled-span">Liked 1</span>
+                    <span class="enrolled-span">Liked ${item?.likedFrom?.length || 0}</span>
                 </div>
             </div>
         </div>`;
 }
 
 export async function detailsPage(ctx) {
-    ctx.render(template());
+    const id = ctx.params.id;
+    let item = {};
+
+    try {
+        item = await get(`/app/${id}`);
+    } catch (err) {
+        alert(err.message);
+    }
+
+    ctx.render(template({item}));
 }

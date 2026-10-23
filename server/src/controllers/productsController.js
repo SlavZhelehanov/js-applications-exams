@@ -35,7 +35,13 @@ shoeShelfRouter.get('/:shoeShelfId', isAuth, async (req, res) => {
     try {
         const item = await ShoeShelf.findOne({shoeShelfId}, props).lean();
 
-        if (!item) return res.status(404).json({shoe: 'No shoe found.'});
+moviesRouter.get('/:movieId', isAuth, async (req, res) => {
+    const {movieId} = req.params;
+
+    try {
+        const item = await Movie.findOne({movieId}, props).lean();
+
+        if (!item) return res.status(404).json({movie: 'No movie found.'});
 
         return res.status(200).json(item);
     } catch (error) {
