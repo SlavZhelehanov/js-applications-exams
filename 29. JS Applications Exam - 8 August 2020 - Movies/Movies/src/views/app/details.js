@@ -1,7 +1,8 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get } from "../../utils/api.js";
+import { getUserData } from '../../utils/utils.js';
 
-function template({item}) {
+function template({ creator, item }) {
     return html`
         <div class="container">
             <div class="row bg-light text-dark">
@@ -12,8 +13,11 @@ function template({item}) {
                 <div class="col-md-4 text-center">
                     <h3 class="my-3 ">Movie Description</h3>
                     <p>${item.description}</p>
-                    <a class="btn btn-danger" href="#">Delete</a>
-                    <a class="btn btn-warning" href="#">Edit</a>
+                    ${creator
+            ? html`<a class="btn btn-warning" href="/${item.movieId}/edit">Edit</a>`
+            : null
+        }
+                    <a class="btn btn-danger" href="#">Delete</a>                    
                     <a class="btn btn-primary" href="#">Like</a>
                     <span class="enrolled-span">Liked ${item?.likedFrom?.length || 0}</span>
                 </div>
@@ -22,14 +26,14 @@ function template({item}) {
 }
 
 export async function detailsPage(ctx) {
-    const id = ctx.params.id;
-    let item = {};
+    const id = ctx.params.id, authData = getUserData();
 
     try {
         item = await get(`/app/${id}`);
+        creator = userId === item.creator;
     } catch (err) {
         alert(err.message);
     }
 
-    ctx.render(template({item}));
+    ctx.render(template({ item, creator }));
 }

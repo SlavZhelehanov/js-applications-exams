@@ -29,8 +29,6 @@ moviesRouter.post("/", isAuth, async (req, res) => {
     }
 });
 
-shoeShelfRouter.get('/:shoeShelfId', isAuth, async (req, res) => {
-    const {shoeShelfId} = req.params;
 
     try {
         const item = await ShoeShelf.findOne({shoeShelfId}, props).lean();
