@@ -47,19 +47,19 @@ moviesRouter.get('/:movieId', isAuth, async (req, res) => {
     }
 });
 
-shoeShelfRouter.put('/:shoeShelfId', isAuth, async (req, res) => {
-    const {shoeShelfId} = req.params;
+moviesRouter.put('/:movieId', isAuth, async (req, res) => {
+    const {movieId} = req.params;
     const creator = req.user.id;
     let options = {};
 
     try {
-        const shoe = await ShoeShelf.findOne({shoeShelfId, creator}).lean();
+        const movie = await Movie.findOne({movieId, creator}).lean();
 
-        if (!shoe) return res.status(404).json({message: "Shoe not found or you are not the author"});
+        if (!movie) return res.status(404).json({message: "Movie not found or you are not the author"});
 
-        for (const key in req.body) if (shoe.hasOwnProperty(key) && shoe[key] !== req.body[key].trim()) options[key] = req.body[key].trim();
+        for (const key in req.body) if (movie.hasOwnProperty(key) && movie[key] !== req.body[key].trim()) options[key] = req.body[key].trim();
 
-        const output = await ShoeShelf.findOneAndUpdate({shoeShelfId, creator}, options, {
+        const output = await Movie.findOneAndUpdate({movieId, creator}, options, {
             runValidators: true,
             returnDocument: 'after'
         });

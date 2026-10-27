@@ -1,8 +1,8 @@
 import { html } from '../../lib/lit-html.min.js';
-import { get } from "../../utils/api.js";
+import { get, put } from "../../utils/api.js";
 
-function template({item}) {
-    return html`<form class="text-center border border-light p-5" action="#" method="">
+function template({ onEdit, item }) {
+    return html`<form class="text-center border border-light p-5" @submit=${onEdit} method="post">
             <h1>Edit Movie</h1>
             <div class="form-group">
                 <label for="title">Movie Title</label>
@@ -24,11 +24,28 @@ export async function editPage(ctx) {
     const id = ctx.params.id;
     let item = {};
 
+    async function onEdit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const newItem = {
+            title: formData.get('title').trim(),
+            description: formData.get('description').trim(),
+            imageUrl: formData.get('imageUrl').trim()
+        }
+
+        if (Object.values(newItem).some((x) => !x)) return alert("All fields are required!");
+
+        await put(`/app/${id}`, newItem);
+        e.target.reset();
+        ctx.page.redirect(`/${id}/details`);
+    }
+
     try {
         item = await get(`/app/${id}`);
     } catch (err) {
         alert(err.message || err);
     }
 
-    ctx.render(template({item}));
+    ctx.render(template({ item, onEdit }));
 }
