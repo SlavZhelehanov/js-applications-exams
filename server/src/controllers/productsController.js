@@ -71,19 +71,19 @@ moviesRouter.put('/:movieId', isAuth, async (req, res) => {
     }
 });
 
-shoeShelfRouter.put('/:shoeShelfId/buy', isAuth, async (req, res) => {
-    const {shoeShelfId} = req.params;
+moviesRouter.put('/:movieId/like', isAuth, async (req, res) => {
+    const {movieId} = req.params;
     const userId = req.user.id;
 
     try {
-        const shoe = await ShoeShelf.findOne({shoeShelfId});
+        const movie = await Movie.findOne({movieId});
 
-        if (!shoe) return res.status(404).json({message: "Shoe not found or you are not the author"});
-        if (shoe.creator === userId) return res.status(409).json({message: "You can't buy your own shoe"});
-        if (shoe.peopleBoughtIt.includes(userId)) return res.status(409).json({message: "User has already bought this shoe"});
+        if (!movie) return res.status(404).json({message: "Movie not found or you are not the author"});
+        if (movie.creator === userId) return res.status(409).json({message: "You can't buy your own movie"});
+        if (movie.likedFrom.includes(userId)) return res.status(409).json({message: "User has already liked this movie"});
 
-        shoe.peopleBoughtIt.push(userId);
-        await shoe.save();
+        movie.likedFrom.push(userId);
+        await movie.save();
 
         return res.status(200).json({message: "Purchase successful"});
     } catch (error) {
