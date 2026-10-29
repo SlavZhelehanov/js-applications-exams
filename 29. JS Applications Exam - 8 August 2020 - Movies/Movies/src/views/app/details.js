@@ -1,8 +1,8 @@
 import { html } from '../../lib/lit-html.min.js';
-import { get, put } from "../../utils/api.js";
+import { get, put, del } from "../../utils/api.js";
 import { getUserData } from '../../utils/utils.js';
 
-function template({ onLike, canLike, creator, item }) {
+function template({ onDelete, onLike, canLike, creator, item }) {
     return html`
         <div class="container">
             <div class="row bg-light text-dark">
@@ -14,7 +14,8 @@ function template({ onLike, canLike, creator, item }) {
                     <h3 class="my-3 ">Movie Description</h3>
                     <p>${item.description}</p>
                     ${creator
-            ? html`<a class="btn btn-warning" href="/${item.movieId}/edit">Edit</a>`
+            ? html`<a class="btn btn-warning" href="/${item.movieId}/edit">Edit</a>
+            <a class="btn btn-danger" @click=${onDelete} href="javascript:void()">Delete</a>`
             : canLike
                 ? html`<a class="btn btn-primary" @click=${onLike} href="javascript:void()">Like</a>`
                 : null
@@ -40,6 +41,18 @@ export async function detailsPage(ctx) {
         }
     }
 
+    async function onDelete() {
+        const choice = confirm('Are you sure?');
+
+        if (choice) {
+            try {
+                await del(`/app/${id}`);
+                ctx.page.redirect('/');
+            } catch (err) {
+                alert(err.message || err);
+            }
+        }
+    }
 
     try {
         item = await get(`/app/${id}`);
@@ -49,5 +62,5 @@ export async function detailsPage(ctx) {
         alert(err.message);
     }
 
-    ctx.render(template({ item, creator, canLike, onLike }));
+    ctx.render(template({ item, creator, canLike, onLike, onDelete }));
 }

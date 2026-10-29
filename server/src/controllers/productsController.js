@@ -92,16 +92,16 @@ moviesRouter.put('/:movieId/like', isAuth, async (req, res) => {
     }
 });
 
-shoeShelfRouter.delete('/:shoeShelfId', isAuth, async (req, res) => {
-    const {shoeShelfId} = req.params;
+moviesRouter.delete('/:movieId', isAuth, async (req, res) => {
+    const {movieId} = req.params;
     const creator = req.user.id;
 
     try {
-        const shoe = await ShoeShelf.findOneAndDelete({shoeShelfId, creator});
+        const movie = await Movie.findOneAndDelete({movieId, creator});
 
-        if (!shoe) return res.status(404).json({dish: 'No shoe found.'});
+        if (!movie) return res.status(404).json({dish: 'No movie found.'});
 
-        return res.status(200).json({dish: "Shoe deleted"});
+        return res.status(200).json({dish: "Movie deleted"});
     } catch (error) {
         console.log(parseErrorMessage(error))
         return res.status(500).json(parseErrorMessage(error));
