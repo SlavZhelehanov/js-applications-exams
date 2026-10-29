@@ -18,11 +18,8 @@ function template({ onDelete, onLike, canLike, creator, item }) {
             <a class="btn btn-danger" @click=${onDelete} href="javascript:void()">Delete</a>`
             : canLike
                 ? html`<a class="btn btn-primary" @click=${onLike} href="javascript:void()">Like</a>`
-                : null
-        }
-                    <a class="btn btn-danger" href="#">Delete</a>                   
-                    
-                    <span class="enrolled-span">Liked ${item?.likedFrom?.length || 0}</span>
+                : html`<span class="enrolled-span">Liked ${item?.likedFrom?.length || 0}</span>`
+        }                    
                 </div>
             </div>
         </div>`;
@@ -59,7 +56,7 @@ export async function detailsPage(ctx) {
         creator = userId === item.creator;
         canLike = userId && !creator ? !item?.likedFrom?.some(usr => usr === userId) : false;
     } catch (err) {
-        alert(err.message);
+        alert(err.message || err);
     }
 
     ctx.render(template({ item, creator, canLike, onLike, onDelete }));
