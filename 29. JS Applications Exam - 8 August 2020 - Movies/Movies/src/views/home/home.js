@@ -1,8 +1,8 @@
 import { html } from "../../lib/lit-html.min.js";
 import { getUserData } from "../../utils/utils.js";
-import { get } from "../../utils/api.js";
+import { get, post } from "../../utils/api.js";
 
-function template({ data, isAuth }) {
+function template({ onSearch, data, isAuth }) {
     return html`
         <div class="jumbotron jumbotron-fluid text-light" style="background-color: #343a40;">
             <img src="https://s.studiobinder.com/wp-content/uploads/2019/06/Best-M-Night-Shyamalan-Movies-and-Directing-Style-StudioBinder.jpg"
@@ -14,9 +14,9 @@ function template({ data, isAuth }) {
             ? html`<h1 class="text-center">Movies</h1>
         <section>
             <a href="/create" class="btn btn-warning ">Add Movie</a>
-            <form class="search float-right">
+            <form class="search float-right" @submit=${onSearch} method="post">
                 <label>Search: </label>
-                <input type="text">
+                <input type="text" name="title">
                 <input type="submit" class="btn btn-info" value="Search">
             </form>
         </section>
@@ -48,6 +48,25 @@ export async function homePage(ctx) {
     const isAuth = !!getUserData();
     let data = [];
 
+    async function onSearch(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const title = formData.get('title');
+
+
+        try {
+            if (title.trim() === '') data = await get(`/app`);
+            else data = await post("/app/search", { title });
+
+            if (399 < data.status) throw data.statusText;
+
+            e.target.reset();
+            ctx.render(template({ isAuth, data, onSearch }));
+        } catch (err) {
+            alert(err.message || err);
+        }
+    }
+
     if (isAuth) {
         try {
             data = await get(`/app`);
@@ -56,5 +75,5 @@ export async function homePage(ctx) {
         }
     }
 
-    ctx.render(template({ isAuth, data }));
+    ctx.render(template({ isAuth, data, onSearch }));
 }

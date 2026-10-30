@@ -29,9 +29,21 @@ moviesRouter.post("/", isAuth, async (req, res) => {
     }
 });
 
+moviesRouter.post("/search", isAuth, async (req, res) => {
+    const {title} = req.body;
+    const safeTitle = escapeRegex(title ?? '');
+    const filter = safeTitle
+        ? {title: {$regex: escapeRegex(safeTitle), $options: 'i'}}
+        : {};
 
     try {
-        const item = await ShoeShelf.findOne({shoeShelfId}, props).lean();
+        const movies = await Movie.find(filter, props).lean();
+        return res.status(200).json(movies);
+    } catch (error) {
+        console.log(parseErrorMessage(error))
+        return res.status(400).json(parseErrorMessage(error));
+    }
+});
 
 moviesRouter.get('/:movieId', isAuth, async (req, res) => {
     const {movieId} = req.params;
