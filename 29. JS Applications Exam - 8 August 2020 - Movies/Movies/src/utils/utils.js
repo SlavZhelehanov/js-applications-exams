@@ -2,6 +2,7 @@ import { render } from "../lib/lit-html.min.js";
 import page from "../lib/page.mjs";
 
 const item = "userData";
+let notificationTimeout;
 
 export function saveUserData(data) {
     sessionStorage.setItem(item, JSON.stringify(data));
@@ -54,4 +55,28 @@ export function guardRoute(status) {
         if ((status === 'user' && isUser) || (status === 'guest' && !isUser)) next();
         else page.redirect('/');
     };
+}
+
+function showNotification(type, message, delay = 3000) {
+    const notification = document.getElementById(`${type}Notification`);
+    const messageBox = document.getElementById(`${type}Box`);
+
+    clearTimeout(notificationTimeout);
+
+    document.querySelectorAll(".notifications").forEach(el => { el.style.display = "none"; });
+
+    messageBox.textContent = message;
+    notification.style.display = "block";
+
+    notificationTimeout = setTimeout(() => {
+        notification.style.display = "none";
+    }, delay);
+}
+
+export function showError(message, delay = 3000) {
+    showNotification("error", message, delay);
+}
+
+export function showSuccess(message, delay = 3000) {
+    showNotification("success", message, delay);
 }
