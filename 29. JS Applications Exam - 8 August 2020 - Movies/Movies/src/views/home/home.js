@@ -1,5 +1,5 @@
 import { html } from "../../lib/lit-html.min.js";
-import { getUserData } from "../../utils/utils.js";
+import { getUserData, showError } from "../../utils/utils.js";
 import { get, post } from "../../utils/api.js";
 
 function template({ onSearch, data, isAuth }) {
@@ -63,7 +63,7 @@ export async function homePage(ctx) {
             e.target.reset();
             ctx.render(template({ isAuth, data, onSearch }));
         } catch (err) {
-            alert(err.message || err);
+            showError(err.message || err);
         }
     }
 
@@ -71,7 +71,7 @@ export async function homePage(ctx) {
         try {
             data = await get(`/app`);
         } catch (err) {
-            alert(err.message || err);
+            showError(err.message || err);
         }
     }
 
