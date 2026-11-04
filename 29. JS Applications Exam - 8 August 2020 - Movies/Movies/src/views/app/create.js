@@ -1,5 +1,6 @@
 import { html } from "../../lib/lit-html.min.js";
 import { post } from "../../utils/api.js";
+import { showError, showSuccess } from "../../utils/utils.js";
 
 function template(onCreate) {
     return html`<form class="text-center border border-light p-5" @submit=${onCreate} method="post">
@@ -31,14 +32,15 @@ export async function createPage(ctx) {
             description: formData.get('description').trim(),
         }
 
-        if (Object.values(item).some((x) => !x)) return alert("All fields are required!");
+        if (Object.values(item).some((x) => !x)) return showError("All fields are required!");
 
         try {
             await post("/app", item);
+            showSuccess("Created successfully!");
             e.target.reset();
             ctx.page.redirect('/');
         } catch (err) {
-            alert(err.message || err);
+            showError(err.message || err);
         }
     }
 
