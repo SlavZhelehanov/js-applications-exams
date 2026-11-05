@@ -1,5 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get, put } from "../../utils/api.js";
+import { showError, showSuccess } from '../../utils/utils.js';
 
 function template({ onEdit, item }) {
     return html`<form class="text-center border border-light p-5" @submit=${onEdit} method="post">
@@ -34,9 +35,10 @@ export async function editPage(ctx) {
             imageUrl: formData.get('imageUrl').trim()
         }
 
-        if (Object.values(newItem).some((x) => !x)) return alert("All fields are required!");
+        if (Object.values(newItem).some((x) => !x)) return showError("All fields are required!");
 
         await put(`/app/${id}`, newItem);
+        showSuccess("Eddited successfully");
         e.target.reset();
         ctx.page.redirect(`/${id}/details`);
     }
@@ -44,7 +46,7 @@ export async function editPage(ctx) {
     try {
         item = await get(`/app/${id}`);
     } catch (err) {
-        alert(err.message || err);
+        showError(err.message || err);
     }
 
     ctx.render(template({ item, onEdit }));
