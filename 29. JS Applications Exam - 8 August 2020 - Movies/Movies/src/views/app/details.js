@@ -1,6 +1,6 @@
 import { html } from '../../lib/lit-html.min.js';
 import { get, put, del } from "../../utils/api.js";
-import { getUserData } from '../../utils/utils.js';
+import { getUserData, showError, showSuccess } from '../../utils/utils.js';
 
 function template({ onDelete, onLike, canLike, creator, item }) {
     return html`
@@ -32,9 +32,10 @@ export async function detailsPage(ctx) {
     async function onLike() {
         try {
             await put(`/app/${id}/like`, { movieId: id });
+            showSuccess("Liked successfully");
             ctx.page.redirect(`/${id}/details`);
         } catch (error) {
-            alert(error.message || error);
+            showError(error.message || error);
         }
     }
 
