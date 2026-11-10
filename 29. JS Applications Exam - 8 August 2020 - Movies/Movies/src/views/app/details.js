@@ -45,9 +45,10 @@ export async function detailsPage(ctx) {
         if (choice) {
             try {
                 await del(`/app/${id}`);
+                showSuccess("Deleted successfully");
                 ctx.page.redirect('/');
             } catch (err) {
-                alert(err.message || err);
+                showError(err.message || err);
             }
         }
     }
@@ -57,7 +58,7 @@ export async function detailsPage(ctx) {
         creator = userId === item.creator;
         canLike = userId && !creator ? !item?.likedFrom?.some(usr => usr === userId) : false;
     } catch (err) {
-        alert(err.message || err);
+        showError(err.message || err);
     }
 
     ctx.render(template({ item, creator, canLike, onLike, onDelete }));
